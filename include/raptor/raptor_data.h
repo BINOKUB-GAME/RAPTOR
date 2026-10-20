@@ -1,12 +1,17 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : include/raptor/raptor_data.h
- * RÉVISION        : Rev 1.0
+ * RÉVISION        : Rev 1.1
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : Modèle de données universel et conteneur de rapport
  *                   agnostique. Définit les structures tabulaires, cartes
  *                   de métriques, alertes et sections consommées par les
  *                   moteurs de restitution (CLI, HTML, GUI ImGui/Raylib).
+ *
+ * NOUVELLES INTÉGRATIONS (Rev 1.1) :
+ *   - Déclaration de raptor_data_context_clear() permettant de réinitialiser
+ *     les sections et métriques d'un contexte sans détruire son conteneur
+ *     racine, indispensable pour les audits itératifs en direct dans l'UI.
  *
  * LISTE DES FONCTIONS DÉCLARÉES :
  *   1. raptor_data_context_create
@@ -17,7 +22,8 @@
  *   6. raptor_data_alert_add
  *   7. raptor_data_get_section_count
  *   8. raptor_data_get_section
- *   9. raptor_data_context_destroy
+ *   9. raptor_data_context_clear
+ *  10. raptor_data_context_destroy
  * ============================================================================
  */
 
@@ -158,7 +164,13 @@ size_t raptor_data_get_section_count(const RaptorReportContext* ctx);
 const RaptorSection* raptor_data_get_section(const RaptorReportContext* ctx, size_t index);
 
 /**
- * 9. Libère récursivement l'ensemble de la mémoire allouée au contexte.
+ * 9. Réinitialise et libère l'intégralité des sections et métriques d'un contexte
+ *    sans détruire son enveloppe racine (prépare un audit ultérieur).
+ */
+void raptor_data_context_clear(RaptorReportContext* ctx);
+
+/**
+ * 10. Libère récursivement l'ensemble de la mémoire allouée au contexte et le conteneur.
  */
 void raptor_data_context_destroy(RaptorReportContext* ctx);
 

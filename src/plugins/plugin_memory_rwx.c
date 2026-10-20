@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : src/plugins/plugin_memory_rwx.c
- * RÉVISION        : Rev 1.7
+ * RÉVISION        : Rev 1.8
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : Greffon d'audit mémoire et processus sous Linux (/proc).
  *                   Inspecte les cartographies mémoire des processus (/proc/[PID]/maps)
@@ -11,10 +11,10 @@
  *                   du système, extrait et trie en temps réel le Top 10 des
  *                   consommateurs de mémoire et isole les réelles anomalies.
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.7) :
- *   - Élimination définitive de la charge CPU de repli (échantillonnage 20ms au T0).
- *   - Ajout de la table "INSPECTION GLOBALE DES PROCESSUS" couvrant tous les
- *     processus réels pour la barre de recherche interactive de l'UI.
+ * NOUVELLES INTÉGRATIONS (Rev 1.8) :
+ *   - Remplacement de strncpy par des copies bornées memcpy avec terminaison
+ *     nulle explicite dans proc_mem_read_stats et proc_mem_run_audit.
+ *   - Suppression définitive de l'avertissement GCC -Wstringop-truncation.
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
  *   1. proc_mem_is_trusted_path
@@ -216,8 +216,13 @@ static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len,
     if (bytes_read > 0) {
         out_exe[bytes_read] = '\0';
     } else {
-        strncpy(out_exe, "[système/restreint]", exe_len - 1);
-        out_exe[exe_len - 1] = '\0';
+        const char* def_sys = "[système/restreint]";
+        size_t slen = strlen(def_sys);
+        if (slen >= exe_len) {
+            slen = exe_len - 1;
+        }
+        memcpy(out_exe, def_sys, slen);
+        out_exe[slen] = '\0';
     }
 
     char status_path[64];
@@ -240,7 +245,13 @@ static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len,
     if (out_comm[0] == '\0') {
         if (out_exe[0] != '\0' && strcmp(out_exe, "[système/restreint]") != 0) {
             const char* slash = strrchr(out_exe, '/');
-            strncpy(out_comm, slash ? (slash + 1) : out_exe, comm_len - 1);
+            const char* src_comm = slash ? (slash + 1) : out_exe;
+            size_t clen = strlen(src_comm);
+            if (clen >= comm_len) {
+                clen = comm_len - 1;
+            }
+            memcpy(out_comm, src_comm, clen);
+            out_comm[clen] = '\0';
         } else {
             snprintf(out_comm, comm_len, "proc_%u", pid);
         }
@@ -402,10 +413,21 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
 
         if (sort_count < sort_cap) {
             sort_list[sort_count].pid = pid;
-            strncpy(sort_list[sort_count].comm, comm, sizeof(sort_list[sort_count].comm) - 1);
-            sort_list[sort_count].comm[sizeof(sort_list[sort_count].comm) - 1] = '\0';
-            strncpy(sort_list[sort_count].exe, exe, sizeof(sort_list[sort_count].exe) - 1);
-            sort_list[sort_count].exe[sizeof(sort_list[sort_count].exe) - 1] = '\0';
+
+            size_t c_len = strlen(comm);
+            if (c_len >= sizeof(sort_list[sort_count].comm)) {
+                c_len = sizeof(sort_list[sort_count].comm) - 1;
+            }
+            memcpy(sort_list[sort_count].comm, comm, c_len);
+            sort_list[sort_count].comm[c_len] = '\0';
+
+            size_t e_len = strlen(exe);
+            if (e_len >= sizeof(sort_list[sort_count].exe)) {
+                e_len = sizeof(sort_list[sort_count].exe) - 1;
+            }
+            memcpy(sort_list[sort_count].exe, exe, e_len);
+            sort_list[sort_count].exe[e_len] = '\0';
+
             sort_list[sort_count].rss = rss;
             sort_list[sort_count].is_threat = is_suspicious;
             sort_count++;
