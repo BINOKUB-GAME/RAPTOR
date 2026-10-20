@@ -1,0 +1,23 @@
+mkdir -p RAPTOR/assets/icons \
+         RAPTOR/include/raptor \
+         RAPTOR/src/core \
+         RAPTOR/src/plugins \
+         RAPTOR/src/report \
+         RAPTOR/src/ui \
+         RAPTOR/build && \
+touch RAPTOR/CMakeLists.txt \
+      RAPTOR/include/raptor/raptor_data.h \
+      RAPTOR/include/raptor/raptor_plugin.h \
+      RAPTOR/include/raptor/raptor_registry.h \
+      RAPTOR/include/raptor/raptor_differential.h \
+      RAPTOR/include/raptor/raptor_report.h \
+      RAPTOR/src/main.c \
+      RAPTOR/src/core/raptor_data.c \
+      RAPTOR/src/core/raptor_registry.c \
+      RAPTOR/src/core/raptor_differential.c \
+      RAPTOR/src/plugins/plugin_memory_rwx.c \
+      RAPTOR/src/plugins/plugin_network_sockets.c \
+      RAPTOR/src/report/report_cli.c \
+      RAPTOR/src/report/report_html.c \
+      RAPTOR/src/ui/ui_engine.c \
+      RAPTOR/src/ui/ui_views.c
