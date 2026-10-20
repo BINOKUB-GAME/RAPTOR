@@ -1,0 +1,82 @@
+# ==============================================================================
+# FICHIER         : .gitignore
+# PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
+# RESPONSABILITÉ  : Exclusion des artéfacts de compilation, dépendances externes,
+#                   fichiers d'environnement et rapports d'audit générés en local.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. DOSSIERS ET ARTÉFACTS DE COMPILATION (CMAKE / GCC / CLANG / MSVC)
+# ------------------------------------------------------------------------------
+build/
+build_*/
+cmake-build-*/
+bin/
+obj/
+out/
+_deps/
+
+# Fichiers internes CMake générés
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+CTestTestfile.cmake
+*.cmake.in
+*.ninja
+.ninja_*
+
+# ------------------------------------------------------------------------------
+# 2. BINAIRES COMPILÉS, OBJETS ET BIBLIOTHÈQUES
+# ------------------------------------------------------------------------------
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+
+# Exécutable RAPTOR généré
+raptor
+raptor.exe
+
+# ------------------------------------------------------------------------------
+# 3. RAPPORTS D'AUDIT LOCAUX & LOGS ÉPHÉMÈRES
+# ------------------------------------------------------------------------------
+raptor_report.html
+raptor_report.txt
+audit_raptor.html
+audit_raptor.txt
+*.log
+
+# ------------------------------------------------------------------------------
+# 4. CONFIGURATIONS D'ÉDITEURS & ENVIRONNEMENTS DE DÉVELOPPEMENT (IDE)
+# ------------------------------------------------------------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+*.patch
+
+# ------------------------------------------------------------------------------
+# 5. FICHIERS SYSTÈME PARASITES (LINUX, WINDOWS, MACOS)
+# ------------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ------------------------------------------------------------------------------
+# 6. EXCEPTIONS EXPLICITES (RESSOURCES DU DÉPÔT À CONSERVER STRICTEMENT)
+# ------------------------------------------------------------------------------
+!assets/
+!assets/icons/
+!assets/icons/*.png
+!assets/fonts/
+!assets/fonts/*.ttf
