@@ -74,6 +74,7 @@ set(RAPTOR_CORE_SOURCES
 set(RAPTOR_REPORT_SOURCES
     src/report/report_cli.c
     src/report/report_html.c
+    src/report/report_audit_log.c
 )
 
 # Architecture modulaire de l'interface graphique (découpage par rôle)

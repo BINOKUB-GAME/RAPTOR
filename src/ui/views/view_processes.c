@@ -1,21 +1,17 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : src/ui/views/view_processes.c
- * RÉVISION        : Rev 1.0
+ * RÉVISION        : Rev 1.3
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : Vue dédiée [ 02 ] Processus & RAM de l'interface graphique.
  *                   Affiche la liste complète des processus actifs du système,
- *                   gère la barre de filtrage/recherche textuelle en temps réel,
- *                   permet la sélection d'une cible et propose la neutralisation
- *                   sécurisée avec test de vivacité et ré-audit automatique.
+ *                   gère la recherche interactive, et orchestre la neutralisation
+ *                   sécurisée avec capture forensique pré-kill, consignation
+ *                   automatique dans AUDIT.TXT et libération du cache de traque.
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.0) :
- *   - Découpage modulaire : extraction complète de la gestion des processus.
- *   - Variables d'état de saisie (filtre, focus, PID sélectionné) confinées en interne.
- *   - Test de vivacité en direct (kill(pid, 0)) évitant d'afficher le bouton
- *     d'arrêt sur un processus déjà inactif.
- *   - Séquence d'arrêt durcie (SIGTERM avec bascule automatique sur SIGKILL).
- *   - Ré-audit automatique instantané (raptor_registry_run_all) à la neutralisation.
+ * NOUVELLES INTÉGRATIONS (Rev 1.3) :
+ *   - Appel de raptor_audit_log_forget_pid() post-neutralisation permettant
+ *     d'immédiatement journaliser un nouvel audit si le malware réapparaît.
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
  *   1. ui_view_processes_draw
@@ -23,6 +19,7 @@
  */
 
 #include "../ui_common.h"
+#include "raptor/raptor_audit_log.h"
 #include <time.h>
 
 #if defined(__linux__) || defined(__unix__)
@@ -205,23 +202,46 @@ void ui_view_processes_draw(RaptorReportContext* ctx) {
             ui_draw_text(kill_btn_label, btn_kill.x + 10.0f, btn_kill.y + 6.0f, 11.0f, COL_TEXT_WHITE);
 
             if (hover_kill && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                int target_pid = s_selected_proc_pid;
+
+                /* ÉTAPE A : Capture forensique immédiate AVANT la mort du processus */
+                RaptorIncidentDetail incident;
+                raptor_audit_log_capture_target(target_pid, &incident);
+
 #if defined(__linux__) || defined(__unix__)
-                kill((pid_t)s_selected_proc_pid, SIGTERM);
+                /* ÉTAPE B : Signalisation et neutralisation */
+                kill((pid_t)target_pid, SIGTERM);
                 usleep(30000);
-                if (kill((pid_t)s_selected_proc_pid, 0) == 0) {
-                    kill((pid_t)s_selected_proc_pid, SIGKILL);
-                    usleep(10000);
+                if (kill((pid_t)target_pid, 0) == 0) {
+                    kill((pid_t)target_pid, SIGKILL);
+                    usleep(30000);
                 }
+                usleep(20000);
+
+                /* ÉTAPE C : Horodatage de fin et consignation sur disque dans AUDIT.TXT */
+                time_t now = time(NULL);
+                struct tm* tm_now = localtime(&now);
+                if (tm_now) {
+                    strftime(incident.kill_time, sizeof(incident.kill_time), "%H:%M:%S", tm_now);
+                } else {
+                    snprintf(incident.kill_time, sizeof(incident.kill_time), "Indisponible");
+                }
+
+                raptor_audit_log_commit(&incident, "NEUTRALISATION ADMINISTRATIVE RÉUSSIE");
+                raptor_audit_log_forget_pid(target_pid);
+
                 snprintf(s_action_feedback, sizeof(s_action_feedback),
-                         "Processus PID %d neutralisé et retiré du système.", s_selected_proc_pid);
+                         "PID %d neutralisé. Preuve consignée dans AUDIT.TXT.", target_pid);
 #else
                 snprintf(s_action_feedback, sizeof(s_action_feedback),
-                         "Intervention exécutée pour le PID %d.", s_selected_proc_pid);
+                         "Intervention exécutée pour le PID %d.", target_pid);
 #endif
                 s_selected_proc_pid = -1;
 
-                /* Ré-audit automatique instantané */
+                /* ÉTAPE D : Ré-audit dynamique avec purge préalable */
+                raptor_data_context_clear(ctx);
                 raptor_registry_run_all(ctx);
+
                 time_t n = time(NULL);
                 struct tm* tm_i = localtime(&n);
                 if (tm_i) {
@@ -236,7 +256,6 @@ void ui_view_processes_draw(RaptorReportContext* ctx) {
                              btn_kill.x + kb_w + 16.0f, bottom_y + 4.0f, 11.0f, COL_TEXT_MUTED);
             }
         } else {
-            /* Processus déjà inactif : affichage de confirmation sans bouton rouge */
             char dead_label[64];
             snprintf(dead_label, sizeof(dead_label), "[ PROCESSUS DÉJÀ TERMINÉ (PID %d) ]", s_selected_proc_pid);
             float db_w = ui_measure_text(dead_label, 11.0f) + 20.0f;
