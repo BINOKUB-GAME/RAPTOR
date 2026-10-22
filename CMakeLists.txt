@@ -1,13 +1,14 @@
 # ==============================================================================
 # NOM DU SCRIPT   : CMakeLists.txt
-# RÉVISION        : Rev 1.3
+# RÉVISION        : Rev 1.4
 # PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
 # RESPONSABILITÉ  : Configuration générale du système de construction CMake.
 #                   - Cible C99 avec extensions GNU (Linux/POSIX) et standard Windows.
 #                   - Définition par défaut du profil de build Release (-O3).
 #                   - Neutralisation des avertissements de dépréciation de Raylib.
 #                   - Intégration autonome de Raylib via FetchContent.
-#                   - Intégration modulaire de l'UI et des 4 greffons système.
+#                   - Intégration modulaire de l'UI et des 5 greffons système.
+#                   - Intégration du greffon souverain Net-Guard (plugin_net_guard.c).
 #                   - Assemblage de l'exécutable unifié 'raptor'.
 # ==============================================================================
 
@@ -106,6 +107,7 @@ if(UNIX)
         src/plugins/plugin_network_sockets.c
         src/plugins/plugin_heuristics_expert.c
         src/plugins/plugin_anomaly_engine.c
+        src/plugins/plugin_net_guard.c
     )
     add_compile_definitions(RAPTOR_PLATFORM_LINUX=1)
 elseif(WIN32)
@@ -156,12 +158,12 @@ elseif(WIN32)
     )
 endif()
 
-# Copie automatique des assets vers le dossier de build
+# Copie automatique des assets vers le dossier de build (icônes et règles .conf)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
     add_custom_command(TARGET raptor POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/assets
         $<TARGET_FILE_DIR:raptor>/assets
-        COMMENT "Copie des ressources visuelles (assets/icons) dans le dossier binaire..."
+        COMMENT "Synchronisation des ressources et des regles (assets/rules) vers le binaire..."
     )
 endif()
