@@ -1,17 +1,17 @@
 /* ==============================================================================
  * NOM DU SCRIPT : plugin_net_guard.c
- * NUMÉRO DE RÉVISION : Rev 2.2
+ * NUMÉRO DE RÉVISION : Rev 2.7
  * BLOC DESCRIPTIF DES INTÉGRATIONS :
  *   - Implémentation du greffon défensif autonome RAPTOR NET-GUARD.
  *   - Analyse passive et temps réel des connexions actives (IPv4 / TCP / UDP).
  *   - Moteur lexical de détection de combosquatting et usurpation de marques.
  *   - Filtrage binaire d'adresses IP avec masques CIDR et gestion de ports.
  *   - Parsing tolérant et assainissement automatique des registres .conf.
- *   - Sérialisation canonique et persistance locale dans fw_custom.conf.
- *   - Procédure de mise à jour atomique via curl sans dépendance réseau lourde.
+ *   - Résolution dynamique de chemin d'accès (dépôt Git racine vs dossier build).
+ *   - Comparateur différentiel binaire (Diff) anti-cache avec GitHub.
+ *   - Module de résolution DNS inverse asynchrone multithread (pthread) avec cache.
+ *   - Raccordement au greffon Section 12 (plugin_asn_intel) pour combler les PTR absents.
  *   - Enregistrement automatique par constructeur GCC sur le bus RaptorPlugin.
- *   - Correctifs de conformité : garde conditionnelle sur _GNU_SOURCE et
- *     suppression de la variable inutilisée test_reg (-Wall -Wextra propre).
  * 
  * LISTE NUMÉROTÉE DES FONCTIONS :
  *   58. net_guard_trim
@@ -25,7 +25,8 @@
  *   66. net_guard_run_audit
  *   67. net_guard_cleanup
  *   68. net_guard_register
- *   [Utilitaire] net_guard_update_official_rules
+ *   69. net_guard_update_official_rules
+ *   70. net_guard_resolve_ip_async
  * ============================================================================== */
 
 #ifndef _GNU_SOURCE
@@ -41,23 +42,63 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/stat.h>
+#include <time.h>
+#include <pthread.h>
+#include <netdb.h>
+#include <sys/socket.h>
 
 #include "raptor/raptor_net_guard.h"
+#include "raptor/raptor_asn_intel.h"
 #include "raptor/raptor_plugin.h"
 #include "raptor/raptor_registry.h"
 #include "raptor/raptor_data.h"
 
-/* -----------------------------------------------------------------------------
- * ÉTAT GLOBAL ET INSTANCE DU REGISTRE EN MÉMOIRE VIVE
- * ----------------------------------------------------------------------------- */
 static NetGuardRegistry g_registry = {0};
 
 static const char* DEFAULT_DOM_KEYWORDS = 
     "login,connexion,auth,verify,securite,compte,verification,update,client,facture";
 
-/* Prototypes internes */
+/* -----------------------------------------------------------------------------
+ * CACHE DNS ASYNCHRONE ET STRUCTURE MULTITHREAD
+ * ----------------------------------------------------------------------------- */
+#define NET_GUARD_DNS_CACHE_MAX 128
+
+typedef struct {
+    char ip[NET_GUARD_STR_SM];
+    char hostname[NET_GUARD_STR_LG];
+    bool resolved;
+    bool in_progress;
+} NetGuardDnsEntry;
+
+static NetGuardDnsEntry g_dns_cache[NET_GUARD_DNS_CACHE_MAX];
+static size_t g_dns_cache_count = 0;
+static pthread_mutex_t g_dns_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 static void net_guard_str_to_lower(char* str);
 static bool net_guard_parse_net_file(const char* filepath, const char* proto, RaptorTable* table, size_t* out_crit, size_t* out_appr);
+
+/* -----------------------------------------------------------------------------
+ * UTILITAIRES DE RÉSOLUTION DE CHEMIN D'ACCÈS
+ * ----------------------------------------------------------------------------- */
+static const char* net_guard_get_official_path(void) {
+    if (access("assets/rules/fw_officiel.conf", F_OK) == 0) {
+        return "assets/rules/fw_officiel.conf";
+    }
+    if (access("../assets/rules/fw_officiel.conf", F_OK) == 0) {
+        return "../assets/rules/fw_officiel.conf";
+    }
+    return RAPTOR_FILE_RULES_OFFICIAL;
+}
+
+static const char* net_guard_get_custom_path(void) {
+    if (access("assets/rules/fw_custom.conf", F_OK) == 0) {
+        return "assets/rules/fw_custom.conf";
+    }
+    if (access("../assets/rules/fw_custom.conf", F_OK) == 0) {
+        return "../assets/rules/fw_custom.conf";
+    }
+    return RAPTOR_FILE_RULES_CUSTOM;
+}
 
 /* ==============================================================================
  * 58. net_guard_trim
@@ -82,7 +123,6 @@ char* net_guard_trim(char* str) {
     return str;
 }
 
-/* Fonction utilitaire interne : conversion minuscule */
 static void net_guard_str_to_lower(char* str) {
     if (!str) return;
     for (size_t i = 0; str[i] != '\0'; i++) {
@@ -251,8 +291,8 @@ bool net_guard_load_file(const char* filepath, bool is_custom_source) {
 bool net_guard_init(void) {
     memset(&g_registry, 0, sizeof(NetGuardRegistry));
 
-    net_guard_load_file(RAPTOR_FILE_RULES_OFFICIAL, false);
-    net_guard_load_file(RAPTOR_FILE_RULES_CUSTOM, true);
+    net_guard_load_file(net_guard_get_official_path(), false);
+    net_guard_load_file(net_guard_get_custom_path(), true);
 
     g_registry.is_initialized = true;
     return true;
@@ -264,7 +304,8 @@ bool net_guard_init(void) {
 bool net_guard_add_custom_rule(NetGuardRuleType type, const char* target, const char* param, const char* desc) {
     if (!target || !param) return false;
 
-    FILE* fp = fopen(RAPTOR_FILE_RULES_CUSTOM, "a+");
+    const char* custom_path = net_guard_get_custom_path();
+    FILE* fp = fopen(custom_path, "a+");
     if (!fp) return false;
 
     if (type == NET_GUARD_TYPE_DOM) {
@@ -288,7 +329,8 @@ bool net_guard_remove_rule(NetGuardRuleType type, size_t index) {
     if (type == NET_GUARD_TYPE_DOM && index >= g_registry.dom_count) return false;
     if (type == NET_GUARD_TYPE_IP && index >= g_registry.ip_count) return false;
 
-    FILE* fp = fopen(RAPTOR_FILE_RULES_CUSTOM, "w");
+    const char* custom_path = net_guard_get_custom_path();
+    FILE* fp = fopen(custom_path, "w");
     if (!fp) return false;
 
     fprintf(fp, "# ==============================================================================\n");
@@ -425,7 +467,6 @@ NetGuardVerdict net_guard_match_ip(const char* remote_ip, uint16_t port, char* o
     return NET_MATCH_NONE;
 }
 
-/* Décodage d'adresse hexadécimale issue de /proc/net/ */
 static void net_guard_decode_hex(const char* hex_ip, uint32_t hex_port, char* out_ip, size_t ip_len, uint16_t* out_port) {
     uint32_t ip_val = 0;
     sscanf(hex_ip, "%X", &ip_val);
@@ -436,7 +477,6 @@ static void net_guard_decode_hex(const char* hex_ip, uint32_t hex_port, char* ou
     *out_port = (uint16_t)hex_port;
 }
 
-/* Analyse d'un fichier noyau /proc/net/tcp ou /proc/net/udp */
 static bool net_guard_parse_net_file(const char* filepath, const char* proto, RaptorTable* table, size_t* out_crit, size_t* out_appr) {
     FILE* fp = fopen(filepath, "r");
     if (!fp) return false;
@@ -561,45 +601,210 @@ bool net_guard_run_audit(RaptorReportContext* ctx) {
  * ============================================================================== */
 void net_guard_cleanup(void) {
     memset(&g_registry, 0, sizeof(NetGuardRegistry));
+    pthread_mutex_lock(&g_dns_mutex);
+    g_dns_cache_count = 0;
+    pthread_mutex_unlock(&g_dns_mutex);
 }
 
-/* ==============================================================================
- * Utilitaire : net_guard_update_official_rules
- * ============================================================================== */
-bool net_guard_update_official_rules(void) {
-    char cmd[512];
-    snprintf(cmd, sizeof(cmd), "curl -s -f -m 10 \"%s\" -o \"%s\"",
-             RAPTOR_OFFICIAL_RULES_URL, RAPTOR_FILE_RULES_TMP);
-
-    int res = system(cmd);
-    if (res != 0) {
-        unlink(RAPTOR_FILE_RULES_TMP);
+/* Comparateur binaire d'identité de fichier */
+static bool net_guard_files_are_identical(const char* file_a, const char* file_b) {
+    FILE* fa = fopen(file_a, "rb");
+    FILE* fb = fopen(file_b, "rb");
+    if (!fa || !fb) {
+        if (fa) fclose(fa);
+        if (fb) fclose(fb);
         return false;
     }
 
-    FILE* fp = fopen(RAPTOR_FILE_RULES_TMP, "r");
-    if (!fp) return false;
+    bool identical = true;
+    char buf_a[512];
+    char buf_b[512];
 
-    char line[128];
+    while (1) {
+        size_t ra = fread(buf_a, 1, sizeof(buf_a), fa);
+        size_t rb = fread(buf_b, 1, sizeof(buf_b), fb);
+
+        if (ra != rb || memcmp(buf_a, buf_b, ra) != 0) {
+            identical = false;
+            break;
+        }
+        if (ra == 0) break;
+    }
+
+    fclose(fa);
+    fclose(fb);
+    return identical;
+}
+
+static int net_guard_count_rules_in_file(const char* filepath) {
+    FILE* fp = fopen(filepath, "r");
+    if (!fp) return 0;
+
+    int count = 0;
+    char line[512];
+    while (fgets(line, sizeof(line), fp)) {
+        char* p = net_guard_trim(line);
+        if (*p == '#' || *p == '\0') continue;
+        if (strncasecmp(p, "DOM", 3) == 0 || strncasecmp(p, "IP", 2) == 0) {
+            count++;
+        }
+    }
+    fclose(fp);
+    return count;
+}
+
+/* ==============================================================================
+ * 69. net_guard_update_official_rules
+ * ============================================================================== */
+NetGuardUpdateStatus net_guard_update_official_rules(int* out_added_lines) {
+    if (out_added_lines) *out_added_lines = 0;
+
+    const char* target_official = net_guard_get_official_path();
+
+    char tmp_file[512];
+    snprintf(tmp_file, sizeof(tmp_file), "%s.tmp", target_official);
+
+    long now = (long)time(NULL);
+    char cmd[768];
+    snprintf(cmd, sizeof(cmd),
+             "curl -s -f -m 10 -H \"Cache-Control: no-cache\" -H \"Pragma: no-cache\" \"%s?nocache=%ld\" -o \"%s\"",
+             RAPTOR_OFFICIAL_RULES_URL, now, tmp_file);
+
+    int res = system(cmd);
+    if (res != 0) {
+        unlink(tmp_file);
+        return NET_UPDATE_ERROR;
+    }
+
+    FILE* fp = fopen(tmp_file, "r");
+    if (!fp) return NET_UPDATE_ERROR;
+
+    char line[256];
     bool header_valid = false;
-    if (fgets(line, sizeof(line), fp)) {
+    int lines_checked = 0;
+    while (fgets(line, sizeof(line), fp) && lines_checked < 10) {
         if (strstr(line, "RAPTOR NET-GUARD") != NULL) {
             header_valid = true;
+            break;
         }
+        lines_checked++;
     }
     fclose(fp);
 
     if (!header_valid) {
-        unlink(RAPTOR_FILE_RULES_TMP);
-        return false;
+        unlink(tmp_file);
+        return NET_UPDATE_ERROR;
     }
 
-    if (rename(RAPTOR_FILE_RULES_TMP, RAPTOR_FILE_RULES_OFFICIAL) != 0) {
-        unlink(RAPTOR_FILE_RULES_TMP);
-        return false;
+    if (net_guard_files_are_identical(tmp_file, target_official)) {
+        unlink(tmp_file);
+        return NET_UPDATE_NO_CHANGE;
     }
 
-    return net_guard_init();
+    int old_count = net_guard_count_rules_in_file(target_official);
+    int new_count = net_guard_count_rules_in_file(tmp_file);
+    int added = new_count - old_count;
+    if (added < 0) added = 0;
+
+    if (rename(tmp_file, target_official) != 0) {
+        unlink(tmp_file);
+        return NET_UPDATE_ERROR;
+    }
+
+    if (!net_guard_init()) {
+        return NET_UPDATE_ERROR;
+    }
+
+    if (out_added_lines) *out_added_lines = added;
+    return NET_UPDATE_SUCCESS;
+}
+
+/* -----------------------------------------------------------------------------
+ * WORKER THREAD DE RÉSOLUTION DNS INVERSE ET ÉVALUATION ASN
+ * ----------------------------------------------------------------------------- */
+static void* net_guard_dns_worker(void* arg) {
+    char* target_ip = (char*)arg;
+    if (!target_ip) return NULL;
+
+    char resolved_name[NET_GUARD_STR_LG] = {0};
+
+    struct sockaddr_in sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = AF_INET;
+
+    if (inet_pton(AF_INET, target_ip, &sa.sin_addr) == 1) {
+        char host[NI_MAXHOST] = {0};
+        if (getnameinfo((struct sockaddr*)&sa, sizeof(sa), host, sizeof(host), NULL, 0, NI_NAMEREQD) == 0) {
+            snprintf(resolved_name, sizeof(resolved_name), "%s", host);
+        } else {
+            uint32_t ip_h = ntohl(sa.sin_addr.s_addr);
+            if ((ip_h >= 0xC0A80000 && ip_h <= 0xC0A8FFFF) ||  /* 192.168.0.0/16 */
+                (ip_h >= 0x0A000000 && ip_h <= 0x0AFFFFFF) ||  /* 10.0.0.0/8 */
+                (ip_h >= 0xAC100000 && ip_h <= 0xAC1FFFFF)) {  /* 172.16.0.0/12 */
+                snprintf(resolved_name, sizeof(resolved_name), "Hôte Réseau Local (LAN Privé)");
+            } else {
+                /* Élimination définitive du vide : cascade table_static.conf -> BGP */
+                asn_intel_lookup(target_ip, resolved_name, sizeof(resolved_name));
+            }
+        }
+    }
+
+    pthread_mutex_lock(&g_dns_mutex);
+    for (size_t i = 0; i < g_dns_cache_count; i++) {
+        if (strcmp(g_dns_cache[i].ip, target_ip) == 0) {
+            snprintf(g_dns_cache[i].hostname, sizeof(g_dns_cache[i].hostname), "%s", resolved_name);
+            g_dns_cache[i].resolved = true;
+            g_dns_cache[i].in_progress = false;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&g_dns_mutex);
+
+    free(target_ip);
+    return NULL;
+}
+
+/* ==============================================================================
+ * 70. net_guard_resolve_ip_async
+ * ============================================================================== */
+bool net_guard_resolve_ip_async(const char* ip_str, char* out_host, size_t out_sz) {
+    if (!ip_str || !out_host || out_sz == 0) return false;
+
+    pthread_mutex_lock(&g_dns_mutex);
+
+    for (size_t i = 0; i < g_dns_cache_count; i++) {
+        if (strcmp(g_dns_cache[i].ip, ip_str) == 0) {
+            if (g_dns_cache[i].resolved) {
+                snprintf(out_host, out_sz, "%s", g_dns_cache[i].hostname);
+                pthread_mutex_unlock(&g_dns_mutex);
+                return true;
+            } else {
+                snprintf(out_host, out_sz, "Résolution DNS en cours...");
+                pthread_mutex_unlock(&g_dns_mutex);
+                return false;
+            }
+        }
+    }
+
+    if (g_dns_cache_count < NET_GUARD_DNS_CACHE_MAX) {
+        size_t idx = g_dns_cache_count++;
+        snprintf(g_dns_cache[idx].ip, sizeof(g_dns_cache[idx].ip), "%s", ip_str);
+        g_dns_cache[idx].resolved = false;
+        g_dns_cache[idx].in_progress = true;
+
+        pthread_t th;
+        char* ip_copy = strdup(ip_str);
+        if (pthread_create(&th, NULL, net_guard_dns_worker, ip_copy) == 0) {
+            pthread_detach(th);
+        } else {
+            free(ip_copy);
+            g_dns_cache[idx].in_progress = false;
+        }
+    }
+
+    pthread_mutex_unlock(&g_dns_mutex);
+    snprintf(out_host, out_sz, "Résolution DNS en cours...");
+    return false;
 }
 
 /* -----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : src/ui/ui_common.h
- * RÉVISION        : Rev 1.0
+ * RÉVISION        : Rev 1.1
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : En-tête commun d'architecture pour l'interface Raylib.
  *                   Définit la palette graphique officielle Cyber Dark/Teal,
@@ -9,11 +9,8 @@
  *                   les variables d'état d'interface partagées et les signatures
  *                   des modules spécialisés (ressources, layout, vues et modale).
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.0) :
- *   - Découpage modulaire : point d'ancrage unique pour tous les sous-composants UI.
- *   - Centralisation des couleurs officielles (thème sombre défensif).
- *   - Déclaration des fonctions d'assistance typographique et d'interrogation du contexte.
- *   - Déclaration des prototypes des 5 vues métier, du layout et de la modale.
+ * NOUVELLES INTÉGRATIONS (Rev 1.1) :
+ *   - Déclaration des fonctions 15 et 16 pour le composant ui_tooltip.c.
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES PROTOTYPES ET COMPOSANTS :
  *   1. ui_draw_text
@@ -30,6 +27,8 @@
  *  12. ui_view_diff_draw
  *  13. ui_view_ai_draw
  *  14. ui_modal_guide_draw
+ *  15. ui_tooltip_trigger
+ *  16. ui_tooltip_draw
  * ============================================================================
  */
 
@@ -124,6 +123,12 @@ void ui_view_ai_draw(const RaptorReportContext* ctx);
 /* BOÎTE MODALE DU GUIDE ANALYTIQUE (src/ui/modals/modal_guide.c)            */
 /* ------------------------------------------------------------------------- */
 void ui_modal_guide_draw(void);
+
+/* ------------------------------------------------------------------------- */
+/* COMPOSANT D'INFOBULLE UNIVERSELLE (src/ui/ui_tooltip.c)                  */
+/* ------------------------------------------------------------------------- */
+void ui_tooltip_trigger(Vector2 mouse_pos, const char* line1, const char* line2, const char* line3, Color line3_col);
+void ui_tooltip_draw(void);
 
 #ifdef __cplusplus
 }

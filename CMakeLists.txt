@@ -1,14 +1,14 @@
 # ==============================================================================
 # NOM DU SCRIPT   : CMakeLists.txt
-# RÉVISION        : Rev 1.4
+# RÉVISION        : Rev 1.5
 # PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
 # RESPONSABILITÉ  : Configuration générale du système de construction CMake.
 #                   - Cible C99 avec extensions GNU (Linux/POSIX) et standard Windows.
 #                   - Définition par défaut du profil de build Release (-O3).
 #                   - Neutralisation des avertissements de dépréciation de Raylib.
 #                   - Intégration autonome de Raylib via FetchContent.
-#                   - Intégration modulaire de l'UI et des 5 greffons système.
-#                   - Intégration du greffon souverain Net-Guard (plugin_net_guard.c).
+#                   - Intégration modulaire de l'UI et des 6 greffons système.
+#                   - Intégration de Net-Guard et de Net-Intel (plugin_asn_intel.c).
 #                   - Assemblage de l'exécutable unifié 'raptor'.
 # ==============================================================================
 
@@ -23,7 +23,6 @@ project(raptor
     LANGUAGES C
 )
 
-# Profil Release par défaut si aucun n'est spécifié (résout le warning Raylib et active -O3)
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Type de build sélectionné" FORCE)
 endif()
@@ -48,7 +47,6 @@ include_directories(
 # ------------------------------------------------------------------------------
 include(FetchContent)
 
-# Neutralise les avertissements de dépréciation internes à la recette CMake de Raylib
 set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
@@ -60,7 +58,6 @@ FetchContent_Declare(
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(raylib)
 
-# Réactivation du contrôle des dépréciations pour notre propre code
 set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
 
 # ------------------------------------------------------------------------------
@@ -78,7 +75,6 @@ set(RAPTOR_REPORT_SOURCES
     src/report/report_audit_log.c
 )
 
-# Architecture modulaire de l'interface graphique (découpage par rôle)
 set(RAPTOR_UI_SOURCES
     src/ui/ui_engine.c
     src/ui/ui_resources.c
@@ -90,6 +86,7 @@ set(RAPTOR_UI_SOURCES
     src/ui/views/view_diff.c
     src/ui/views/view_ai.c
     src/ui/modals/modal_guide.c
+    src/ui/ui_tooltip.c
 )
 
 set(RAPTOR_MAIN_SOURCE
@@ -108,6 +105,7 @@ if(UNIX)
         src/plugins/plugin_heuristics_expert.c
         src/plugins/plugin_anomaly_engine.c
         src/plugins/plugin_net_guard.c
+        src/plugins/plugin_asn_intel.c
     )
     add_compile_definitions(RAPTOR_PLATFORM_LINUX=1)
 elseif(WIN32)
@@ -131,7 +129,6 @@ target_include_directories(raptor PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
 )
 
-# Options strictes limitées à notre code (sans polluer Raylib)
 if(MSVC)
     target_compile_options(raptor PRIVATE /W4 /utf-8)
 else()
@@ -155,15 +152,5 @@ elseif(WIN32)
         gdi32
         user32
         shell32
-    )
-endif()
-
-# Copie automatique des assets vers le dossier de build (icônes et règles .conf)
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
-    add_custom_command(TARGET raptor POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_SOURCE_DIR}/assets
-        $<TARGET_FILE_DIR:raptor>/assets
-        COMMENT "Synchronisation des ressources et des regles (assets/rules) vers le binaire..."
     )
 endif()

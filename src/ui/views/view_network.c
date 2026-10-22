@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : src/ui/views/view_network.c
- * RÉVISION        : Rev 2.1
+ * RÉVISION        : Rev 2.7
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : Vue dédiée [ 03 ] Sockets & Réseau de l'interface graphique.
  *                   - Visualisation passive des flux TCP/UDP ouverts.
@@ -9,20 +9,19 @@
  *                   - Qualification en temps réel des flux distants (APPROUVÉ / HOSTILE).
  *                   - Abattage chirurgical des processus malveillants via SIGKILL.
  *                   - Boîte modale ergonomique de création de règles (fw_custom.conf).
- *                   - Synchronisation atomique du registre officiel via GitHub (curl).
+ *                   - Boîte de dialogue modale de confirmation pour la synchronisation.
+ *                   - Appel du composant modulaire ui_tooltip pour les résolutions DNS.
  *
- * NOUVELLES INTÉGRATIONS (Rev 2.1) :
- *   - Réalignement complet des 7 colonnes du tableau réseau pour éliminer
- *     toute collision visuelle entre le PID/Processus, le Proto et l'adresse IP.
- *   - Troncature défensive du libellé de processus à 25 caractères max.
- *   - Suppression du caractère Unicode non reconnu '⟳' remplacé par du texte pur.
- *   - Dimensionnement du tampon disp_urls pour neutraliser l'avertissement -Wformat-truncation.
+ * NOUVELLES INTÉGRATIONS (Rev 2.7) :
+ *   - Réalignement épuré de l'en-tête de colonne : "Adresse Distante".
+ *   - Suppression de tout code redondant d'infobulle : délégation à ui_tooltip.c.
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
  *   1. ui_view_network_draw_btn
  *   2. ui_view_network_handle_typing
  *   3. ui_view_network_draw_modal
- *   4. ui_view_network_draw
+ *   4. ui_view_network_draw_dialog
+ *   5. ui_view_network_draw
  * ============================================================================
  */
 
@@ -31,27 +30,23 @@
 #include <signal.h>
 #include <ctype.h>
 
-/* ------------------------------------------------------------------------- */
-/* ÉTAT INTERNE DE LA MODALE ET DU GESTIONNAIRE DE SAISIE                     */
-/* ------------------------------------------------------------------------- */
 static bool s_modal_open = false;
-static int  s_rule_mode = 0;        /* 0: Marque / DOM, 1: Adresse IP */
-static int  s_active_field = 0;     /* Index du champ actuellement sélectionné */
+static int  s_rule_mode = 0;
+static int  s_active_field = 0;
 
-/* Tampons de saisie pour le mode DOM */
 static char s_dom_brand[NET_GUARD_STR_SM] = {0};
 static char s_dom_urls[NET_GUARD_STR_LG]  = {0};
 static char s_dom_desc[NET_GUARD_STR_MD]  = {0};
 
-/* Tampons de saisie pour le mode IP */
 static char s_ip_target[NET_GUARD_STR_SM] = {0};
-static int  s_ip_status = 0;        /* 0: HOSTILE, 1: APPROUVÉ */
+static int  s_ip_status = 0;
 static char s_ip_desc[NET_GUARD_STR_MD]   = {0};
 
-/* Notification contextuelle (Toast) */
-static char  s_toast_msg[128] = {0};
-static float s_toast_timer = 0.0f;
-static Color s_toast_color = { 0, 230, 118, 255 };
+/* Dialogue modal de notification */
+static bool  s_dialog_open = false;
+static char  s_dialog_title[64] = {0};
+static char  s_dialog_msg[256] = {0};
+static Color s_dialog_color = { 0, 230, 118, 255 };
 
 /* ------------------------------------------------------------------------- */
 /* 1. ASSISTANCE AU RENDU DES BOUTONS INTERACTIFS                            */
@@ -98,7 +93,7 @@ static void ui_view_network_handle_typing(char* buffer, size_t max_len) {
 }
 
 /* ------------------------------------------------------------------------- */
-/* 3. RENDU ET ORCHESTRATION DE LA BOÎTE MODALE D'AJOUT DE RÈGLE             */
+/* 3. RENDU DE LA MODALE D'AJOUT DE RÈGLE DANS FW_CUSTOM.CONF                */
 /* ------------------------------------------------------------------------- */
 static void ui_view_network_draw_modal(int screen_w, int screen_h) {
     DrawRectangle(0, 0, screen_w, screen_h, (Color){ 4, 8, 14, 215 });
@@ -237,7 +232,6 @@ static void ui_view_network_draw_modal(int screen_w, int screen_h) {
                      f3_rec.x + 8.0f, f3_rec.y + 6.0f, 11.0f, (strlen(s_ip_desc) > 0) ? COL_TEXT_WHITE : COL_TEXT_MUTED);
     }
 
-    /* Actions de validation */
     Rectangle btn_save   = { modal_x + 376.0f, modal_y + modal_h - 48.0f, 220.0f, 30.0f };
     Rectangle btn_cancel = { modal_x + 24.0f, modal_y + modal_h - 48.0f, 140.0f, 30.0f };
 
@@ -253,9 +247,12 @@ static void ui_view_network_draw_modal(int screen_w, int screen_h) {
             if (strlen(s_dom_brand) > 0 && strlen(s_dom_urls) > 0) {
                 net_guard_add_custom_rule(NET_GUARD_TYPE_DOM, s_dom_brand, s_dom_urls, s_dom_desc);
                 s_modal_open = false;
-                snprintf(s_toast_msg, sizeof(s_toast_msg), "Règle de protection '%s' enregistrée dans fw_custom.conf.", s_dom_brand);
-                s_toast_color = COL_GREEN_OK;
-                s_toast_timer = 4.0f;
+                
+                snprintf(s_dialog_title, sizeof(s_dialog_title), "RÈGLE ENREGISTRÉE");
+                snprintf(s_dialog_msg, sizeof(s_dialog_msg), "Règle '%s' ajoutée dans fw_custom.conf.", s_dom_brand);
+                s_dialog_color = COL_GREEN_OK;
+                s_dialog_open = true;
+
                 s_dom_brand[0] = '\0';
                 s_dom_urls[0] = '\0';
                 s_dom_desc[0] = '\0';
@@ -267,9 +264,12 @@ static void ui_view_network_draw_modal(int screen_w, int screen_h) {
                 const char* st_text = (s_ip_status == 0) ? "HOSTILE" : "APPROUVÉ";
                 net_guard_add_custom_rule(NET_GUARD_TYPE_IP, s_ip_target, st_text, s_ip_desc);
                 s_modal_open = false;
-                snprintf(s_toast_msg, sizeof(s_toast_msg), "Règle IP '%s' [%s] enregistrée dans fw_custom.conf.", s_ip_target, st_text);
-                s_toast_color = COL_GREEN_OK;
-                s_toast_timer = 4.0f;
+
+                snprintf(s_dialog_title, sizeof(s_dialog_title), "RÈGLE IP ENREGISTRÉE");
+                snprintf(s_dialog_msg, sizeof(s_dialog_msg), "Cible '%s' [%s] ajoutée dans fw_custom.conf.", s_ip_target, st_text);
+                s_dialog_color = COL_GREEN_OK;
+                s_dialog_open = true;
+
                 s_ip_target[0] = '\0';
                 s_ip_desc[0] = '\0';
             }
@@ -278,14 +278,39 @@ static void ui_view_network_draw_modal(int screen_w, int screen_h) {
 }
 
 /* ------------------------------------------------------------------------- */
-/* 4. RENDU PRINCIPAL DE LA VUE RÉSEAU & RWX [ 03 ]                          */
+/* 4. RENDU DU DIALOGUE MODAL DE STATUT                                      */
+/* ------------------------------------------------------------------------- */
+static void ui_view_network_draw_dialog(int screen_w, int screen_h) {
+    DrawRectangle(0, 0, screen_w, screen_h, (Color){ 3, 6, 10, 220 });
+
+    float dlg_w = 480.0f;
+    float dlg_h = 180.0f;
+    float dlg_x = ((float)screen_w - dlg_w) * 0.5f;
+    float dlg_y = ((float)screen_h - dlg_h) * 0.5f;
+
+    DrawRectangle((int)dlg_x, (int)dlg_y, (int)dlg_w, (int)dlg_h, COL_PANEL_BG);
+    DrawRectangleLinesEx((Rectangle){ dlg_x, dlg_y, dlg_w, dlg_h }, 1.5f, s_dialog_color);
+
+    DrawRectangle((int)dlg_x, (int)dlg_y, (int)dlg_w, 4, s_dialog_color);
+    ui_draw_text(s_dialog_title, dlg_x + 24.0f, dlg_y + 22.0f, 13.0f, s_dialog_color);
+
+    ui_draw_text(s_dialog_msg, dlg_x + 24.0f, dlg_y + 60.0f, 12.0f, COL_TEXT_WHITE);
+
+    Rectangle btn_ack = { dlg_x + (dlg_w - 180.0f) * 0.5f, dlg_y + dlg_h - 44.0f, 180.0f, 28.0f };
+    if (ui_view_network_draw_btn(btn_ack, "COMPRIS", COL_CARD_BG, COL_BLUE_BTN, COL_TEXT_WHITE) ||
+        IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_SPACE)) {
+        s_dialog_open = false;
+    }
+}
+
+/* ------------------------------------------------------------------------- */
+/* 5. RENDU PRINCIPAL DE LA VUE RÉSEAU & RWX [ 03 ]                          */
 /* ------------------------------------------------------------------------- */
 void ui_view_network_draw(const RaptorReportContext* ctx) {
     int screen_w = GetScreenWidth();
     int screen_h = GetScreenHeight();
     float content_y = 102.0f;
 
-    /* 1. En-tête de section */
     if (g_icon_network.id > 0) {
         DrawTexturePro(g_icon_network,
                        (Rectangle){0, 0, (float)g_icon_network.width, (float)g_icon_network.height},
@@ -298,21 +323,28 @@ void ui_view_network_draw(const RaptorReportContext* ctx) {
     ui_draw_text("SÉCURITÉ RÉSEAU & CONTRÔLE SOUVERAIN (NET-GUARD / RWX)", 68.0f, content_y + 6.0f, 13.0f, COL_CYAN_ACCENT);
     ui_draw_text("Analyse en direct des sockets ouverts, détection anti-phishing et traque d'injections mémoire.", 68.0f, content_y + 26.0f, 11.0f, COL_TEXT_MUTED);
 
-    /* Boutons d'actions rapides (texte ASCII standard) */
     Rectangle btn_update_rec = { (float)screen_w - 410.0f, content_y + 8.0f, 198.0f, 28.0f };
     Rectangle btn_add_rec    = { (float)screen_w - 200.0f, content_y + 8.0f, 184.0f, 28.0f };
 
-    if (!s_modal_open) {
+    if (!s_modal_open && !s_dialog_open) {
         if (ui_view_network_draw_btn(btn_update_rec, "SYNCHRONISER REGISTRE", COL_CARD_BG, COL_BLUE_BTN, COL_TEXT_WHITE)) {
-            if (net_guard_update_official_rules()) {
-                snprintf(s_toast_msg, sizeof(s_toast_msg), "Registre fw_officiel.conf mis à jour avec succès depuis GitHub !");
-                s_toast_color = COL_GREEN_OK;
-                s_toast_timer = 4.0f;
+            int added_lines = 0;
+            NetGuardUpdateStatus status = net_guard_update_official_rules(&added_lines);
+
+            if (status == NET_UPDATE_NO_CHANGE) {
+                snprintf(s_dialog_title, sizeof(s_dialog_title), "SYNCHRONISATION REGISTRE");
+                snprintf(s_dialog_msg, sizeof(s_dialog_msg), "FW_OFFICIEL.CONF A JOUR: RIEN A FAIRE");
+                s_dialog_color = (Color){ 0, 180, 230, 255 };
+            } else if (status == NET_UPDATE_SUCCESS) {
+                snprintf(s_dialog_title, sizeof(s_dialog_title), "SYNCHRONISATION REGISTRE");
+                snprintf(s_dialog_msg, sizeof(s_dialog_msg), "%d LIGNE A ETE AJOUTÉ..", added_lines);
+                s_dialog_color = COL_GREEN_OK;
             } else {
-                snprintf(s_toast_msg, sizeof(s_toast_msg), "Échec de synchronisation (Vérifiez l'accès Internet ou curl).");
-                s_toast_color = COL_CRIT_RED;
-                s_toast_timer = 4.0f;
+                snprintf(s_dialog_title, sizeof(s_dialog_title), "ERREUR SYNCHRONISATION");
+                snprintf(s_dialog_msg, sizeof(s_dialog_msg), "Échec de récupération du fichier officiel distant.");
+                s_dialog_color = COL_CRIT_RED;
             }
+            s_dialog_open = true;
         }
 
         if (ui_view_network_draw_btn(btn_add_rec, "+ NOUVELLE RÈGLE", COL_BLUE_BTN, COL_BLUE_HOVER, COL_TEXT_WHITE)) {
@@ -321,15 +353,6 @@ void ui_view_network_draw(const RaptorReportContext* ctx) {
         }
     }
 
-    /* Notification Toast */
-    if (s_toast_timer > 0.0f) {
-        s_toast_timer -= GetFrameTime();
-        DrawRectangle(16, (int)(content_y + 48.0f), screen_w - 32, 20, (Color){ 10, 20, 30, 240 });
-        DrawRectangleLines(16, (int)(content_y + 48.0f), screen_w - 32, 20, s_toast_color);
-        ui_draw_text(s_toast_msg, 24.0f, content_y + 52.0f, 10.0f, s_toast_color);
-    }
-
-    /* 2. Tableau des flux réseau actifs et évaluation EDR */
     const RaptorTable* net_tbl = ui_find_table(ctx, "sec_network", "Flux");
     size_t net_count = net_tbl ? net_tbl->row_count : 0;
 
@@ -343,16 +366,7 @@ void ui_view_network_draw(const RaptorReportContext* ctx) {
     float tbl_w = (float)screen_w - 32.0f;
     float row_h = 24.0f;
 
-    /*
-     * ÉCHELLE D'ALIGNEMENT DES COLONNES (LARGEUR TOTALE OPTIMISÉE) :
-     * Col 1 - PID / Processus : X = 24.0f   (largeur ~210px)
-     * Col 2 - Proto           : X = 240.0f  (largeur ~60px)
-     * Col 3 - Adresse Locale  : X = 310.0f  (largeur ~170px)
-     * Col 4 - Adresse Distante: X = 485.0f  (largeur ~180px)
-     * Col 5 - État            : X = 675.0f  (largeur ~105px)
-     * Col 6 - Statut EDR      : X = 785.0f  (largeur ~145px)
-     * Col 7 - Action          : X = 940.0f
-     */
+    /* En-tête de tableau propre : aucun débordement de texte */
     DrawRectangle(16, (int)tbl_y, (int)tbl_w, (int)row_h, (Color){ 16, 26, 42, 255 });
     DrawRectangleLines(16, (int)tbl_y, (int)tbl_w, (int)row_h, COL_BORDER);
 
@@ -364,7 +378,9 @@ void ui_view_network_draw(const RaptorReportContext* ctx) {
     ui_draw_text("Statut Net-Guard", 785.0f, tbl_y + 5.0f, 11.0f, COL_TEXT_MUTED);
     ui_draw_text("Action Défensive", 940.0f, tbl_y + 5.0f, 11.0f, COL_TEXT_MUTED);
 
+    Vector2 mouse = GetMousePosition();
     size_t draw_net_limit = (net_tbl && net_tbl->row_count < 8) ? net_tbl->row_count : 8;
+
     for (size_t r = 0; r < 8; ++r) {
         float ry = tbl_y + row_h + ((float)r * row_h);
 
@@ -375,7 +391,6 @@ void ui_view_network_draw(const RaptorReportContext* ctx) {
             const char* rem_addr = net_tbl->rows[r].cell_texts[3];
             const char* st       = net_tbl->rows[r].cell_texts[4];
 
-            /* Troncature de sécurité si le nom du binaire est volumineux */
             char pid_disp[32];
             strncpy(pid_disp, pid_raw, sizeof(pid_disp) - 1);
             pid_disp[sizeof(pid_disp) - 1] = '\0';
@@ -386,7 +401,6 @@ void ui_view_network_draw(const RaptorReportContext* ctx) {
                 pid_disp[25] = '\0';
             }
 
-            /* Évaluation Net-Guard */
             char ip_copy[64] = {0};
             uint16_t port_val = 0;
             strncpy(ip_copy, rem_addr, sizeof(ip_copy) - 1);
@@ -410,20 +424,44 @@ void ui_view_network_draw(const RaptorReportContext* ctx) {
             ui_draw_text(pid_disp, 24.0f, ry + 5.0f, 11.0f, (verdict == NET_MATCH_CRITICAL) ? COL_CRIT_RED : COL_TEXT_MUTED);
             ui_draw_text(proto, 240.0f, ry + 5.0f, 11.0f, COL_TEXT_WHITE);
             ui_draw_text(loc_addr, 310.0f, ry + 5.0f, 11.0f, COL_TEXT_WHITE);
-            ui_draw_text(rem_addr, 485.0f, ry + 5.0f, 11.0f, (verdict == NET_MATCH_CRITICAL) ? COL_CRIT_RED : COL_TEXT_WHITE);
+
+            /* Survol sur l'adresse distante : déclenchement du composant universel */
+            Rectangle rec_ip = { 480.0f, ry, 185.0f, row_h };
+            bool ip_hovered = CheckCollisionPointRec(mouse, rec_ip);
+
+            if (ip_hovered && !s_modal_open && !s_dialog_open) {
+                DrawRectangleRec(rec_ip, (Color){ 0, 119, 204, 60 });
+                DrawRectangleLinesEx(rec_ip, 1.0f, COL_CYAN_ACCENT);
+
+                char ep_buf[128];
+                char host_buf[NET_GUARD_STR_LG];
+                char full_host[NET_GUARD_STR_LG + 32];
+                char line_edr[NET_GUARD_STR_LG + 32];
+
+                snprintf(ep_buf, sizeof(ep_buf), "CONNEXION : %s (%s)", rem_addr, proto);
+                net_guard_resolve_ip_async(ip_copy, host_buf, sizeof(host_buf));
+                snprintf(full_host, sizeof(full_host), "HÔTE DNS  : %s", host_buf);
+                snprintf(line_edr, sizeof(line_edr), "SÉCURITÉ  : %s", (strlen(reason) > 0) ? reason : "Aucune anomalie détectée");
+
+                ui_tooltip_trigger(mouse, ep_buf, full_host, line_edr, (Color){ 255, 204, 0, 255 });
+            }
+
+            ui_draw_text(rem_addr, 485.0f, ry + 5.0f, 11.0f, 
+                         ip_hovered ? COL_CYAN_ACCENT : ((verdict == NET_MATCH_CRITICAL) ? COL_CRIT_RED : COL_TEXT_WHITE));
             ui_draw_text(st, 675.0f, ry + 5.0f, 11.0f, strcmp(st, "ESTABLISHED") == 0 ? COL_GREEN_OK : COL_TEXT_WHITE);
 
             if (verdict == NET_MATCH_CRITICAL) {
                 ui_draw_text("HOSTILE (ALERTE)", 785.0f, ry + 5.0f, 11.0f, COL_CRIT_RED);
 
                 Rectangle btn_kill = { 930.0f, ry + 2.0f, 115.0f, row_h - 4.0f };
-                if (!s_modal_open && ui_view_network_draw_btn(btn_kill, "NEUTRALISER", COL_CRIT_RED, (Color){ 255, 60, 90, 255 }, WHITE)) {
+                if (!s_modal_open && !s_dialog_open && ui_view_network_draw_btn(btn_kill, "NEUTRALISER", COL_CRIT_RED, (Color){ 255, 60, 90, 255 }, WHITE)) {
                     int target_pid = 0;
                     if (sscanf(pid_raw, "PID %d", &target_pid) == 1 && target_pid > 1) {
                         kill(target_pid, SIGKILL);
-                        snprintf(s_toast_msg, sizeof(s_toast_msg), "Processus PID %d neutralisé chirurgicalement (SIGKILL) !", target_pid);
-                        s_toast_color = COL_CRIT_RED;
-                        s_toast_timer = 4.0f;
+                        snprintf(s_dialog_title, sizeof(s_dialog_title), "PROCESSUS NEUTRALISÉ");
+                        snprintf(s_dialog_msg, sizeof(s_dialog_msg), "Le processus PID %d a été abattu (SIGKILL).", target_pid);
+                        s_dialog_color = COL_CRIT_RED;
+                        s_dialog_open = true;
                     }
                 }
             } else if (verdict == NET_MATCH_APPROVED) {
@@ -446,7 +484,6 @@ void ui_view_network_draw(const RaptorReportContext* ctx) {
         }
     }
 
-    /* 3. Tableau RWX / Anomalies */
     float rwx_y = tbl_y + (9.0f * row_h) + 20.0f;
     ui_draw_text("Processus avec mémoire exécutable non officielle (RWX) :", 16.0f, rwx_y, 12.0f, (Color){ 255, 187, 0, 255 });
 
@@ -481,8 +518,12 @@ void ui_view_network_draw(const RaptorReportContext* ctx) {
         ui_draw_text("• Aucune injection détectée.", 24.0f, rwx_ry + 10.0f, 12.0f, COL_GREEN_OK);
     }
 
-    /* 4. Rendu de la modale active */
+    /* Rendu des calques prioritaires : modale, dialogue ou infobulle */
     if (s_modal_open) {
         ui_view_network_draw_modal(screen_w, screen_h);
+    } else if (s_dialog_open) {
+        ui_view_network_draw_dialog(screen_w, screen_h);
+    } else {
+        ui_tooltip_draw();
     }
 }
