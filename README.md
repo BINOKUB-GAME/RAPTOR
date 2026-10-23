@@ -179,3 +179,4 @@ Dépôt du code source : BINOKUB-GAME/RAPTOR
 
 📄 Licence & Souveraineté
 Le projet RAPTOR est distribué sous licence open-source. Il garantit une totale souveraineté logicielle : zéro transmission de télémétrie, fonctionnement autonome hors-ligne et neutralité stricte vis-à-vis des écosystèmes d'analyse cloud tiers.
+

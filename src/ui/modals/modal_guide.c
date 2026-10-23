@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : src/ui/modals/modal_guide.c
- * RÉVISION        : Rev 1.1
+ * RÉVISION        : Rev 1.2
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : Boîte de dialogue modale du Guide Analytique de RAPTOR.
  *                   Affiche l'écran d'aide contextuel en superposition avec
@@ -9,11 +9,12 @@
  *                   et système d'accordéon interactif détaillant le fonctionnement
  *                   des sondes d'audit et des greffons défensifs.
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.1) :
- *   - Intégration du volet Net-Guard (anti-combosquatting et registres de filtrage).
- *   - Intégration du volet Net-Intel / ASN (Section 12, CDN et table_static.conf).
- *   - Documentation explicative des binaires fantômes en RAM (étiquette deleted).
- *   - Passage à 6 volets d'accordéon avec ajustement dynamique des dimensions.
+ * NOUVELLES INTÉGRATIONS (Rev 1.2) :
+ *   - Intégration du volet Forensique Avancé (Section 13 : traque mémoire anonyme R-X
+ *     consécutive aux bascules mprotect() clandestines et analyse Inode 0).
+ *   - Enrichissement du volet Cahier Différentiel avec la traque des mutations dynamiques.
+ *   - Passage de 6 à 7 volets d'accordéon interactifs avec recalibrage vertical (mh = 560 px).
+ *   - Maintien du volet Net-Guard (anti-combosquatting) et Net-Intel (CDN / BGP / table_static).
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
  *   1. ui_modal_guide_draw
@@ -41,7 +42,7 @@ void ui_modal_guide_draw(void) {
 
     /* 2. Cadre central de la modale */
     float mw = 880.0f;
-    float mh = 530.0f;
+    float mh = 560.0f;
     float mx = ((float)screen_w - mw) / 2.0f;
     float my = ((float)screen_h - mh) / 2.0f;
 
@@ -65,18 +66,19 @@ void ui_modal_guide_draw(void) {
 
     ui_draw_text("COMPRENDRE LE FONCTIONNEMENT DU DIAGNOSTIC SOUVERAIN", mx + 16.0f, my + 44.0f, 12.0f, COL_CYAN_ACCENT);
 
-    /* 4. Liste des volets de l'accordéon analytique */
-    const char* items[6] = {
+    /* 4. Liste des 7 volets de l'accordéon analytique */
+    const char* items[7] = {
         "1. Mémoire Vive, Détection de Fuites & Binaires Fantômes (deleted)",
         "2. Net-Guard Défensif, Anti-Usurpation & Registres de Flux",
         "3. Net-Intel : Résolution ASN / BGP & Table Statique des CDN",
         "4. Intrusions Mémoire & Signatures d'Attaque (RWX)",
-        "5. Cahier de Bord & Moteur Différentiel (T-1 vs T0)",
-        "6. Moteur d'IA Locale (Rapport d'Audit Souverain)"
+        "5. Forensique Avancé : Traque Mémoire Anonyme R-X (Section 13)",
+        "6. Cahier de Bord & Moteur Différentiel (T-1 vs T0)",
+        "7. Moteur d'IA Locale (Rapport d'Audit Souverain)"
     };
 
     float cur_y = my + 68.0f;
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 7; ++i) {
         Rectangle item_rec = { mx + 16.0f, cur_y, mw - 32.0f, 26.0f };
         bool hover_item = CheckCollisionPointRec(mouse, item_rec);
 
@@ -142,18 +144,31 @@ void ui_modal_guide_draw(void) {
                 ui_draw_text("Tout processus hôte compromis peut être abattu immédiatement depuis la vue réseau.",
                              body_rec.x + 14.0f, body_rec.y + 76.0f, 11.0f, COL_CRIT_RED);
             } else if (i == 4) {
+                ui_draw_text("•  Contournement mprotect() : Neutralise les ruses où le code bascule de RW- (écriture) à R-X (exécution).",
+                             body_rec.x + 14.0f, body_rec.y + 10.0f, 11.0f, COL_TEXT_WHITE);
+                ui_draw_text("•  Analyse Inode 0 (Sans Ancrage Disque) : Isole tout segment exécutable orphelin de fichier physique.",
+                             body_rec.x + 14.0f, body_rec.y + 30.0f, 11.0f, (Color){ 255, 187, 0, 255 });
+                ui_draw_text("•  Filtrage Heuristique JIT : Exclut les moteurs légitimes (Chromium, Firefox) et segments système ([vdso]).",
+                             body_rec.x + 14.0f, body_rec.y + 50.0f, 11.0f, COL_TEXT_MUTED);
+                ui_draw_text("•  Signalement Forensique : Achemine l'anomalie en direct vers le Cahier Différentiel pour figer la preuve à T0.",
+                             body_rec.x + 14.0f, body_rec.y + 70.0f, 11.0f, COL_CYAN_ACCENT);
+                ui_draw_text("Permet de démasquer les ordinateurs zombies et les botnets sans binaire disque persistant.",
+                             body_rec.x + 14.0f, body_rec.y + 88.0f, 11.0f, COL_GREEN_OK);
+            } else if (i == 5) {
                 ui_draw_text("•  Différentiel Temporel : Compare l'empreinte mémoire actuelle (T0) avec le cycle précédent (T-1).",
                              body_rec.x + 14.0f, body_rec.y + 12.0f, 11.0f, COL_TEXT_WHITE);
                 ui_draw_text("•  Dérive en Mo/min : Calcule la vitesse d'expansion de la mémoire pour anticiper les saturations OOM.",
                              body_rec.x + 14.0f, body_rec.y + 36.0f, 11.0f, COL_TEXT_WHITE);
-                ui_draw_text("Isole les processus silencieux dont l'activité augmente subitement en tâche de fond.",
+                ui_draw_text("•  Journal Forensique des Mutations : Consigne les alertes critiques (mutations R-X et processus éphémères).",
                              body_rec.x + 14.0f, body_rec.y + 60.0f, 11.0f, COL_TEXT_MUTED);
+                ui_draw_text("Permet d'isoler les activités clandestines même si le processus s'est éteint entre deux audits.",
+                             body_rec.x + 14.0f, body_rec.y + 82.0f, 11.0f, COL_CYAN_ACCENT);
             } else {
                 ui_draw_text("•  Moteur d'Audit Souverain : Traduit les métriques techniques complexes en synthèse compréhensible.",
                              body_rec.x + 14.0f, body_rec.y + 12.0f, 11.0f, COL_TEXT_WHITE);
                 ui_draw_text("•  Confidentialité Absolue : Analyse 100 % locale, sans appel d'API distante ni fuite de télémétrie.",
                              body_rec.x + 14.0f, body_rec.y + 36.0f, 11.0f, COL_TEXT_WHITE);
-                ui_draw_text("Délivre des recommandations précises sur les processus énergivores et les flux suspects.",
+                ui_draw_text("Délivre des recommandations précises sur les processus énergivores, les flux et les anomalies mémoire.",
                              body_rec.x + 14.0f, body_rec.y + 60.0f, 11.0f, COL_TEXT_MUTED);
             }
 

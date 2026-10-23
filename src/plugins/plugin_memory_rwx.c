@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : src/plugins/plugin_memory_rwx.c
- * RÉVISION        : Rev 1.8
+ * RÉVISION        : Rev 1.10
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : Greffon d'audit mémoire et processus sous Linux (/proc).
  *                   Inspecte les cartographies mémoire des processus (/proc/[PID]/maps)
@@ -11,10 +11,10 @@
  *                   du système, extrait et trie en temps réel le Top 10 des
  *                   consommateurs de mémoire et isole les réelles anomalies.
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.8) :
- *   - Remplacement de strncpy par des copies bornées memcpy avec terminaison
- *     nulle explicite dans proc_mem_read_stats et proc_mem_run_audit.
- *   - Suppression définitive de l'avertissement GCC -Wstringop-truncation.
+ * NOUVELLES INTÉGRATIONS (Rev 1.10) :
+ *   - Transmission conjointe de comm et exe à mem_stealth_scan_maps_anon_rx.
+ *   - Neutralisation des faux positifs sur xed et les outils Mint/Cinnamon.
+ *   - Qualification stricte de l'étiquette "MUTATION R-X" dans le rapport.
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
  *   1. proc_mem_is_trusted_path
@@ -29,6 +29,7 @@
 #include "raptor/raptor_plugin.h"
 #include "raptor/raptor_registry.h"
 #include "raptor/raptor_data.h"
+#include "../core/mem_stealth.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,6 +49,7 @@ typedef struct {
     char exe[512];
     uint64_t rss;
     bool is_threat;
+    char threat_status[32];
 } ProcSortEntry;
 
 /* ------------------------------------------------------------------------- */
@@ -98,7 +100,7 @@ static bool proc_mem_is_legit_jit(const char* comm, const char* exe) {
         "cinnamon", "csd-", "gnome", "xed", "libffi", "luajit",
         "ibus", "muffin", "gio", "dconf", "gvfs", "pipewire",
         "wireplumber", "pulseaudio", "lightdm", "mariadb",
-        "flameshot", "github-desktop", "github", "qt",
+        "flameshot", "github-desktop", "github", "qt", "mint",
         NULL
     };
 
@@ -393,11 +395,15 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
         bool is_rwx_threat = proc_mem_scan_maps_rwx(pid, jit, trusted);
         bool is_deleted = (strstr(exe, "(deleted)") != NULL);
 
+        /* Section 13 : Traque de mémoire anonyme R-X avec validation conjointe comm + exe */
+        StealthEvent stealth_ev;
+        bool is_anon_rx = mem_stealth_scan_maps_anon_rx((pid_t)pid, comm, exe, &stealth_ev);
+
         if (strcmp(exe, "[système/restreint]") == 0) {
             trusted = true;
         }
 
-        bool is_suspicious = (!trusted) || is_rwx_threat || is_deleted;
+        bool is_suspicious = (!trusted) || is_rwx_threat || is_deleted || is_anon_rx;
         if (is_suspicious) {
             threats_count++;
         }
@@ -430,6 +436,21 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
 
             sort_list[sort_count].rss = rss;
             sort_list[sort_count].is_threat = is_suspicious;
+
+            /* Qualification précise */
+            if (is_anon_rx) {
+                strncpy(sort_list[sort_count].threat_status, "MUTATION R-X", sizeof(sort_list[sort_count].threat_status) - 1);
+            } else if (is_rwx_threat) {
+                strncpy(sort_list[sort_count].threat_status, "INJECTION RWX", sizeof(sort_list[sort_count].threat_status) - 1);
+            } else if (is_deleted) {
+                strncpy(sort_list[sort_count].threat_status, "BINAIRE SUPPRIMÉ", sizeof(sort_list[sort_count].threat_status) - 1);
+            } else if (!trusted) {
+                strncpy(sort_list[sort_count].threat_status, "NON OFFICIEL", sizeof(sort_list[sort_count].threat_status) - 1);
+            } else {
+                strncpy(sort_list[sort_count].threat_status, "CONFORME", sizeof(sort_list[sort_count].threat_status) - 1);
+            }
+            sort_list[sort_count].threat_status[sizeof(sort_list[sort_count].threat_status) - 1] = '\0';
+
             sort_count++;
         }
     }
@@ -493,7 +514,7 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
                 char r_str[32];
                 snprintf(r_str, sizeof(r_str), "%llu Mo", (unsigned long long)(sort_list[i].rss / (1024 * 1024)));
 
-                const char* cells[6] = { p_str, sort_list[i].comm, r_str, "0 Mo", "NON OFFICIEL", sort_list[i].exe };
+                const char* cells[6] = { p_str, sort_list[i].comm, r_str, "0 Mo", sort_list[i].threat_status, sort_list[i].exe };
                 const RaptorSeverity sevs[6] = { RAPTOR_SEV_WARNING, RAPTOR_SEV_CRITICAL, RAPTOR_SEV_INFO, RAPTOR_SEV_INFO, RAPTOR_SEV_CRITICAL, RAPTOR_SEV_CRITICAL };
                 raptor_data_table_row_add(tbl_anomalies, cells, sevs);
             }
@@ -530,7 +551,7 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
         raptor_data_table_row_add(tbl_anomalies, clean_cells, clean_sevs);
     }
 
-    /* 3. INSPECTION GLOBALE DES PROCESSUS (POUR RECHERCHE DYNAMIQUE DANS L'UI) */
+    /* 3. INSPECTION GLOBALE DES PROCESSUS */
     const char* col_all[] = { "PID", "Nom du Processus", "RAM (RSS)", "Statut Dérive", "Emplacement Binaire" };
     RaptorTable* tbl_all = raptor_data_table_create(sec, "INSPECTION GLOBALE DES PROCESSUS", 5, col_all);
     for (size_t i = 0; i < sort_count && tbl_all; ++i) {
