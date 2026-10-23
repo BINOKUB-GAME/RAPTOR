@@ -378,7 +378,7 @@ Une fois le processus arrêté, cliquez sur **`[ LANCER UN NOUVEL AUDIT IMMÉDIA
 
 # SECTION 4 : ONGLET [ 03 ] SOCKETS & RÉSEAU (NET-GUARD & SOUVERAINETÉ)
 
-L'onglet **[ 03 ] Sockets & Réseau** assure la surveillance passive et la qualification souveraine de l'ensemble des communications réseau de l'hôte[cite: 15]. Contrairement aux pare-feux conventionnels basés sur Netfilter/iptables qui inspectent les paquets au niveau de la couche réseau du noyau, RAPTOR corrèle en temps réel chaque flux réseau avec le processus local propriétaire, son binaire physique sur disque et son intégrité mémoire[cite: 2, 15].
+L'onglet **[ 03 ] Sockets & Réseau** assure la surveillance passive et la qualification souveraine de l'ensemble des communications réseau de l'hôte. Contrairement aux pare-feux conventionnels basés sur Netfilter/iptables qui inspectent les paquets au niveau de la couche réseau du noyau, RAPTOR corrèle en temps réel chaque flux réseau avec le processus local propriétaire, son binaire physique sur disque et son intégrité mémoire.
 
 ```
 +----------------------------------------------------------------------------------------------------+
@@ -448,7 +448,7 @@ RAPTOR parcourt les répertoires `/proc/[PID]/fd/` de l'ensemble des tâches act
 
 ## 4.2. Moteur Net-Guard (Section 11) : Filtrage Binaire & Anti-Phishing
 
-Dès qu'une socket est résolue, elle traverse le filtre Net-Guard afin de déterminer sa légitimité[cite: 15].
+Dès qu'une socket est résolue, elle traverse le filtre Net-Guard afin de déterminer sa légitimité.
 
 ```
                      FLUX D'ÉVALUATION D'UNE SOCKET NET-GUARD
@@ -484,14 +484,14 @@ Dès qu'une socket est résolue, elle traverse le filtre Net-Guard afin de déte
 
 | Statut Net-Guard | Niveau de Menace | Description & Conséquence Opérationnelle |
 | :--- | :--- | :--- |
-| **`APPROUVÉ`** | **NOMINAL** | Flux dirigé vers une infrastructure institutionnelle, un réseau d'entreprise autorisé ou un serveur de mise à jour officiel certifié[cite: 15]. |
-| **`SURVEILLÉ`** | **ATTENTION** | Flux légitime sortant vers des services Web, des hébergeurs tiers ou des réseaux CDN ne figurant pas sur liste noire[cite: 4]. |
-| **`HOSTILE`** | **CRITIQUE** | Connexion établie vers un relais de commande et contrôle (C2), une passerelle d'exfiltration ou un domaine d'hameçonnage identifié[cite: 15]. |
+| **`APPROUVÉ`** | **NOMINAL** | Flux dirigé vers une infrastructure institutionnelle, un réseau d'entreprise autorisé ou un serveur de mise à jour officiel certifié. |
+| **`SURVEILLÉ`** | **ATTENTION** | Flux légitime sortant vers des services Web, des hébergeurs tiers ou des réseaux CDN ne figurant pas sur liste noire. |
+| **`HOSTILE`** | **CRITIQUE** | Connexion établie vers un relais de commande et contrôle (C2), une passerelle d'exfiltration ou un domaine d'hameçonnage identifié. |
 
 ### Format des Règles Souveraines (`fw_officiel.conf` et `fw_custom.conf`)
-Le filtrage réseau de RAPTOR repose sur deux fichiers au format texte modifiables à chaud[cite: 15] :
-1. `assets/rules/fw_officiel.conf` : Registre de sécurité maintenu et mis à jour de façon souveraine[cite: 15].
-2. `assets/rules/fw_custom.conf` : Règles personnalisées de l'organisation locale[cite: 15].
+Le filtrage réseau de RAPTOR repose sur deux fichiers au format texte modifiables à chaud :
+1. `assets/rules/fw_officiel.conf` : Registre de sécurité maintenu et mis à jour de façon souveraine.
+2. `assets/rules/fw_custom.conf` : Règles personnalisées de l'organisation locale.
 
 ```text
 # ==============================================================================
@@ -511,26 +511,26 @@ IP  | 185.220.101.0/24                | HOSTILE  | Nœuds de sortie Tor d'exfilt
 ```
 
 ### Ajout de Règles à Chaud via l'Interface Graphique
-Le bouton **`[ + NOUVELLE RÈGLE ]`** situé en haut à droite de l'onglet 3 ouvre une boîte modale interactive permettant d'intégrer immédiatement une règle de blocage ou d'autorisation sans redémarrer le programme[cite: 2] :
+Le bouton **`[ + NOUVELLE RÈGLE ]`** situé en haut à droite de l'onglet 3 ouvre une boîte modale interactive permettant d'intégrer immédiatement une règle de blocage ou d'autorisation sans redémarrer le programme :
 * **Type de cible :** Sélection par commutateur entre `DOM` (anti-phishing) et `IP` (blocage réseau).
-* **Validation dynamique :** RAPTOR vérifie la cohérence du masque CIDR et enregistre la nouvelle directive directement dans `assets/rules/fw_custom.conf`[cite: 15].
+* **Validation dynamique :** RAPTOR vérifie la cohérence du masque CIDR et enregistre la nouvelle directive directement dans `assets/rules/fw_custom.conf`.
 
 ### Neutralisation Chirurgicale d'un Flux Hostile
-Lorsqu'un socket est qualifié `HOSTILE`, la colonne *Action Défensive* propose l'abattage immédiat du processus[cite: 2, 15] :
+Lorsqu'un socket est qualifié `HOSTILE`, la colonne *Action Défensive* propose l'abattage immédiat du processus :
 * En un clic, RAPTOR transmet un signal d'arrêt non différable :
   $$\text{kill}(PID, \text{SIGKILL})$$
-* La connexion TCP est immédiatement interrompue par l'envoi d'un paquet `RST` par la pile réseau du noyau Linux, empêchant toute exfiltration de données[cite: 15].
+* La connexion TCP est immédiatement interrompue par l'envoi d'un paquet `RST` par la pile réseau du noyau Linux, empêchant toute exfiltration de données.
 
 ---
 
 ## 4.3. Renseignement BGP & Rapprochement Lexical (Section 12)
 
 ### Moteur Anti-Combosquatting
-Pour neutraliser les attaques d'ingénierie sociale et les domaines de phishing imitant des organisations légitimes, RAPTOR calcule la distance lexicale de **Levenshtein** entre le nom d'hôte résolu et les marques enregistrées dans la configuration[cite: 15] :
-* Si un domaine distant contient la marque cible (ex: `desjardins-verification-compte.com`), mais ne correspond à aucun des domaines certifiés de la liste blanche (`desjardins.com`), le moteur lève instantanément une alerte rouge d'usurpation d'identité institutionnelle[cite: 15].
+Pour neutraliser les attaques d'ingénierie sociale et les domaines de phishing imitant des organisations légitimes, RAPTOR calcule la distance lexicale de **Levenshtein** entre le nom d'hôte résolu et les marques enregistrées dans la configuration :
+* Si un domaine distant contient la marque cible (ex: `desjardins-verification-compte.com`), mais ne correspond à aucun des domaines certifiés de la liste blanche (`desjardins.com`), le moteur lève instantanément une alerte rouge d'usurpation d'identité institutionnelle.
 
 ### Cascade Anti-Opacité & Résolution BGP (Net-Intel)
-Pour identifier instantanément les serveurs distants qui ne possèdent aucun enregistrement DNS inverse (PTR), RAPTOR déploie une cascade d'identification en trois couches[cite: 15] :
+Pour identifier instantanément les serveurs distants qui ne possèdent aucun enregistrement DNS inverse (PTR), RAPTOR déploie une cascade d'identification en trois couches :
 
 ```
              CASCADE DE RENSEIGNEMENT RÉSEAU SANS PTR
@@ -561,28 +561,28 @@ Pour identifier instantanément les serveurs distants qui ne possèdent aucun en
              [ ASN Identifié : ex AS13335 (Cloudflare) ]
 ```
 
-1. **Étage 1 (Cache L1) :** Table de hachage interne thread-safe conservant les résolutions précédentes afin d'éliminer les requêtes réseau répétitives[cite: 15].
-2. **Étage 2 (Table Statique 0 ms) :** Fichier `assets/rules/table_static.conf` contenant les allocations IP des infrastructures mondiales majeures (AWS, Cloudflare, Akamai, OVH, Hetzner, Fastly, GitHub)[cite: 15].
+1. **Étage 1 (Cache L1) :** Table de hachage interne thread-safe conservant les résolutions précédentes afin d'éliminer les requêtes réseau répétitives.
+2. **Étage 2 (Table Statique 0 ms) :** Fichier `assets/rules/table_static.conf` contenant les allocations IP des infrastructures mondiales majeures (AWS, Cloudflare, Akamai, OVH, Hetzner, Fastly, GitHub).
 3. **Étage 3 (Sonde BGP Asynchrone) :** Si l'adresse est inconnue, un thread détaché interroge le service d'infrastructure de **Team Cymru** via une requête DNS `TXT` au format :
    ```bash
    host -t txt 25.113.82.140.origin.asn.cymru.com
    ```
-   La réponse extrait directement le numéro de système autonome (ASN), la plage CIDR allouée et le code pays officiel d'enregistrement[cite: 15].
+   La réponse extrait directement le numéro de système autonome (ASN), la plage CIDR allouée et le code pays officiel d'enregistrement.
 
 ---
 
 ## 4.4. Tableau Inférieur : Corrélation Sockets et Injections RWX
 
-La partie inférieure de l'onglet 3 isole spécifiquement les processus qui détiennent une connexion réseau active **tout en présentant des segments de mémoire altérés (RWX)**[cite: 2] :
+La partie inférieure de l'onglet 3 isole spécifiquement les processus qui détiennent une connexion réseau active **tout en présentant des segments de mémoire altérés (RWX)** :
 
-* **Gravité tactique maximale :** Un processus réseau normal (comme `curl`, `firefox` ou `ssh`) possède des segments mémoire stricts ($W \oplus X$)[cite: 15]. La présence simultanée d'une connexion réseau externe et d'une allocation `rwx` (Lecture, Écriture, Exécution) est le marqueur caractéristique d'un **implant distant**, d'un **shell interactif inversé** (*reverse shell*) ou d'un **relais d'exfiltration C2**[cite: 2, 15].
-* **Visibilité immédiate :** Tout binaire présent dans ce tableau doit faire l'objet d'un abattage prioritaire (`SIGKILL`) et d'un examen forensique approfondi[cite: 15].
+* **Gravité tactique maximale :** Un processus réseau normal (comme `curl`, `firefox` ou `ssh`) possède des segments mémoire stricts ($W \oplus X$). La présence simultanée d'une connexion réseau externe et d'une allocation `rwx` (Lecture, Écriture, Exécution) est le marqueur caractéristique d'un **implant distant**, d'un **shell interactif inversé** (*reverse shell*) ou d'un **relais d'exfiltration C2**.
+* **Visibilité immédiate :** Tout binaire présent dans ce tableau doit faire l'objet d'un abattage prioritaire (`SIGKILL`) et d'un examen forensique approfondi.
 
 ---
 
 # SECTION 5 : ONGLET [ 04 ] CAHIER DIFFÉRENTIEL (FORENSIQUE TEMPOREL & MUTATIONS)
 
-L'onglet **[ 04 ] Cahier Différentiel** est l'instrument de diagnostic temporel de RAPTOR[cite: 6, 10]. Il offre une visibilité sur les anomalies dynamiques qui ne peuvent pas être détectées par un audit instantané ponctuel : les gonflements progressifs de mémoire (fuites et injections par étapes) et l'historique chronologique des mutations d'exécution clandestines[cite: 6, 10].
+L'onglet **[ 04 ] Cahier Différentiel** est l'instrument de diagnostic temporel de RAPTOR. Il offre une visibilité sur les anomalies dynamiques qui ne peuvent pas être détectées par un audit instantané ponctuel : les gonflements progressifs de mémoire (fuites et injections par étapes) et l'historique chronologique des mutations d'exécution clandestines.
 
 ```
 +----------------------------------------------------------------------------------------------------+
@@ -614,16 +614,16 @@ $$\text{Variation \%} = \frac{\Delta\text{RSS}}{\text{RSS}(T_{-1})} \times 100$$
 * **Allocation Furtive par Paliers :** Comportement typique d'implants de collecte qui mettent en mémoire tampon des frappes clavier (*keylogging*), des captures d'écran ou des fichiers avant exfiltration groupée.
 
 Lorsque toutes les variations demeurent dans les seuils nominaux, RAPTOR affiche un message de conformité vert :
-`"Système stable. Aucune fuite mémoire critique d'expansion détectée sur le dernier cycle."`[cite: 6, 10]
+`"Système stable. Aucune fuite mémoire critique d'expansion détectée sur le dernier cycle."`
 
 ---
 
 ## 5.2. Volet Inférieur : Registre Forensique LIFO (Sections 13 & 14)
 
-Le second volet constitue le registre immuable des événements de sécurité critiques détectés sur le sous-système mémoire[cite: 6, 10].
+Le second volet constitue le registre immuable des événements de sécurité critiques détectés sur le sous-système mémoire.
 
 ### Architecture de la File LIFO (*Last In, First Out*)
-Les alertes forensiques sont conservées au sein d'un tampon circulaire protégé en mémoire (`MAX_STEALTH_EVENTS`). Le rendu à l'écran applique un ordonnancement LIFO strict : **la dernière attaque interceptée apparaît systématiquement sur la première ligne rouge du tableau**, garantissant à l'administrateur une lecture chronologique immédiate sans nécessiter de défilement[cite: 6, 10].
+Les alertes forensiques sont conservées au sein d'un tampon circulaire protégé en mémoire (`MAX_STEALTH_EVENTS`). Le rendu à l'écran applique un ordonnancement LIFO strict : **la dernière attaque interceptée apparaît systématiquement sur la première ligne rouge du tableau**, garantissant à l'administrateur une lecture chronologique immédiate sans nécessiter de défilement.
 
 ```
                      FLUX D'ALIMENTATION DU REGISTRE FORENSIQUE
@@ -650,23 +650,23 @@ Les alertes forensiques sont conservées au sein d'un tampon circulaire protég�
 
 ### Signification des Colonnes Forensiques
 
-1. **PID :** Identifiant numérique du processus audité au moment de l'infraction[cite: 6, 10].
-2. **EXÉCUTABLE :** Nom court de la commande ou du binaire (`comm`)[cite: 6, 10].
+1. **PID :** Identifiant numérique du processus audité au moment de l'infraction.
+2. **EXÉCUTABLE :** Nom court de la commande ou du binaire (`comm`).
 3. **PLAGE MÉMOIRE (RAM) :**
    * *Pour une Mutation R-X (Section 13) :* Adresse hexadécimale exacte de début et de fin de la page anonyme devenue exécutable (ex: `0x7f10b000 - 0x7f10c000`).
-   * *Pour un Détournement LD_PRELOAD (Section 14) :* Affichage normalisé **`N/A`**[cite: 10]. Cette mention signifie formellement **Non Applicable**, car l'injection s'est opérée au niveau de l'environnement d'exécution du chargeur dynamique et ne possède pas d'adresse virtuelle isolée[cite: 10].
+   * *Pour un Détournement LD_PRELOAD (Section 14) :* Affichage normalisé **`N/A`**. Cette mention signifie formellement **Non Applicable**, car l'injection s'est opérée au niveau de l'environnement d'exécution du chargeur dynamique et ne possède pas d'adresse virtuelle isolée.
 4. **TAILLE :**
    * *Pour une Mutation R-X :* Taille physique de la plage injectée en kilo-octets (calculée par $\frac{\text{Adresse Fin} - \text{Adresse Début}}{1024}$).
-   * *Pour un Détournement LD_PRELOAD :* Affichage normalisé **`N/A`**[cite: 10].
+   * *Pour un Détournement LD_PRELOAD :* Affichage normalisé **`N/A`**.
 5. **DIAGNOSTIC FORENSIQUE :**
-   * Indication claire de la signature d'intrusion et, dans le cas d'un `LD_PRELOAD`, le chemin complet vers la bibliothèque partagée injectée[cite: 6, 10].
+   * Indication claire de la signature d'intrusion et, dans le cas d'un `LD_PRELOAD`, le chemin complet vers la bibliothèque partagée injectée.
 
 ---
 
 ## 5.3. Procédures Administrateur : Purge et Traçabilité
 
 ### 1. Purge Manuelle de l'Historique
-Lorsqu'un incident a été investigué, corrigé et que le binaire malveillant a été neutralisé, l'administrateur peut réinitialiser la vue à l'aide du bouton **`[ Purger l'historique ]`** situé en haut à droite du panneau forensique[cite: 6, 10].
+Lorsqu'un incident a été investigué, corrigé et que le binaire malveillant a été neutralisé, l'administrateur peut réinitialiser la vue à l'aide du bouton **`[ Purger l'historique ]`** situé en haut à droite du panneau forensique.
 * Cette action appelle la fonction `mem_stealth_clear_diff_events()`.
 * Le tampon mémoire est remis à zéro.
 * L'encadré repasse immédiatement en vert avec la mention :
@@ -754,7 +754,7 @@ L'administrateur peut exporter l'intégralité du rapport d'audit vers des forma
 
 # SECTION 7 : NOTIFICATIONS SYSTÈME ASYNCHRONES FREEDESKTOP (SECTION 15)
 
-Pour garantir une protection continue du poste même lorsque RAPTOR fonctionne en tâche de fond ou avec sa fenêtre Raylib minimisée, la Section 15 introduit le moteur de notifications asynchrones `raptor_notify`[cite: 14].
+Pour garantir une protection continue du poste même lorsque RAPTOR fonctionne en tâche de fond ou avec sa fenêtre Raylib minimisée, la Section 15 introduit le moteur de notifications asynchrones `raptor_notify`.
 
 ```
                 ARCHITECTURE DU DOUBLE-FORK DÉCOUPÉ (0 ms & 0 ZOMBIE)
@@ -786,7 +786,7 @@ Pour garantir une protection continue du poste même lorsque RAPTOR fonctionne e
 
 Un appel standard à `system("notify-send ...")` figerait la boucle de rendu Raylib pendant 100 à 300 ms, provoquant un décrochage visible du rafraîchissement d'écran et des saccades d'animation.
 
-Pour contourner ce verrouillage, la fonction 86 (`raptor_notify_send_desktop`) implémente la technique UNIX du double découplage (`double-fork`)[cite: 14] :
+Pour contourner ce verrouillage, la fonction 86 (`raptor_notify_send_desktop`) implémente la technique UNIX du double découplage (`double-fork`) :
 1. **Premier `fork()` :** Le processus parent crée un enfant intermédiaire puis l'attend immédiatement via `waitpid(pid, NULL, 0)`.
 2. **Second `fork()` :** L'enfant intermédiaire crée immédiatement un petit-fils, puis s'éteint sans délai (`_exit(0)`).
 3. **Adoption par `init` / `systemd` (PID 1) :** Le petit-fils devient orphelin et se retrouve automatiquement rattaché au gestionnaire racine du système.
@@ -796,7 +796,7 @@ Pour contourner ce verrouillage, la fonction 86 (`raptor_notify_send_desktop`) i
 
 ## 7.2. Filtre Anti-Rebond Temporel (*Debounce Logic*)
 
-Pour éviter de saturer le serveur d'affichage et l'attention de l'opérateur par des centaines de bulles consécutives, la fonction 87 (`raptor_notify_evaluate_threats`) arbitre les émissions d'alerte[cite: 14] :
+Pour éviter de saturer le serveur d'affichage et l'attention de l'opérateur par des centaines de bulles consécutives, la fonction 87 (`raptor_notify_evaluate_threats`) arbitre les émissions d'alerte :
 
 ```
                         LOGIQUE DU FILTRE ANTI-REBOND TEMPOREL
@@ -818,7 +818,7 @@ Pour éviter de saturer le serveur d'affichage et l'attention de l'opérateur pa
                                                          Processus identifié" 30 secondes)
 ```
 
-* **Déclenchement Instantané :** L'apparition d'une nouvelle menace (passage de $0 \rightarrow N$ ou élévation du nombre d'anomalies) déclenche la notification sans aucun délai d'attente[cite: 14].
+* **Déclenchement Instantané :** L'apparition d'une nouvelle menace (passage de $0 \rightarrow N$ ou élévation du nombre d'anomalies) déclenche la notification sans aucun délai d'attente.
 * **Temporisation de Rappel (Cooldown) :** Si l'anomalie persiste sans être neutralisée, un rappel n'est émis qu'une fois toutes les 30 secondes au maximum.
 * **Notification de Résolution :** Dès que l'administrateur neutralise le processus pirate et que le compteur retombe à zéro, une notification informative verte est transmise au bureau pour confirmer le retour au statut nominal.
 
@@ -826,7 +826,7 @@ Pour éviter de saturer le serveur d'affichage et l'attention de l'opérateur pa
 
 # SECTION 8 : BANCS D'ESSAIS FORENSIQUES & VALIDATION OPÉRATIONNELLE
 
-RAPTOR est livré avec deux outils d'injection inoffensifs autonomes situés dans `tools/` permettant de certifier le bon fonctionnement des sondes en conditions réelles sans compromettre la machine[cite: 14].
+RAPTOR est livré avec deux outils d'injection inoffensifs autonomes situés dans `tools/` permettant de certifier le bon fonctionnement des sondes en conditions réelles sans compromettre la machine.
 
 ```
 RAPTOR/tools/
@@ -838,7 +838,7 @@ RAPTOR/tools/
 
 ## 8.1. Épreuve 1 : Validation de la Traque de Mutations R-X (`test_stealth.c`)
 
-Le banc d'essai `test_stealth.c` reproduit fidèlement la technique de camouflage utilisée par les injecteurs de shellcodes sans fichier[cite: 14] :
+Le banc d'essai `test_stealth.c` reproduit fidèlement la technique de camouflage utilisée par les injecteurs de shellcodes sans fichier :
 
 ```c
 /* Extrait fonctionnel de test_stealth.c */
@@ -882,7 +882,7 @@ void simuler_mutation_clandestine(void) {
 
 ## 8.2. Épreuve 2 : Validation de Preload-Hunter (`test_preload.c`)
 
-Le banc d'essai `test_preload.c` est un binaire inoffensif qui boucle pendant 60 secondes, utilisé pour vérifier la détection de l'injection d'une bibliothèque partagée dans son environnement d'exécution[cite: 14].
+Le banc d'essai `test_preload.c` est un binaire inoffensif qui boucle pendant 60 secondes, utilisé pour vérifier la détection de l'injection d'une bibliothèque partagée dans son environnement d'exécution.
 
 ```c
 /* Extrait de test_preload.c */
@@ -898,7 +898,7 @@ int main(void) {
    ```bash
    gcc -Wall -O2 tools/test_preload.c -o tools/test_preload
    ```
-2. Lancer le binaire en lui injectant dynamiquement la bibliothèque mathématique standard du système via `LD_PRELOAD`[cite: 14] :
+2. Lancer le binaire en lui injectant dynamiquement la bibliothèque mathématique standard du système via `LD_PRELOAD` :
    ```bash
    LD_PRELOAD=/lib/x86_64-linux-gnu/libm.so.6 ./tools/test_preload
    ```
@@ -934,42 +934,42 @@ L'architecture logicielle de RAPTOR est soumise à une gouvernance stricte : **a
 ### Section 11 — Moteur Net-Guard & Filtrage Sockets (`raptor_net_guard.c`)
 * **58. `net_guard_init`** : Initialisation des descripteurs et structures de hachage réseau.
 * **59. `net_guard_cleanup`** : Libération des registres et tampons de filtrage mémoire.
-* **60. `net_guard_rules_load`** : Chargement et parsing des fichiers `fw_officiel.conf` et `fw_custom.conf`[cite: 14].
+* **60. `net_guard_rules_load`** : Chargement et parsing des fichiers `fw_officiel.conf` et `fw_custom.conf`.
 * **61. `net_guard_rule_add_memory`** : Insertion atomique d'une règle en mémoire sans interruption de service.
-* **62. `net_guard_rule_add_custom`** : Persistance sur disque d'une nouvelle règle dans `fw_custom.conf`[cite: 14].
-* **63. `net_guard_eval_socket`** : Évaluation d'un flux selon la cascade Whitelist $\rightarrow$ DOM $\rightarrow$ IP[cite: 14].
-* **64. `net_guard_kill_process`** : Émission du signal `SIGKILL` vers un PID hostile identifié[cite: 14].
-* **65. `net_guard_sync_official`** : Téléchargement sécurisé (`curl`) et mise à jour atomique du registre[cite: 14].
-* **66. `net_guard_levenshtein_dist`** : Calcul mathématique de distance pour la détection de typosquatting[cite: 14].
+* **62. `net_guard_rule_add_custom`** : Persistance sur disque d'une nouvelle règle dans `fw_custom.conf`.
+* **63. `net_guard_eval_socket`** : Évaluation d'un flux selon la cascade Whitelist $\rightarrow$ DOM $\rightarrow$ IP.
+* **64. `net_guard_kill_process`** : Émission du signal `SIGKILL` vers un PID hostile identifié.
+* **65. `net_guard_sync_official`** : Téléchargement sécurisé (`curl`) et mise à jour atomique du registre.
+* **66. `net_guard_levenshtein_dist`** : Calcul mathématique de distance pour la détection de typosquatting.
 * **67. `net_guard_normalize_string`** : Nettoyage typographique et passage en minuscules pour comparaison.
 * **68. `net_guard_parse_ip_port`** : Décomposition d'une chaîne IP:Port vers les types binaires POSIX.
-* **69. `net_guard_ip_in_cidr`** : Vérification binaire d'appartenance d'une adresse à un masque de sous-réseau[cite: 14].
-* **70. `net_guard_dns_worker_thread`** : Résolution inverse asynchrone non-bloquante (`pthread`)[cite: 14].
+* **69. `net_guard_ip_in_cidr`** : Vérification binaire d'appartenance d'une adresse à un masque de sous-réseau.
+* **70. `net_guard_dns_worker_thread`** : Résolution inverse asynchrone non-bloquante (`pthread`).
 
 ### Section 12 — Moteur Net-Intel & Cascade BGP (`raptor_asn_intel.c`)
 * **71. `asn_intel_init`** : Initialisation du cache de renseignement et chargement de la table statique.
 * **72. `asn_intel_cleanup`** : Libération des tables de hachage de l'infrastructure de renseignement.
-* **73. `asn_intel_table_load`** : Parsing et indexation en mémoire du fichier `assets/rules/table_static.conf`[cite: 14].
-* **74. `asn_intel_cache_lookup`** : Recherche ultra-rapide en mémoire (0 ms) dans le cache L1[cite: 14].
+* **73. `asn_intel_table_load`** : Parsing et indexation en mémoire du fichier `assets/rules/table_static.conf`.
+* **74. `asn_intel_cache_lookup`** : Recherche ultra-rapide en mémoire (0 ms) dans le cache L1.
 * **75. `asn_intel_cache_insert`** : Insertion thread-safe d'une résolution validée dans le cache.
-* **76. `asn_intel_static_lookup`** : Confrontation binaire 0 ms contre les plages CIDR des opérateurs mondiaux[cite: 14].
-* **77. `asn_intel_query_cymru_sync`** : Émission d'une requête DNS TXT de secours vers Team Cymru[cite: 14].
-* **78. `asn_intel_resolve_ip_async`** : Déclenchement de la cascade anti-opacité sur thread détaché[cite: 14].
+* **76. `asn_intel_static_lookup`** : Confrontation binaire 0 ms contre les plages CIDR des opérateurs mondiaux.
+* **77. `asn_intel_query_cymru_sync`** : Émission d'une requête DNS TXT de secours vers Team Cymru.
+* **78. `asn_intel_resolve_ip_async`** : Déclenchement de la cascade anti-opacité sur thread détaché.
 * **79. `asn_intel_format_descriptor`** : Mise en forme unifiée du libellé ASN et code pays pour l'interface.
 
 ### Section 13 — Traque Mémoire Anonyme R-X (`mem_stealth.c`)
-* **80. `mem_stealth_whitelist_load`** : Lecture et indexation du registre souverain `assets/rules/mem_whitelist.conf`[cite: 14].
+* **80. `mem_stealth_whitelist_load`** : Lecture et indexation du registre souverain `assets/rules/mem_whitelist.conf`.
 * **81. `mem_stealth_is_whitelisted`** : Validation d'innocuité d'un processus vis-à-vis des moteurs JIT et FFI certifiés.
-* **82. `mem_stealth_scan_maps_anon_rx`** : Traque des segments exécutables `r-xp` Inode 0 dans `/proc/[PID]/maps`[cite: 14].
-* **83. `mem_stealth_dispatch_diff_event`** : Enregistrement et déduplication des alertes dans la file LIFO de l'onglet 4[cite: 14].
+* **82. `mem_stealth_scan_maps_anon_rx`** : Traque des segments exécutables `r-xp` Inode 0 dans `/proc/[PID]/maps`.
+* **83. `mem_stealth_dispatch_diff_event`** : Enregistrement et déduplication des alertes dans la file LIFO de l'onglet 4.
 
 ### Section 14 — Traque du Chargeur Dynamique (`preload_hunter.c`)
-* **84. `preload_hunter_check_global`** : Contrôle passif direct de `/etc/ld.so.preload` pour neutraliser les rootkits hôtes[cite: 14].
-* **85. `preload_hunter_scan_process_env`** : Inspection unitaire de `/proc/[PID]/environ` découpée sur les octets nuls[cite: 14].
+* **84. `preload_hunter_check_global`** : Contrôle passif direct de `/etc/ld.so.preload` pour neutraliser les rootkits hôtes.
+* **85. `preload_hunter_scan_process_env`** : Inspection unitaire de `/proc/[PID]/environ` découpée sur les octets nuls.
 
 ### Section 15 — Notifications Bureau Asynchrones (`raptor_notify.c`)
-* **86. `raptor_notify_send_desktop`** : Émission de la bulle Freedesktop via double `fork()` sans processus zombie[cite: 14].
-* **87. `raptor_notify_evaluate_threats`** : Filtre anti-rebond (30s) et arbitrage lors des transitions d'alertes[cite: 14].
+* **86. `raptor_notify_send_desktop`** : Émission de la bulle Freedesktop via double `fork()` sans processus zombie.
+* **87. `raptor_notify_evaluate_threats`** : Filtre anti-rebond (30s) et arbitrage lors des transitions d'alertes.
 
 ---
 
@@ -979,7 +979,7 @@ Toute extension ou nouveau greffon intégré à RAPTOR doit respecter scrupuleus
 
 1. **Modularité Stricte par Greffons (`RaptorPlugin`) :** Aucun outil d'analyse ou d'export ne doit être codé directement dans la boucle graphique principale `ui_engine.c`. Tout module s'enregistre via la macro officielle `RAPTOR_PLUGIN_INIT`.
 2. **Indépendance des Fichiers de Configuration :** Zéro chaîne d'adresses IP, de domaines ou de noms d'exécutables codée en dur dans le langage C. Tout élément configurable réside dans `assets/rules/`.
-3. **Absence Totale de Télémétrie :** Le code ne doit émettre aucune requête vers des serveurs d'analyse tiers, des régies publicitaires ou des métriques cloud. La souveraineté des données de l'hôte audité est absolue[cite: 14].
-4. **Zéro Régression de Performance :** L'interface doit maintenir en permanence 60 FPS constants sans saccade visuelle. Tout traitement bloquant (réseau, DNS, lecture disque lourde) doit être déporté sur un thread secondaire ou asynchrone[cite: 14].
+3. **Absence Totale de Télémétrie :** Le code ne doit émettre aucune requête vers des serveurs d'analyse tiers, des régies publicitaires ou des métriques cloud. La souveraineté des données de l'hôte audité est absolue.
+4. **Zéro Régression de Performance :** L'interface doit maintenir en permanence 60 FPS constants sans saccade visuelle. Tout traitement bloquant (réseau, DNS, lecture disque lourde) doit être déporté sur un thread secondaire ou asynchrone.
 5. **Documentation Systématique en En-Tête :** Chaque script C ou en-tête doit comporter son bloc descriptif standardisé précisant le nom du fichier, le numéro de révision, la responsabilité système et la liste numérotée exhaustive de ses fonctions.
 ```

@@ -80,3 +80,4 @@ desktop.ini
 !assets/icons/*.png
 !assets/fonts/
 !assets/fonts/*.ttf
+tools/export_handbook_pdf.sh
