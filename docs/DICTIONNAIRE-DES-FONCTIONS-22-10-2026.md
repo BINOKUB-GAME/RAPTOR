@@ -385,3 +385,71 @@ Fonction 69 : plugin_net_guard.c -- net_guard_update_official_rules -- Rapatriem
   • Signature C : bool net_guard_update_official_rules(void);
   • Utilité     : Télécharge la dernière mouture de fw_officiel.conf via curl vers un fichier
                   temporaire (.tmp), valide l'en-tête de conformité et applique un remplacement atomique POSIX (rename).
+
+================================================================================
+SECTION 12 : RENSEIGNEMENT RÉSEAU, BGP & CDN INTEL (Fonctions 71 à 79)
+Module source : src/plugins/plugin_asn_intel.c
+En-tête       : include/raptor/raptor_asn_intel.h
+Configuration : assets/rules/table_static.conf
+================================================================================
+
+71. asn_intel_trim
+    - Rôle : Nettoyage canonique des espaces blancs en tête et queue de chaîne.
+    - Entrée : char* str
+    - Sortie : char* (pointeur sur la chaîne assainie).
+
+72. asn_intel_parse_cidr
+    - Rôle : Décomposition arithmétique d'une notation CIDR (X.X.X.X/YY).
+    - Calcul : Extraction de l'adresse réseau hôte et génération du masque binaire 32 bits.
+    - Sortie : bool (validation syntaxique et mathématique).
+
+73. asn_intel_load_file
+    - Rôle : Parsing à chaud du fichier assets/rules/table_static.conf.
+    - Fonctionnement : Peuplement dynamique de la table g_static_ranges sans recompilation.
+    - Sortie : bool (succès du chargement).
+
+74. asn_intel_match_static
+    - Rôle : Évaluation arithmétique instantanée (0 ms) contre les infrastructures répertoriées.
+    - Logique : (ip_host & r->netmask) == (r->network_ip & r->netmask).
+    - Sortie : bool (vrai si correspondance CDN/Cloud trouvée).
+
+75. asn_intel_query_bgp
+    - Rôle : Sonde DNS TXT de secours vers le registre Team Cymru (origin.asn.cymru.com).
+    - Extraction : Numéro ASN public et code pays ISO pour les adresses non répertoriées.
+    - Sortie : bool (succès de la résolution distante).
+
+76. asn_intel_lookup
+    - Rôle : Moteur central d'investigation en cascade.
+    - Cascade : 1. Cache dynamique -> 2. table_static.conf (0 ms) -> 3. Sonde DNS BGP.
+    - Sortie : bool (identification formelle de l'opérateur).
+
+77. asn_intel_init
+    - Rôle : Initialisation du greffon, allocation du verrou d'exclusion mutuelle et chargement des règles.
+    - Sortie : bool (état opérationnel).
+
+78. asn_intel_cleanup
+    - Rôle : Vidange complète des structures et remise à zéro du cache en mémoire vive.
+    - Sortie : void.
+
+79. asn_intel_register
+    - Rôle : Enregistrement constructeur GCC du greffon autonome sur le bus RaptorPlugin.
+    - Sortie : void.
+
+### SECTION 13 : FORENSIC & TRAQUE DE MUTATIONS MÉMOIRE ANONYMES (R-X)
+
+| N° | Nom de la fonction | Fichier source | Signature | Rôle & Responsabilité technique |
+| :--- | :--- | :--- | :--- | :--- |
+| **80** | `mem_stealth_is_jit_whitelisted` | `src/core/mem_stealth.c` | `bool mem_stealth_is_jit_whitelisted(const char* comm)` | Isole les moteurs à compilation JIT légitimes (Chromium, Firefox, Electron, Node, JVM) pour éliminer les faux positifs structurels sur le code exécutable dynamique. |
+| **81** | `mem_stealth_scan_maps_anon_rx` | `src/core/mem_stealth.c` | `bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, StealthEvent* ev_out)` | Scanne chirurgicalement `/proc/[PID]/maps` à la recherche de plages mémoires possédant le droit d'exécution (`x`) avec un Inode à `0` (aucun fichier adossé sur disque), excluant `[vdso]` et `[vsyscall]`. Renseigne la structure d'incident `StealthEvent`. |
+| **82** | `mem_stealth_dispatch_diff_event` | `src/core/mem_stealth.c` | `void mem_stealth_dispatch_diff_event(const StealthEvent* ev)` | Formate l'anomalie forensique identifiée et l'injecte dans le pipeline temporel du Cahier Différentiel (Onglet 4) pour marquage critique lors de la bascule d'état entre T-1 et T0. |
+
+#### Structure forensique associée (src/core/mem_stealth.h) :
+
+typedef struct {
+    pid_t pid;
+    char comm[64];
+    unsigned long start_addr;
+    unsigned long end_addr;
+    size_t size_kb;
+    char detail[128];
+} StealthEvent;

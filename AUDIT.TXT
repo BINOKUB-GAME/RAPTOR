@@ -1,0 +1,2019 @@
+================================================================================
+AUDIT NO #01 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2328
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2021
+  • Nom du Parent            : nemo-desktop
+  • Ligne Commande Parent    : /usr/bin/nemo-desktop
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #02 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2336
+  • Nom du Processus         : chrome_crashpad
+  • Binaire Exécuté          : /usr/lib/chromium/chrome_crashpad_handler (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 1
+  • Nom du Parent            : systemd
+  • Ligne Commande Parent    : /sbin/init splash
+  • Dossier Source Parent    : [inconnu]
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #03 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2338
+  • Nom du Processus         : chrome_crashpad
+  • Binaire Exécuté          : /usr/lib/chromium/chrome_crashpad_handler (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 1
+  • Nom du Parent            : systemd
+  • Ligne Commande Parent    : /sbin/init splash
+  • Dossier Source Parent    : [inconnu]
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #04 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2342
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2328
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --disable-features=TFLiteLanguageDetectionEnabled,GlobalVaapiLock --ozone-platform-hint=auto --use-gl=angle --use-angle=gl --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiVideoDecodeLinuxGL,UseChromeOSDirectVideoDecoder --video-capture-use-gpu-memory-buffer --enable-native-gpu-memory-buffers --enable-gpu-rasterization --disable-pings --no-pings
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #05 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2343
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2328
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --disable-features=TFLiteLanguageDetectionEnabled,GlobalVaapiLock --ozone-platform-hint=auto --use-gl=angle --use-angle=gl --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiVideoDecodeLinuxGL,UseChromeOSDirectVideoDecoder --video-capture-use-gpu-memory-buffer --enable-native-gpu-memory-buffers --enable-gpu-rasterization --disable-pings --no-pings
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #06 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2345
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2343
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #07 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2381
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2342
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --no-zygote-sandbox --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #08 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2384
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2328
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --disable-features=TFLiteLanguageDetectionEnabled,GlobalVaapiLock --ozone-platform-hint=auto --use-gl=angle --use-angle=gl --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiVideoDecodeLinuxGL,UseChromeOSDirectVideoDecoder --video-capture-use-gpu-memory-buffer --enable-native-gpu-memory-buffers --enable-gpu-rasterization --disable-pings --no-pings
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #09 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2395
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #10 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2402
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2381
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=gpu-process --gpu-recent-crash-count=0 --enable-gpu-rasterization --ozone-platform=x11 --enable-native-gpu-memory-buffers --use-angle=gl --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable --gpu-preferences=YAAAAAAAAAAgAQAEAAAAAAAAAAAAAGAASAAAAAAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAACCAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAAAEAAAAAAAAACAAAAAAAAAAMAAAAAQAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --use-gl=angle --shared-files --m
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #11 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2427
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:03:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #12 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2461
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:03:45
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #13 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2619
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:03:48
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #14 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2640
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:03:48
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #15 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 2665
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:03:49
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2328
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --disable-features=TFLiteLanguageDetectionEnabled,GlobalVaapiLock --ozone-platform-hint=auto --use-gl=angle --use-angle=gl --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiVideoDecodeLinuxGL,UseChromeOSDirectVideoDecoder --video-capture-use-gpu-memory-buffer --enable-native-gpu-memory-buffers --enable-gpu-rasterization --disable-pings --no-pings
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #16 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 3007
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:06:58
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #17 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 3026
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:07:30
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #18 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 3573
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:15:11
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #19 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 3594
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:15:12
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #20 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 3714
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:21:01
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #21 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 3720
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:21:01
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #22 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:26:53
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 3761
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:24:12
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #23 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:33:09
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4523
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:33:08
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #24 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:33:12
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4537
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:33:09
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #25 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:33:12
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4552
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:33:10
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2328
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --disable-features=TFLiteLanguageDetectionEnabled,GlobalVaapiLock --ozone-platform-hint=auto --use-gl=angle --use-angle=gl --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiVideoDecodeLinuxGL,UseChromeOSDirectVideoDecoder --video-capture-use-gpu-memory-buffer --enable-native-gpu-memory-buffers --enable-gpu-rasterization --disable-pings --no-pings
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #26 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:33:21
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4564
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:33:19
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #27 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:33:21
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4574
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 08:33:20
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2328
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --disable-features=TFLiteLanguageDetectionEnabled,GlobalVaapiLock --ozone-platform-hint=auto --use-gl=angle --use-angle=gl --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiVideoDecodeLinuxGL,UseChromeOSDirectVideoDecoder --video-capture-use-gpu-memory-buffer --enable-native-gpu-memory-buffers --enable-gpu-rasterization --disable-pings --no-pings
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #28 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:34:34
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4588
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:34:30
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #29 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:34:34
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4621
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:34:32
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #30 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:34:34
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4630
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:34:32
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #31 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:34:37
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4645
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:34:33
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #32 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:35:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4699
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:35:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #33 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:43:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4872
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:43:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #34 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:45:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4933
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:45:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #35 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:47:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4953
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:46:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #36 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:51:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4981
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:50:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #37 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:52:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 4995
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:51:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #38 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:53:01
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5011
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:52:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #39 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:53:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5026
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:53:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #40 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:54:37
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5041
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:54:35
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #41 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:55:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5062
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:55:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #42 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:56:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5078
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:56:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #43 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:57:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5094
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:57:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #44 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:58:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5127
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:58:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #45 : RAPTOR DEFENSE SYSTEM - 2026-10-23 08:59:37
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5143
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 08:59:35
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #46 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:00:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5185
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:00:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #47 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:01:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5200
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:01:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #48 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:02:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5216
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:02:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #49 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:03:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5245
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:03:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #50 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:05:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5265
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:05:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #51 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:06:38
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5282
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:06:36
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #52 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:08:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5295
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:07:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #53 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:09:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5313
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:08:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #54 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:09:39
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5381
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:09:35
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #55 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:10:36
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5402
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:10:33
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #56 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:12:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5420
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:11:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #57 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:13:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5436
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:12:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #58 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:14:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5457
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:13:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #59 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:14:36
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5472
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:14:35
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #60 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:15:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5495
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:15:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #61 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:16:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5511
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:16:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #62 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:17:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5530
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:17:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #63 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:20:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5559
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:20:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #64 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:21:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5577
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:21:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #65 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:23:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5600
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:23:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #66 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:24:38
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5616
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:24:35
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #67 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:25:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5641
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:25:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #68 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:26:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5657
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:26:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #69 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:27:50
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5682
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:27:47
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #70 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:27:50
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5692
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:27:47
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #71 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:27:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5722
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:27:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #72 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:28:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5741
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:28:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #73 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:30:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5764
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:30:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #74 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:31:59
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5780
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:31:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #75 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:34:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5804
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:33:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #76 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:35:45
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5826
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:35:41
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #77 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:36:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5835
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:35:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #78 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:36:03
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5845
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:36:01
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #79 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:37:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5860
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:36:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #80 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:38:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5875
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:37:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #81 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:38:03
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5887
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:38:02
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #82 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:38:54
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5949
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:38:51
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #83 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:38:54
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5961
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:38:53
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #84 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:38:57
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5978
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 09:38:53
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2328
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --disable-features=TFLiteLanguageDetectionEnabled,GlobalVaapiLock --ozone-platform-hint=auto --use-gl=angle --use-angle=gl --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiVideoDecodeLinuxGL,UseChromeOSDirectVideoDecoder --video-capture-use-gpu-memory-buffer --enable-native-gpu-memory-buffers --enable-gpu-rasterization --disable-pings --no-pings
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #85 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:38:57
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 5986
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:38:54
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #86 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:40:15
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6067
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:40:12
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #87 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:40:15
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6076
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:40:13
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #88 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:40:15
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6092
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 09:40:14
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2328
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --disable-features=TFLiteLanguageDetectionEnabled,GlobalVaapiLock --ozone-platform-hint=auto --use-gl=angle --use-angle=gl --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiVideoDecodeLinuxGL,UseChromeOSDirectVideoDecoder --video-capture-use-gpu-memory-buffer --enable-native-gpu-memory-buffers --enable-gpu-rasterization --disable-pings --no-pings
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #89 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:41:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6122
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:40:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #90 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:42:00
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6146
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:41:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #91 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:42:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6165
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:42:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #92 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:43:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6183
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:43:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #93 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:44:37
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6198
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:44:35
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #94 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:45:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6219
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:45:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #95 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:46:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6238
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:46:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #96 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:47:58
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6255
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:47:57
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #97 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:48:34
+ÉVÉNEMENT    : [NEUTRALISATION ADMINISTRATIVE RÉUSSIE]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6067
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:40:12
+  • Heure Interception / Fin : 09:48:34
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #98 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:48:46
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6272
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:48:44
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #99 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:48:49
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6282
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:48:48
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #100 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:48:49
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6291
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /proc/2344/fdinfo
+  • Heure de Début (Spawn)   : 09:48:48
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2345
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --type=zygote --crashpad-handler-pid=2336 --enable-crash-reporter=,for Linux Mint --change-stack-guard-on-fork=enable
+  • Dossier Source Parent    : /proc/2344/fdinfo
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+
+================================================================================
+AUDIT NO #101 : RAPTOR DEFENSE SYSTEM - 2026-10-23 09:48:52
+ÉVÉNEMENT    : [DÉTECTION HEURISTIQUE EN TEMPS RÉEL]
+--------------------------------------------------------------------------------
+DÉTAILS DU PROCESSUS CIBLÉ :
+  • PID Cible                : 6306
+  • Nom du Processus         : chromium
+  • Binaire Exécuté          : /usr/lib/chromium/chromium (deleted)
+  • Répertoire de Lancement  : /home/dan
+  • Heure de Début (Spawn)   : 09:48:49
+  • Heure Interception / Fin : [ACTIF - DÉTECTÉ EN MÉMOIRE]
+  • Qualification Heuristique: [DÉLINKÉ/SUPPRIMÉ] 
+LIGNÉE PARENTALE (CRÉATEUR DU PROCESSUS) :
+  • PID Parent (PPID)        : 2328
+  • Nom du Parent            : chromium
+  • Ligne Commande Parent    : /usr/lib/chromium/chromium --disable-features=TFLiteLanguageDetectionEnabled,GlobalVaapiLock --ozone-platform-hint=auto --use-gl=angle --use-angle=gl --enable-features=VaapiVideoDecoder,VaapiVideoEncoder,VaapiVideoDecodeLinuxGL,UseChromeOSDirectVideoDecoder --video-capture-use-gpu-memory-buffer --enable-native-gpu-memory-buffers --enable-gpu-rasterization --disable-pings --no-pings
+  • Dossier Source Parent    : /home/dan
+STATUT : CONSIGNATION FORENSIQUE EFFECTUÉE
+================================================================================
+

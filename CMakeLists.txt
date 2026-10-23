@@ -67,6 +67,7 @@ set(RAPTOR_CORE_SOURCES
     src/core/raptor_data.c
     src/core/raptor_registry.c
     src/core/raptor_differential.c
+    src/core/mem_stealth.c
 )
 
 set(RAPTOR_REPORT_SOURCES
