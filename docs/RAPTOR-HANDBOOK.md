@@ -1,5 +1,9 @@
 # RAPTOR DEFENSE v2.0 // MANUEL DE RÉFÉRENCE ADMINISTRATEUR
-## Volume 1 : Architecture Fondamentale, Métriques Système & Inspection Mémoire (Onglets 1 & 2)
+## Guide d'Exploitation Technique, Forensique Mémoire & Réseau (Volumes 1, 2 & 3)
+
+---
+
+# VOLUME 1 : ARCHITECTURE FONDAMENTALE & INSPECTION MÉMOIRE (ONGLETS 1 & 2)
 
 ---
 
@@ -9,7 +13,7 @@ RAPTOR v2.0 est un agent défensif d'investigation en direct (*Host-based Intrus
 
 Le moteur repose sur une inspection passive directe des pseudo-systèmes de fichiers du noyau Linux (`/proc` et `/sys`). Chaque cycle d'audit extrait, normalise et corrèle l'état des descripteurs de processus, des tables d'allocation de pages virtuelles (`maps`) et des structures de communication réseau (`net/tcp`, `net/udp`).
 
-```
+```text
                 +-------------------------------------------------+
                 |             NOYAU LINUX (VFS /proc)             |
                 +-------------------------------------------------+
@@ -45,7 +49,7 @@ Le moteur repose sur une inspection passive directe des pseudo-systèmes de fich
 
 L'onglet **[ 01 ] Vue Globale** constitue l'interface de contrôle tactique immédiate. Il condense en un panneau unique l'état de santé du poste, le volume de ressources matérielles mobilisées et les indicateurs de compromission active.
 
-```
+```text
 +----------------------------------------------------------------------------------------------------+
 | RAPTOR DEFENSE // AUDIT MÉMOIRE & PROCESSUS   [ SURVEILLANCE ACTIVE ]       [ ? Guide Analytique ] |
 | [ 01 ] Vue Globale | [ 02 ] Processus & RAM | [ 03 ] Sockets & Réseau | [ 04 ] Diff | [ 05 ] IA    |
@@ -73,15 +77,21 @@ L'onglet **[ 01 ] Vue Globale** constitue l'interface de contrôle tactique imm�
 ### Charge Processeur (CPU)
 * **Origine des données :** Parsing direct de `/proc/stat` sur la ligne d'agrégation `cpu`.
 * **Algorithme de calcul :** Mesure différentielle sur deux échantillons temporels $t_1$ et $t_2$ espacés d'un intervalle de garde $\Delta t$ :
-  $$\text{Total} = \text{user} + \text{nice} + \text{system} + \text{idle} + \text{iowait} + \text{irq} + \text{softirq}$$
-  $$\text{Charge \%} = \frac{(\Delta\text{Total} - \Delta\text{idle})}{\Delta\text{Total}} \times 100$$
+
+$$\mathrm{Total} = \mathrm{user} + \mathrm{nice} + \mathrm{system} + \mathrm{idle} + \mathrm{iowait} + \mathrm{irq} + \mathrm{softirq}$$
+
+$$\mathrm{Charge}\;\% = \frac{\Delta\mathrm{Total} - \Delta\mathrm{idle}}{\Delta\mathrm{Total}} \times 100$$
+
 * **Comportement administrateur :** Un pic ponctuel ($> 85\%$) est toléré lors de compilations ou d'audits complets. Une charge CPU soutenue sans processus visible dans le Top 5 signale un déni de service local ou une dissimulation par hooking d'appels système.
 
 ### Mémoire Vive (RAM Physique)
 * **Origine des données :** `/proc/meminfo` via les compteurs `MemTotal` et `MemAvailable`.
 * **Formule :** 
-  $$\text{RAM Utilisée} = \text{MemTotal} - \text{MemAvailable}$$
-  $$\text{Pourcentage} = \frac{\text{RAM Utilisée}}{\text{MemTotal}} \times 100$$
+
+$$\mathrm{RAM\;Utilis\acute{e}e} = \mathrm{MemTotal} - \mathrm{MemAvailable}$$
+
+$$\mathrm{Pourcentage} = \frac{\mathrm{RAM\;Utilis\acute{e}e}}{\mathrm{MemTotal}} \times 100$$
+
 * **Interprétation :** RAPTOR n'utilise pas `MemFree`, car le noyau Linux alloue massivement la mémoire inactive au cache de pages (`buffers/cache`). `MemAvailable` reflète la mémoire réellement disponible pour les processus applicatifs sans forcer d'éviction sur la partition d'échange (*swap*).
 
 ### Menaces / RWX
@@ -99,7 +109,7 @@ L'onglet **[ 01 ] Vue Globale** constitue l'interface de contrôle tactique imm�
 
 Le bandeau horizontal situé sous la barre de navigation reflète en temps réel l'évaluation heuristique du poste :
 
-```
+```text
 Statut Nominal (Sain) :
 [ SYSTÈME SÉCURISÉ // AUCUNE INTRUSION DÉTECTÉE ]
 Tous les processus actifs sont conformes et adossés à des binaires signés ou répertoriés.
@@ -136,7 +146,7 @@ En bas à gauche de la vue, le bouton **`[ LANCER UN NOUVEL AUDIT IMMÉDIAT ]`**
 
 L'onglet **[ 02 ] Processus & RAM** est la console d'investigation mémoire de RAPTOR. Il fournit une cartographie rigoureuse de chaque tâche résidente, vérifie la légitimité de ses segments de mémoire virtuelle et neutralise les contournements d'injection sans fichier.
 
-```
+```text
 +----------------------------------------------------------------------------------------------------+
 | 1. TOP 10 DES PLUS GROS CONSOMMATEURS DE MÉMOIRE                                                   |
 | PID   | Nom du Processus | RAM (RSS) | Statut  | Emplacement Binaire                               |
@@ -164,7 +174,7 @@ L'onglet **[ 02 ] Processus & RAM** est la console d'investigation mémoire de R
 
 Pour chaque identifiant de processus rencontré lors de l'ouverture de `/proc`, RAPTOR applique la séquence d'extraction normalisée suivante :
 
-```
+```text
              LECTURE CHIRURGICALE DES STRUCTURES PAR PROCESSUS
              
              /proc/[PID]/comm   ---> Nom court de l'exécutable (ex: chromium)
@@ -190,7 +200,7 @@ Pour chaque identifiant de processus rencontré lors de l'ouverture de `/proc`, 
 
 Le moteur forensique qualifie chaque processus selon un ordre de priorité déterministe. Une seule anomalie critique suffit à basculer la ligne dans le tableau des alertes.
 
-```
+```text
                      ARBRE DE DÉCISION DU STATUT FORENSIQUE
                      
                              [ Processus audité ]
@@ -259,7 +269,7 @@ RAPTOR intercepte ces attaques en lisant directement la mémoire d'environnement
 ### 2. Mutations R-X & Inode 0 (Section 13)
 Pour contourner les mécanismes de détection statique des segments RWX, les implants modernes appliquent la séquence d'évasion en deux temps :
 
-```
+```text
 ÉTAPE A (Injection) : Allocation d'une page anonyme standard en lecture/écriture :
                       mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0)
                       -> Permissions affichées : rw-p (Totalement légitime, non détecté par RWX)
@@ -328,7 +338,7 @@ node                     | JIT  | Moteur serveur JavaScript
 
 Lorsqu'une anomalie est signalée dans le tableau **`2. PROCESSUS SUSPECTS ET ANOMALIES DÉTECTÉES`**, appliquez la méthodologie d'investigation suivante depuis un terminal d'administration :
 
-```
+```text
                                GUIDE DE RÉPONSE SUR INCIDENT
                                
                                [ Anomalie affichée dans RAPTOR ]
@@ -363,16 +373,14 @@ awk '$2 ~ /..x./ && $5 == 0 && $6 == "" { print $0 }' /proc/[PID]/maps
 
 #### 3. Éliminer la menace :
 ```bash
-# Neutralisation immédiate par signal noyau non interceptable
 kill -SIGKILL [PID]
 ```
 
 Une fois le processus arrêté, cliquez sur **`[ LANCER UN NOUVEL AUDIT IMMÉDIAT ]`** dans RAPTOR : l'anomalie bascule au statut résolu et le compteur d'alertes revient au niveau nominal.
 
-######################################################################################################################################################################
+---
 
-# RAPTOR DEFENSE v2.0 // MANUEL DE RÉFÉRENCE ADMINISTRATEUR
-## Volume 2 : Sécurité Réseau, Filtrage Net-Guard & Cahier Différentiel Forensique (Onglets 3 & 4)
+# VOLUME 2 : SÉCURITÉ RÉSEAU, NET-GUARD & CAHIER FORENSIQUE (ONGLETS 3 & 4)
 
 ---
 
@@ -380,7 +388,7 @@ Une fois le processus arrêté, cliquez sur **`[ LANCER UN NOUVEL AUDIT IMMÉDIA
 
 L'onglet **[ 03 ] Sockets & Réseau** assure la surveillance passive et la qualification souveraine de l'ensemble des communications réseau de l'hôte. Contrairement aux pare-feux conventionnels basés sur Netfilter/iptables qui inspectent les paquets au niveau de la couche réseau du noyau, RAPTOR corrèle en temps réel chaque flux réseau avec le processus local propriétaire, son binaire physique sur disque et son intégrité mémoire.
 
-```
+```text
 +----------------------------------------------------------------------------------------------------+
 | RAPTOR DEFENSE // AUDIT MÉMOIRE & PROCESSUS   [ SURVEILLANCE ACTIVE ]       [ ? Guide Analytique ] |
 | [ 01 ] Vue Globale | [ 02 ] Processus & RAM | [ 03 ] Sockets & Réseau | [ 04 ] Diff | [ 05 ] IA    |
@@ -406,7 +414,7 @@ L'onglet **[ 03 ] Sockets & Réseau** assure la surveillance passive et la quali
 
 Pour relier une adresse IP distante à un processus local sans jamais altérer le flux de données, RAPTOR exécute une corrélation triangulaire en trois étapes :
 
-```
+```text
       +------------------------+       +----------------------------+
       | /proc/net/{tcp,udp}    |       | /proc/[PID]/fd/[FD]        |
       | - Adresse Locale (Hex) |       | - Lien symbolique vers VFS |
@@ -450,7 +458,7 @@ RAPTOR parcourt les répertoires `/proc/[PID]/fd/` de l'ensemble des tâches act
 
 Dès qu'une socket est résolue, elle traverse le filtre Net-Guard afin de déterminer sa légitimité.
 
-```
+```text
                      FLUX D'ÉVALUATION D'UNE SOCKET NET-GUARD
                      
                              [ Socket Détectée ]
@@ -518,7 +526,9 @@ Le bouton **`[ + NOUVELLE RÈGLE ]`** situé en haut à droite de l'onglet 3 ouv
 ### Neutralisation Chirurgicale d'un Flux Hostile
 Lorsqu'un socket est qualifié `HOSTILE`, la colonne *Action Défensive* propose l'abattage immédiat du processus :
 * En un clic, RAPTOR transmet un signal d'arrêt non différable :
-  $$\text{kill}(PID, \text{SIGKILL})$$
+
+$$\mathrm{kill}(\mathrm{PID},\; \mathrm{SIGKILL})$$
+
 * La connexion TCP est immédiatement interrompue par l'envoi d'un paquet `RST` par la pile réseau du noyau Linux, empêchant toute exfiltration de données.
 
 ---
@@ -532,7 +542,7 @@ Pour neutraliser les attaques d'ingénierie sociale et les domaines de phishing 
 ### Cascade Anti-Opacité & Résolution BGP (Net-Intel)
 Pour identifier instantanément les serveurs distants qui ne possèdent aucun enregistrement DNS inverse (PTR), RAPTOR déploie une cascade d'identification en trois couches :
 
-```
+```text
              CASCADE DE RENSEIGNEMENT RÉSEAU SANS PTR
              
                  [ IP Distante non résolue par PTR ]
@@ -584,7 +594,7 @@ La partie inférieure de l'onglet 3 isole spécifiquement les processus qui dét
 
 L'onglet **[ 04 ] Cahier Différentiel** est l'instrument de diagnostic temporel de RAPTOR. Il offre une visibilité sur les anomalies dynamiques qui ne peuvent pas être détectées par un audit instantané ponctuel : les gonflements progressifs de mémoire (fuites et injections par étapes) et l'historique chronologique des mutations d'exécution clandestines.
 
-```
+```text
 +----------------------------------------------------------------------------------------------------+
 | CAHIER DIFFÉRENTIEL TEMPOREL (T-1 vs T0) // SUIVI DE DÉRIVE RAM                                    |
 | Mesure différentielle active entre les cycles d'échantillonnage de /proc (analyse d'inflation RAM) |
@@ -605,8 +615,10 @@ Le premier tableau capture l'empreinte mémoire résidente (RSS) de chaque proce
 
 ### 1. Formule d'Analyse d'Inflation
 Pour chaque processus actif présent sur les deux cycles :
-$$\Delta\text{RSS} = \text{RSS}(T_0) - \text{RSS}(T_{-1})$$
-$$\text{Variation \%} = \frac{\Delta\text{RSS}}{\text{RSS}(T_{-1})} \times 100$$
+
+$$\Delta\mathrm{RSS} = \mathrm{RSS}(T_0) - \mathrm{RSS}(T_{-1})$$
+
+$$\mathrm{Variation}\;\% = \frac{\Delta\mathrm{RSS}}{\mathrm{RSS}(T_{-1})} \times 100$$
 
 ### 2. Typologie des Dérives Surveillées
 * **Expansion Normale :** Augmentation modérée lors du chargement de documents ou d'onglets de navigation.
@@ -625,7 +637,7 @@ Le second volet constitue le registre immuable des événements de sécurité cr
 ### Architecture de la File LIFO (*Last In, First Out*)
 Les alertes forensiques sont conservées au sein d'un tampon circulaire protégé en mémoire (`MAX_STEALTH_EVENTS`). Le rendu à l'écran applique un ordonnancement LIFO strict : **la dernière attaque interceptée apparaît systématiquement sur la première ligne rouge du tableau**, garantissant à l'administrateur une lecture chronologique immédiate sans nécessiter de défilement.
 
-```
+```text
                      FLUX D'ALIMENTATION DU REGISTRE FORENSIQUE
                      
        [ Section 13 : Mutation Inode 0 ]       [ Section 14 : Preload-Hunter ]
@@ -656,7 +668,7 @@ Les alertes forensiques sont conservées au sein d'un tampon circulaire protég�
    * *Pour une Mutation R-X (Section 13) :* Adresse hexadécimale exacte de début et de fin de la page anonyme devenue exécutable (ex: `0x7f10b000 - 0x7f10c000`).
    * *Pour un Détournement LD_PRELOAD (Section 14) :* Affichage normalisé **`N/A`**. Cette mention signifie formellement **Non Applicable**, car l'injection s'est opérée au niveau de l'environnement d'exécution du chargeur dynamique et ne possède pas d'adresse virtuelle isolée.
 4. **TAILLE :**
-   * *Pour une Mutation R-X :* Taille physique de la plage injectée en kilo-octets (calculée par $\frac{\text{Adresse Fin} - \text{Adresse Début}}{1024}$).
+   * *Pour une Mutation R-X :* Taille physique de la plage injectée en kilo-octets (calculée par $\frac{\mathrm{Adresse\;Fin} - \mathrm{Adresse\;D\acute{e}but}}{1024}$).
    * *Pour un Détournement LD_PRELOAD :* Affichage normalisé **`N/A`**.
 5. **DIAGNOSTIC FORENSIQUE :**
    * Indication claire de la signature d'intrusion et, dans le cas d'un `LD_PRELOAD`, le chemin complet vers la bibliothèque partagée injectée.
@@ -684,11 +696,11 @@ xargs -0 -L1 -a /proc/18859/environ > /var/log/raptor_incident_18859_env.log
 
 # Extraire les bibliothèques partagées ouvertes
 lsof -p 18859 > /var/log/raptor_incident_18859_lsof.log
+```
 
-##########################################################################################################################
+---
 
-# RAPTOR DEFENSE v2.0 // MANUEL DE RÉFÉRENCE ADMINISTRATEUR
-## Volume 3 : Intelligence Heuristique, Notifications Asynchrones & Bancs d'Essai (Onglet 5, Section 15 & Outils Forensiques)
+# VOLUME 3 : HEURISTIQUES D'ANOMALIE, NOTIFICATIONS & BANCS D'ESSAIS (ONGLET 5, SECTION 15 & OUTILS)
 
 ---
 
@@ -696,7 +708,7 @@ lsof -p 18859 > /var/log/raptor_incident_18859_lsof.log
 
 L'onglet **[ 05 ] Rapport IA** concentre l'intelligence décisionnelle et la synthèse prédictive de RAPTOR v2.0. Alors que les onglets précédents fournissent une vision forensique granulaire (pages mémoire, sockets bruts, descripteurs de fichiers), le moteur heuristique corrèle ces signaux faibles pour produire une évaluation d'intégrité globale et orienter les actions de remédiation de l'administrateur.
 
-```
+```text
 +----------------------------------------------------------------------------------------------------+
 | RAPTOR DEFENSE // AUDIT MÉMOIRE & PROCESSUS   [ SURVEILLANCE ACTIVE ]       [ ? Guide Analytique ] |
 | [ 01 ] Vue Globale | [ 02 ] Processus & RAM | [ 03 ] Sockets & Réseau | [ 04 ] Diff | [ 05 ] IA    |
@@ -726,7 +738,7 @@ L'onglet **[ 05 ] Rapport IA** concentre l'intelligence décisionnelle et la syn
 
 L'indice de santé système (noté de 0 à 100) est évalué à chaque cycle d'audit par pondération différentielle des anomalies constatées sur les 4 vecteurs critiques d'intrusion :
 
-$$\text{Indice Global} = 100 - \sum_{i=1}^{n} (\text{Pondération}_i \times \text{Gravité}_i)$$
+$$\mathrm{Indice\;Global} = 100 - \sum_{i=1}^{n} \left(\mathrm{Pond\acute{e}ration}_i \times \mathrm{Gravit\acute{e}}_i\right)$$
 
 ### Barème des Pénalités Heuristiques
 
@@ -756,7 +768,7 @@ L'administrateur peut exporter l'intégralité du rapport d'audit vers des forma
 
 Pour garantir une protection continue du poste même lorsque RAPTOR fonctionne en tâche de fond ou avec sa fenêtre Raylib minimisée, la Section 15 introduit le moteur de notifications asynchrones `raptor_notify`.
 
-```
+```text
                 ARCHITECTURE DU DOUBLE-FORK DÉCOUPÉ (0 ms & 0 ZOMBIE)
                 
                 [ Boucle Graphique Raylib (60 FPS) ]
@@ -798,7 +810,7 @@ Pour contourner ce verrouillage, la fonction 86 (`raptor_notify_send_desktop`) i
 
 Pour éviter de saturer le serveur d'affichage et l'attention de l'opérateur par des centaines de bulles consécutives, la fonction 87 (`raptor_notify_evaluate_threats`) arbitre les émissions d'alerte :
 
-```
+```text
                         LOGIQUE DU FILTRE ANTI-REBOND TEMPOREL
                         
                               [ Nombre de Menaces Actuelles ]
@@ -828,7 +840,7 @@ Pour éviter de saturer le serveur d'affichage et l'attention de l'opérateur pa
 
 RAPTOR est livré avec deux outils d'injection inoffensifs autonomes situés dans `tools/` permettant de certifier le bon fonctionnement des sondes en conditions réelles sans compromettre la machine.
 
-```
+```text
 RAPTOR/tools/
 ├── test_stealth.c   # Banc d'essai Section 13 : Mutation de permissions mprotect()
 └── test_preload.c   # Banc d'essai Section 14 : Détournement de chargeur LD_PRELOAD
@@ -916,7 +928,7 @@ int main(void) {
 
 L'architecture logicielle de RAPTOR est soumise à une gouvernance stricte : **aucun code non tracé, chaque fonction possède un identifiant unique immuable au dictionnaire et toute modification incrémente la révision du fichier d'en-tête**.
 
-```
+```text
                            MATRICE DES 15 SECTIONS DE RAPTOR
                            
  [ Sec 01-10 : Socle Universel, Forensique RWX & Rapports ] ----> Fonctions 01 à 57
@@ -982,4 +994,3 @@ Toute extension ou nouveau greffon intégré à RAPTOR doit respecter scrupuleus
 3. **Absence Totale de Télémétrie :** Le code ne doit émettre aucune requête vers des serveurs d'analyse tiers, des régies publicitaires ou des métriques cloud. La souveraineté des données de l'hôte audité est absolue.
 4. **Zéro Régression de Performance :** L'interface doit maintenir en permanence 60 FPS constants sans saccade visuelle. Tout traitement bloquant (réseau, DNS, lecture disque lourde) doit être déporté sur un thread secondaire ou asynchrone.
 5. **Documentation Systématique en En-Tête :** Chaque script C ou en-tête doit comporter son bloc descriptif standardisé précisant le nom du fichier, le numéro de révision, la responsabilité système et la liste numérotée exhaustive de ses fonctions.
-```
