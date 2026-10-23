@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : src/plugins/plugin_memory_rwx.c
- * RÉVISION        : Rev 1.10
+ * RÉVISION        : Rev 1.13
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : Greffon d'audit mémoire et processus sous Linux (/proc).
  *                   Inspecte les cartographies mémoire des processus (/proc/[PID]/maps)
@@ -11,10 +11,16 @@
  *                   du système, extrait et trie en temps réel le Top 10 des
  *                   consommateurs de mémoire et isole les réelles anomalies.
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.10) :
- *   - Transmission conjointe de comm et exe à mem_stealth_scan_maps_anon_rx.
- *   - Neutralisation des faux positifs sur xed et les outils Mint/Cinnamon.
- *   - Qualification stricte de l'étiquette "MUTATION R-X" dans le rapport.
+ * NOUVELLES INTÉGRATIONS (Rev 1.13) :
+ *   - Structuration séquentielle et chronologique intégrale de la fonction 5
+ *     en 6 sous-étapes strictement numérotées (5.1 à 5.6).
+ *   - Intégration effective de la Section 15 (raptor_notify_evaluate_threats)
+ *     avec extraction déterministe du processus attaquant dans la notification.
+ *   - Alignement logique des dépendances architecturales :
+ *       * Section 13 : Mem-Stealth (Mutations R-X Inode 0)
+ *       * Section 14 : Preload-Hunter (Global et Ciblé)
+ *       * Section 15 : Notification Système Asynchrone (Freedesktop)
+ *   - Élimination des incohérences de libellés et des sauts de numérotation.
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
  *   1. proc_mem_is_trusted_path
@@ -30,6 +36,8 @@
 #include "raptor/raptor_registry.h"
 #include "raptor/raptor_data.h"
 #include "../core/mem_stealth.h"
+#include "../core/preload_hunter.h"
+#include "../core/raptor_notify.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -284,6 +292,9 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
         return false;
     }
 
+    /* --------------------------------------------------------------------- */
+    /* 5.1. MESURE GLOBALE DU SYSTÈME (RAM PHYSIQUE & CHARGE CPU)            */
+    /* --------------------------------------------------------------------- */
     uint64_t ram_total_bytes = 8ULL * 1024 * 1024 * 1024;
     uint64_t ram_avail_bytes = 4ULL * 1024 * 1024 * 1024;
 
@@ -352,6 +363,29 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
     size_t kernel_threads = 0;
     size_t threats_count = 0;
 
+    /* --------------------------------------------------------------------- */
+    /* 5.2. AUDIT D'INTÉGRITÉ GLOBALE DE L'HÔTE (SECTION 14 : PRELOAD GLOBAL)*/
+    /* --------------------------------------------------------------------- */
+    char global_preload[512] = {0};
+    if (preload_hunter_check_global(global_preload, sizeof(global_preload))) {
+        char alert_msg[600];
+        snprintf(alert_msg, sizeof(alert_msg),
+                 "CRITIQUE : Infection globale /etc/ld.so.preload active -> %s", global_preload);
+        raptor_data_alert_add(sec, RAPTOR_SEV_CRITICAL, alert_msg);
+        threats_count++;
+
+        StealthEvent g_ev;
+        g_ev.pid = 0;
+        memcpy(g_ev.comm, "[HOST SYSTEM]", 13);
+        g_ev.comm[13] = '\0';
+        g_ev.start_addr = 0;
+        g_ev.end_addr = 0;
+        g_ev.size_kb = 0;
+        snprintf(g_ev.detail, sizeof(g_ev.detail),
+                 "Infection globale /etc/ld.so.preload : %.70s", global_preload);
+        mem_stealth_dispatch_diff_event(&g_ev);
+    }
+
     ProcSortEntry* sort_list = NULL;
     size_t sort_count = 0;
     size_t sort_cap = 0;
@@ -364,6 +398,9 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
         return false;
     }
 
+    /* --------------------------------------------------------------------- */
+    /* 5.3. BALAYAGE & INSPECTION UNITAIRE DES PROCESSUS (/proc/[PID])       */
+    /* --------------------------------------------------------------------- */
     struct dirent* ent = NULL;
     while ((ent = readdir(pdir)) != NULL) {
         if (!isdigit((unsigned char)ent->d_name[0])) {
@@ -390,24 +427,75 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
             continue;
         }
 
+        /* 5.3.1. Filtrage Whitelist et Chemins de Confiance */
+        bool is_whitelisted = mem_stealth_is_whitelisted(comm, exe);
         bool trusted = proc_mem_is_trusted_path(exe);
         bool jit = proc_mem_is_legit_jit(comm, exe);
         bool is_rwx_threat = proc_mem_scan_maps_rwx(pid, jit, trusted);
-        bool is_deleted = (strstr(exe, "(deleted)") != NULL);
 
-        /* Section 13 : Traque de mémoire anonyme R-X avec validation conjointe comm + exe */
+        /* 5.3.2. Analyse Contextuelle des Binaires Supprimés (deleted) */
+        bool is_deleted = false;
+        if (strstr(exe, "(deleted)") != NULL) {
+            char clean_exe[512];
+            size_t elen = strlen(exe);
+            if (elen >= sizeof(clean_exe)) elen = sizeof(clean_exe) - 1;
+            memcpy(clean_exe, exe, elen);
+            clean_exe[elen] = '\0';
+
+            char* del_ptr = strstr(clean_exe, " (deleted)");
+            if (!del_ptr) del_ptr = strstr(clean_exe, "(deleted)");
+            if (del_ptr) {
+                while (del_ptr > clean_exe && (*(del_ptr - 1) == ' ' || *(del_ptr - 1) == '\t')) {
+                    del_ptr--;
+                }
+                *del_ptr = '\0';
+            }
+
+            if (clean_exe[0] != '\0' && access(clean_exe, F_OK) == 0 && (is_whitelisted || trusted)) {
+                is_deleted = false;
+            } else {
+                is_deleted = true;
+            }
+        }
+
+        /* 5.3.3. Traque de Mémoire Anonyme Exécutable (SECTION 13 : Inode 0 R-X) */
         StealthEvent stealth_ev;
         bool is_anon_rx = mem_stealth_scan_maps_anon_rx((pid_t)pid, comm, exe, &stealth_ev);
+
+        /* 5.3.4. Traque de Détournement Ciblé (SECTION 14 : LD_PRELOAD) */
+        char proc_preload[512] = {0};
+        bool is_preload_hijack = false;
+
+        if (!is_whitelisted) {
+            is_preload_hijack = preload_hunter_scan_process_env((pid_t)pid, proc_preload, sizeof(proc_preload));
+            if (is_preload_hijack) {
+                StealthEvent p_ev;
+                p_ev.pid = (pid_t)pid;
+
+                size_t clen = strlen(comm);
+                if (clen >= sizeof(p_ev.comm)) clen = sizeof(p_ev.comm) - 1;
+                memcpy(p_ev.comm, comm, clen);
+                p_ev.comm[clen] = '\0';
+
+                p_ev.start_addr = 0;
+                p_ev.end_addr = 0;
+                p_ev.size_kb = 0;
+                snprintf(p_ev.detail, sizeof(p_ev.detail),
+                         "Détournement LD_PRELOAD : %.75s", proc_preload);
+                mem_stealth_dispatch_diff_event(&p_ev);
+            }
+        }
 
         if (strcmp(exe, "[système/restreint]") == 0) {
             trusted = true;
         }
 
-        bool is_suspicious = (!trusted) || is_rwx_threat || is_deleted || is_anon_rx;
+        bool is_suspicious = (!trusted) || is_rwx_threat || is_deleted || is_anon_rx || is_preload_hijack;
         if (is_suspicious) {
             threats_count++;
         }
 
+        /* 5.3.5. Qualification et Enregistrement dans la Liste de Tri */
         if (sort_count >= sort_cap) {
             size_t new_cap = (sort_cap == 0) ? 64 : sort_cap * 2;
             ProcSortEntry* new_arr = (ProcSortEntry*)realloc(sort_list, new_cap * sizeof(ProcSortEntry));
@@ -437,8 +525,9 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
             sort_list[sort_count].rss = rss;
             sort_list[sort_count].is_threat = is_suspicious;
 
-            /* Qualification précise */
-            if (is_anon_rx) {
+            if (is_preload_hijack) {
+                strncpy(sort_list[sort_count].threat_status, "HIJACK LD_PRELOAD", sizeof(sort_list[sort_count].threat_status) - 1);
+            } else if (is_anon_rx) {
                 strncpy(sort_list[sort_count].threat_status, "MUTATION R-X", sizeof(sort_list[sort_count].threat_status) - 1);
             } else if (is_rwx_threat) {
                 strncpy(sort_list[sort_count].threat_status, "INJECTION RWX", sizeof(sort_list[sort_count].threat_status) - 1);
@@ -457,6 +546,9 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
     closedir(pdir);
 #endif
 
+    /* --------------------------------------------------------------------- */
+    /* 5.4. TRI DE L'ENSEMBLE DES PROCESSUS PAR CONSOMMATION RAM (RSS)       */
+    /* --------------------------------------------------------------------- */
     for (size_t i = 0; i < sort_count; ++i) {
         for (size_t j = i + 1; j < sort_count; ++j) {
             if (sort_list[j].rss > sort_list[i].rss) {
@@ -467,6 +559,9 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
         }
     }
 
+    /* --------------------------------------------------------------------- */
+    /* 5.5. GÉNÉRATION DES MÉTRIQUES ET DES TABLES RAPTOR                    */
+    /* --------------------------------------------------------------------- */
     char cpu_str[32];
     snprintf(cpu_str, sizeof(cpu_str), "%.1f %%", cpu_load_pct);
     raptor_data_card_add(sec, "CHARGE PROCESSEUR", cpu_str, cpu_load_pct, RAPTOR_SEV_INFO);
@@ -486,7 +581,7 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
     snprintf(procs_str, sizeof(procs_str), "%zu", total_procs);
     raptor_data_card_add(sec, "SURVEILLANCE PROCESSUS", procs_str, 100.0f, RAPTOR_SEV_INFO);
 
-    /* 1. TOP 10 DES PLUS GROS CONSOMMATEURS */
+    /* Table 1 : Top 10 des plus gros consommateurs de mémoire */
     const char* col_top10[] = { "PID", "Nom du Processus", "RAM (RSS)", "Statut", "Emplacement Binaire" };
     RaptorTable* tbl_top10 = raptor_data_table_create(sec, "TOP 10 DES PLUS GROS CONSOMMATEURS DE MÉMOIRE", 5, col_top10);
 
@@ -502,7 +597,7 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
         raptor_data_table_row_add(tbl_top10, cells, sevs);
     }
 
-    /* 2. PROCESSUS SUSPECTS ET ANOMALIES DÉTECTÉES */
+    /* Table 2 : Processus suspects et anomalies détectées */
     const char* col_anomalies[] = { "PID", "Nom du Processus", "RAM (RSS)", "Mémoire Virtuelle", "Statut Dérive", "Emplacement Binaire" };
     RaptorTable* tbl_anomalies = raptor_data_table_create(sec, "PROCESSUS SUSPECTS ET ANOMALIES DÉTECTÉES", 6, col_anomalies);
 
@@ -551,7 +646,7 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
         raptor_data_table_row_add(tbl_anomalies, clean_cells, clean_sevs);
     }
 
-    /* 3. INSPECTION GLOBALE DES PROCESSUS */
+    /* Table 3 : Inspection globale des processus */
     const char* col_all[] = { "PID", "Nom du Processus", "RAM (RSS)", "Statut Dérive", "Emplacement Binaire" };
     RaptorTable* tbl_all = raptor_data_table_create(sec, "INSPECTION GLOBALE DES PROCESSUS", 5, col_all);
     for (size_t i = 0; i < sort_count && tbl_all; ++i) {
@@ -570,6 +665,20 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
     } else {
         raptor_data_alert_add(sec, RAPTOR_SEV_OK, "SYSTÈME SÉCURISÉ // AUCUNE INTRUSION DÉTECTÉE : Tous les processus sont adossés à des binaires intègres.");
     }
+
+    /* --------------------------------------------------------------------- */
+    /* 5.6. ÉMISSION D'ALERTE BUREAU (ARCHITECTURE SECTION 15 : NOTIFY)      */
+    /* --------------------------------------------------------------------- */
+    const char* primary_threat_comm = NULL;
+    if (threats_count > 0 && sort_list) {
+        for (size_t i = 0; i < sort_count; ++i) {
+            if (sort_list[i].is_threat) {
+                primary_threat_comm = sort_list[i].comm;
+                break;
+            }
+        }
+    }
+    raptor_notify_evaluate_threats((int)threats_count, primary_threat_comm);
 
     if (sort_list) {
         free(sort_list);

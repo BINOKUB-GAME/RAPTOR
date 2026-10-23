@@ -453,3 +453,51 @@ typedef struct {
     size_t size_kb;
     char detail[128];
 } StealthEvent;
+
+
+### SECTION 13 — TRAQUE MÉMOIRE ANONYME & MUTATIONS R-X (`src/core/mem_stealth.c`)
+
+* **80. `mem_stealth_whitelist_load`**
+  * **Prototype :** `bool mem_stealth_whitelist_load(const char* filepath)`
+  * **Rôle :** Charge et analyse le fichier souverain externe (`assets/rules/mem_whitelist.conf`). Parse les directives `JIT` et `FFI`, nettoie les délimiteurs verticaux (`|`) et peuple le registre d'exception en mémoire vive (capacité portée à 256 motifs).
+  * **Retour :** `true` si au moins une règle est chargée avec succès, sinon `false`.
+
+* **81. `mem_stealth_is_whitelisted`**
+  * **Prototype :** `bool mem_stealth_is_whitelisted(const char* comm, const char* exe)`
+  * **Rôle :** Vérifie si un processus correspond à une signature autorisée dans la liste blanche externe. Effectue une comparaison insensible à la casse sur le nom court (`comm`) et le chemin absolu (`exe`) pour neutraliser les faux positifs (navigateurs, Flatpak, environnements de bureau Cinnamon/GNOME/KDE).
+  * **Retour :** `true` si le binaire est légitime, sinon `false`.
+
+* **82. `mem_stealth_scan_maps_anon_rx`**
+  * **Prototype :** `bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe, StealthEvent* ev_out)`
+  * **Rôle :** Analyse chirurgicale de `/proc/[PID]/maps` pour isoler les allocations anonymes rendues exécutables (`r-xp`) après bascule dynamique `mprotect()`. Isole les segments orphelins (Inode 0 sans fichier disque associé) hors vecteurs système protégés (`[vdso]`, `[vsyscall]`).
+  * **Retour :** `true` si une mutation mémoire clandestine est constatée, sinon `false`.
+
+* **83. `mem_stealth_dispatch_diff_event`**
+  * **Prototype :** `void mem_stealth_dispatch_diff_event(const StealthEvent* ev)`
+  * **Rôle :** Enregistre et déduplique les alertes forensiques dans le tampon circulaire de RAPTOR. Propulse les événements en temps réel vers le registre LIFO du Cahier Différentiel (Onglet 4).
+
+---
+
+### SECTION 14 — DÉTECTION DES DÉTOURNEMENTS DU CHARGEUR DYNAMIQUE (`src/core/preload_hunter.c`)
+
+* **84. `preload_hunter_check_global`**
+  * **Prototype :** `bool preload_hunter_check_global(char* out_path, size_t out_len)`
+  * **Rôle :** Audit d'intégrité passif de l'hôte via le contrôle d'accès direct à `/etc/ld.so.preload`. Identifie la persistance globale d'un rootkit en espace utilisateur forçant l'injection d'une bibliothèque partagée (`.so`) dans l'ensemble des exécutables de la machine.
+  * **Retour :** `true` si le fichier existe et référence une bibliothèque active, sinon `false`.
+
+* **85. `preload_hunter_scan_process_env`**
+  * **Prototype :** `bool preload_hunter_scan_process_env(pid_t pid, char* out_preload_lib, size_t out_len)`
+  * **Rôle :** Inspection unitaire et sécurisée du pseudo-fichier `/proc/[PID]/environ`. Parcourt les variables délimitées par des octets nuls (`\0`) pour intercepter la variable hostile `LD_PRELOAD=` ciblant un processus spécifique.
+  * **Retour :** `true` en cas d'injection ciblée détectée avec extraction du chemin de la bibliothèque, sinon `false`.
+
+---
+
+### SECTION 15 — NOTIFICATIONS BUREAU ASYNCHRONES FREEDESKTOP (`src/core/raptor_notify.c`)
+
+* **86. `raptor_notify_send_desktop`**
+  * **Prototype :** `void raptor_notify_send_desktop(const char* title, const char* body, bool is_critical)`
+  * **Rôle :** Émet une bulle d'avertissement native vers le démon de notification du bureau via `notify-send`. Utilise un double découplage de processus (`fork()` / `_exit(0)`) garantissant 0 ms de blocage sur la boucle de rendu Raylib (60 FPS constants) et 0 processus zombie.
+
+* **87. `raptor_notify_evaluate_threats`**
+  * **Prototype :** `void raptor_notify_evaluate_threats(int current_threats, const char* primary_threat_name)`
+  * **Rôle :** Moteur d'arbitrage d'alertes avec filtre anti-rebond temporel (délai de garde de 30 secondes). Déclenche instantanément la notification lors d'une transition critique (passage de 0 à N menaces) et notifie le retour au statut nominal lors de la résolution de l'incident.

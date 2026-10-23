@@ -68,6 +68,8 @@ set(RAPTOR_CORE_SOURCES
     src/core/raptor_registry.c
     src/core/raptor_differential.c
     src/core/mem_stealth.c
+    src/core/preload_hunter.c
+    src/core/raptor_notify.c
 )
 
 set(RAPTOR_REPORT_SOURCES
