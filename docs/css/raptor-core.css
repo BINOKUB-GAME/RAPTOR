@@ -1,21 +1,19 @@
 /* ============================================================================
  * NOM DU SCRIPT   : docs/css/raptor-core.css
- * RÉVISION        : Rev 1.1
+ * RÉVISION        : Rev 1.2
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Socle stylistique global, variables graphiques souveraines,
- *                   architecture de mise en page institutionnelle (style FreeBSD),
+ *                   architecture de mise en page institutionnelle ,
  *                   composants de navigation, simulateur de terminal et grilles.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTEGRATIONS (Rev 1.1) :
- *   - Normalisation de la palette chromatique officielle : Rouge institutionnel
- *     (#8C1D18), rouge vermillon (#B71C1C), blanc pur et gris technique.
- *   - En-tête d'autorité avec alignement du logo officiel, navigation et barre de recherche.
- *   - Ajout d'un filtre d'inversion chromatique (brightness/invert) sur l'image
- *     de marque pour forcer le blanc/transparence du logo sur le fond rouge.
- *   - Grille de cartes modulaires pour l'exposition des sondes du noyau.
- *   - Émulateur d'affichage de manuel Unix (troff/groff) pour les man pages.
- *   - Agencement à deux colonnes pour la FAQ technique avec sommaire flottant (Sticky TOC).
- *   - Rendu entièrement responsive sans dépendance logicielle externe.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
+ *   - Correction mobile responsive intégrale (Media Query <= 768px) :
+ *     * Déverrouillage de la hauteur fixe du bandeau (.raptor-header { height: auto })
+ *       pour éliminer le débordement des liens sur le contenu de page.
+ *     * Masquage automatique du champ de recherche sur smartphone (.raptor-search-box).
+ *     * Transformation de la barre de navigation mobile (.raptor-nav) en onglets
+ *       tactiles avec fond contrasté et espacement calibré pour écran tactile.
+ *     * Ajustement de la typographie du titre Hero et des cartes pour petits écrans.
  *
  * SECTIONS NUMÉROTÉES :
  *   1. VARIABLES CSS & PALETTE OFFICIELLE
@@ -36,7 +34,7 @@
  */
 :root {
     /* Nuances de rouge souverain */
-    --color-primary-red       : #8C1D18; /* Rouge institutionnel style FreeBSD */
+    --color-primary-red       : #8C1D18; /* Rouge institutionnel  */
     --color-primary-hover     : #A8231E; /* Rouge actif au survol */
     --color-accent-red        : #B71C1C; /* Rouge vermillon pour alertes et accents */
     --color-subtle-red        : #FBEBEB; /* Fond teinté discret pour surbrillance */
@@ -174,7 +172,7 @@ code, pre {
     width: 44px;
     object-fit: contain;
     border-radius: 50%;
-    filter: brightness(0) invert(1); /* Rehausse les contours et lignes de l'image en blanc éclatant */
+    filter: brightness(0) invert(1);
 }
 
 .raptor-brand span {
@@ -562,7 +560,7 @@ code, pre {
 }
 
 .man-section-heading {
-    color: #E06C75; /* Rouge bordeaux pour titres NAME, SYNOPSIS... */
+    color: #E06C75;
     font-weight: 700;
     display: block;
     margin-top: 18px;
@@ -575,7 +573,7 @@ code, pre {
 }
 
 .man-flag {
-    color: #E5C07B; /* Jaune/Ambre pour les options -q, -r */
+    color: #E5C07B;
 }
 
 /* ============================================================================
@@ -749,30 +747,108 @@ code, pre {
 }
 
 @media (max-width: 768px) {
-    .raptor-header .container {
-        flex-wrap: wrap;
+    /* Déverrouillage complet de la hauteur du bandeau */
+    .raptor-header {
         height: auto;
-        padding-top: 12px;
-        padding-bottom: 12px;
-        gap: 12px;
+        min-height: auto;
+        padding: 8px 0 10px 0;
     }
 
+    .raptor-header .container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        height: auto;
+        padding-left: 14px;
+        padding-right: 14px;
+        gap: 8px 12px;
+    }
+
+    /* Ligne 1 : Marque à gauche, GitHub à droite */
+    .raptor-brand {
+        order: 1;
+        font-size: 1.15rem;
+    }
+
+    .raptor-brand img {
+        height: 36px;
+        width: 36px;
+    }
+
+    .raptor-header-actions {
+        order: 2;
+        gap: 8px;
+    }
+
+    /* Masquage de la barre de recherche sur smartphone pour libérer le bandeau */
+    .raptor-search-box {
+        display: none;
+    }
+
+    .btn-github {
+        padding: 5px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* Ligne 2 : Menu tactile étalé sur toute la largeur */
     .raptor-nav {
         order: 3;
         width: 100%;
+        display: flex;
         justify-content: space-between;
-        gap: 12px;
-        border-top: 1px solid rgba(255, 255, 255, 0.15);
-        padding-top: 10px;
+        align-items: center;
+        gap: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 8px;
+        margin-top: 2px;
+    }
+
+    .raptor-nav a {
+        font-size: 0.82rem;
+        padding: 6px 4px;
+        border-radius: var(--border-radius-sm);
+        background-color: rgba(255, 255, 255, 0.1);
+        text-align: center;
+        flex: 1;
+        opacity: 0.95;
+    }
+
+    .raptor-nav a.active {
+        background-color: rgba(255, 255, 255, 0.28);
+        text-decoration: none;
+        font-weight: 700;
+        opacity: 1;
+    }
+
+    /* Ajustement des espacements du corps pour mobile */
+    .raptor-hero {
+        padding: 32px 0 40px 0;
+    }
+
+    .raptor-hero-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        line-height: 1.4;
     }
 
     .raptor-hero h1 {
-        font-size: 2rem;
+        font-size: 1.85rem;
+    }
+
+    .raptor-hero-subtitle {
+        font-size: 0.98rem;
+        margin-bottom: 24px;
     }
 
     .raptor-join-banner {
         flex-direction: column;
         align-items: flex-start;
+        gap: 14px;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
     }
 
     .footer-grid {
