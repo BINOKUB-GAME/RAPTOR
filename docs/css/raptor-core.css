@@ -3,7 +3,7 @@
  * RÉVISION        : Rev 1.3
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Socle stylistique global, variables graphiques souveraines,
- *                   architecture de mise en page institutionnelle (style FreeBSD),
+ *                   architecture de mise en page institutionnelle,
  *                   composants de navigation, simulateur de terminal et grilles.
  *
  * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.3) :
@@ -885,6 +885,7 @@ code, pre {
 
     .man-search-group input {
         width: 100%;
+        height: 38px;
     }
 
     .man-btn-group {
