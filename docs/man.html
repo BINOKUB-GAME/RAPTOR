@@ -1,0 +1,133 @@
+<!-- ==========================================================================
+ * NOM DU SCRIPT   : docs/man.html
+ * RÉVISION        : Rev 1.1
+ * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
+ * RESPONSABILITÉ  : Interface interactive de consultation des pages de manuel
+ *                   UNIX en ligne (Section 1 Commandes, Section 5 Formats).
+ *
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
+ *   - Remplacement du lien générique GitHub par https://github.com/BINOKUB-GAME/RAPTOR.
+ * ========================================================================== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPTOR DEFENSE // Manual Pages Archive</title>
+    <meta name="description" content="Archive en ligne des pages de manuel de RAPTOR DEFENSE (rap, rapless, formats de règles).">
+    <link rel="stylesheet" href="css/raptor-core.css">
+    <link rel="icon" type="image/png" href="raptor-icon.png">
+</head>
+<body>
+
+    <!-- ======================================================================
+         1. EN-TÊTE INSTITUTIONNEL
+         ====================================================================== -->
+    <header class="raptor-header">
+        <div class="container">
+            <a href="index.html" class="raptor-brand">
+                <img src="raptor-icon.png" alt="Logo Officiel RAPTOR DEFENSE">
+                <span>RAPTOR<span class="version-badge">v2.0</span></span>
+            </a>
+
+            <nav class="raptor-nav">
+                <a href="index.html">Accueil</a>
+                <a href="man.html" class="active">Manuel (Man)</a>
+                <a href="faq.html">FAQ Technique</a>
+                <a href="community.html">Communauté</a>
+            </nav>
+
+            <div class="raptor-header-actions">
+                <a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener" class="btn-github">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================================================================
+         2. SECTION DE RECHERCHE & ARCHIVE (STYLE FREEBSD MAN PAGES)
+         ====================================================================== -->
+    <main class="raptor-section" style="padding-top: 40px;">
+        <div class="container">
+            <div style="margin-bottom: 24px;">
+                <h1 style="font-size: 2rem; margin-bottom: 8px;">Archive des Pages de Manuel</h1>
+                <p style="color: var(--color-text-muted); font-size: 0.95rem;">
+                    Documentation d'exploitation des utilitaires de combat et des registres de configuration souverains.
+                </p>
+            </div>
+
+            <!-- Barre d'interrogation et sélecteurs -->
+            <div class="man-selector-bar">
+                <input type="text" id="manSearchInput" placeholder="Rechercher une commande (ex: rx, kill, net)..." 
+                       style="padding: 7px 12px; font-family: var(--font-mono); font-size: 0.85rem; border: 1px solid var(--color-border-dark); border-radius: var(--border-radius-sm); width: 260px;">
+                
+                <button type="button" id="btnManExec" class="btn-primary" style="padding: 7px 16px; font-size: 0.85rem; cursor: pointer;">man</button>
+                <button type="button" id="btnAproposExec" class="btn-secondary" style="padding: 7px 16px; font-size: 0.85rem; cursor: pointer;">apropos</button>
+
+                <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+                    <label for="manSectionSelect">Section :</label>
+                    <select id="manSectionSelect" class="man-select">
+                        <option value="all">Toutes les sections</option>
+                        <option value="1" selected>1 - Commandes de Secours (rap, rapless)</option>
+                        <option value="5">5 - Formats de Règles (.conf)</option>
+                    </select>
+
+                    <label for="manCommandSelect" style="margin-left: 8px;">Page :</label>
+                    <select id="manCommandSelect" class="man-select">
+                        <!-- Rempli dynamiquement par man-engine.js -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Visionneuse de la man page active -->
+            <div class="man-viewer-box">
+                <div class="man-viewer-header">
+                    <span id="manViewerTitle" class="man-viewer-title">MANUAL PAGE // RAP(1)</span>
+                    <button id="btnCopyMan" class="man-btn-copy">Copier le texte brut</button>
+                </div>
+                <div id="manViewerContent" class="man-content">
+                    <!-- Contenu textuel injecté dynamiquement -->
+                </div>
+            </div>
+
+            <!-- Raccourcis de navigation directe -->
+            <div style="margin-top: 24px; padding: 16px; background-color: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); font-size: 0.85rem;">
+                <span style="font-weight: 600; color: var(--color-primary-red);">Raccourcis rapides :</span>
+                <span style="margin-left: 10px;">
+                    <a href="#rap">rap(1)</a> &bull; 
+                    <a href="#rap-status">rap-status(1)</a> &bull; 
+                    <a href="#rap-top">rap-top(1)</a> &bull; 
+                    <a href="#rap-hunt">rap-hunt(1)</a> &bull; 
+                    <a href="#rap-rx">rap-rx(1)</a> &bull; 
+                    <a href="#rap-preload">rap-preload(1)</a> &bull; 
+                    <a href="#rap-heur">rap-heur(1)</a> &bull; 
+                    <a href="#rap-net">rap-net(1)</a> &bull; 
+                    <a href="#rap-kill">rap-kill(1)</a> &bull; 
+                    <a href="#rap-freeze">rap-freeze(1)</a> &bull; 
+                    <a href="#rapless">rapless(1)</a> &bull; 
+                    <a href="#mem_whitelist">mem_whitelist(5)</a> &bull; 
+                    <a href="#fw_officiel">fw_officiel(5)</a>
+                </span>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================================================================
+         3. PIED DE PAGE INSTITUTIONNEL
+         ====================================================================== -->
+    <footer class="raptor-footer">
+        <div class="container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+                <div>&copy; 2026 RAPTOR DEFENSE Project. Documentation officielle du projet.</div>
+                <div><a href="index.html" style="color: #ABB2BF;">Retour à l'accueil</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/man-engine.js"></script>
+</body>
+</html>

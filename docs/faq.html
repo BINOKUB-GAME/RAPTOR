@@ -1,0 +1,225 @@
+<!-- ==========================================================================
+ * NOM DU SCRIPT   : docs/faq.html
+ * RÉVISION        : Rev 1.1
+ * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
+ * RESPONSABILITÉ  : Base de connaissances technique et foire aux questions (FAQ).
+ *
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
+ *   - Remplacement du lien générique GitHub par https://github.com/BINOKUB-GAME/RAPTOR.
+ * ========================================================================== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPTOR DEFENSE // Foire Aux Questions Technique (FAQ)</title>
+    <meta name="description" content="Base de connaissances technique de RAPTOR DEFENSE : architecture C99, gestion de la mémoire, Net-Guard et guide développeur.">
+    <link rel="stylesheet" href="css/raptor-core.css">
+    <link rel="icon" type="image/png" href="raptor-icon.png">
+</head>
+<body>
+
+    <!-- ======================================================================
+         1. EN-TÊTE INSTITUTIONNEL
+         ====================================================================== -->
+    <header class="raptor-header">
+        <div class="container">
+            <a href="index.html" class="raptor-brand">
+                <img src="raptor-icon.png" alt="Logo Officiel RAPTOR DEFENSE">
+                <span>RAPTOR<span class="version-badge">v2.0</span></span>
+            </a>
+
+            <nav class="raptor-nav">
+                <a href="index.html">Accueil</a>
+                <a href="man.html">Manuel (Man)</a>
+                <a href="faq.html" class="active">FAQ Technique</a>
+                <a href="community.html">Communauté</a>
+            </nav>
+
+            <div class="raptor-header-actions">
+                <a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener" class="btn-github">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================================================================
+         2. DISPOSITION DOUBLE COLONNE : FAQ & SOMMAIRE FLOTTANT
+         ====================================================================== -->
+    <main class="raptor-section" style="padding-top: 40px;">
+        <div class="container">
+            <div style="margin-bottom: 32px;">
+                <h1 style="font-size: 2rem; margin-bottom: 8px;">Foire Aux Questions Technique (FAQ)</h1>
+                <p style="color: var(--color-text-muted); font-size: 0.95rem;">
+                    Principes architecturaux, gestion forensique des alertes et guide pratique pour les développeurs et administrateurs.
+                </p>
+            </div>
+
+            <div class="faq-layout">
+                <!-- Colonne latérale : Sommaire dynamique (Sticky TOC) -->
+                <aside class="faq-sidebar">
+                    <h4>Sommaire des Sujets</h4>
+                    <ul class="faq-toc-list" id="faqToc">
+                        <li><a href="#faq-intro" class="active">1. Architecture & Survie C99</a></li>
+                        <li><a href="#faq-mem" class="">2. Forensic Mémoire & Inode 0</a></li>
+                        <li><a href="#faq-net" class="">3. Net-Guard & Flux Réseau</a></li>
+                        <li><a href="#faq-cinetique" class="">4. Neutralisation & Gardes-fous</a></li>
+                        <li><a href="#faq-contrib" class="">5. Rejoindre l'Équipe & Bogues</a></li>
+                    </ul>
+                </aside>
+
+                <!-- Colonne principale : Articles et réponses d'ingénierie -->
+                <section class="faq-content">
+                    
+                    <!-- GROUPE 1 -->
+                    <div class="faq-group" id="faq-intro">
+                        <h3>1. Architecture & Survie C99</h3>
+                        
+                        <div class="faq-item">
+                            <h4>Pourquoi avoir banni l'allocation dynamique (malloc / 0 heap) sur le mode CLI ?</h4>
+                            <p>
+                                Lorsqu'un serveur Linux subit une attaque par déni de service, une fuite de mémoire massive ou un rançongiciel chiffrant la RAM, le gestionnaire de mémoire du noyau (OOM Killer) élimine en priorité les processus tentant d'allouer de la mémoire sur le tas (<code>heap</code>).
+                            </p>
+                            <p>
+                                Les utilitaires <code>rap</code> et <code>rapless</code> s'exécutent entièrement dans la pile statique (buffers bornés) et la mémoire morte (<code>.rodata</code>). Ils peuvent démarrer, auditer et neutraliser des menaces même lorsqu'il ne reste que <strong>moins de 2 Mo de RAM libre</strong> sur l'hôte, là où des outils écrits en Python, Go ou Node.js échoueraient instantanément avec un <code>OutOfMemory</code>.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment le mode CLI peut-il fonctionner si X11 ou Wayland s'effondre ?</h4>
+                            <p>
+                                La console <code>rap</code> n'a aucune liaison dynamique avec la bibliothèque graphique Raylib, OpenGL ou les serveurs d'affichage. Elle communique exclusivement avec les interfaces textuelles du noyau via les pseudo-fichiers <code>/proc</code> et émet des séquences ANSI pures compatibles avec les terminaux de secours virtuels (TTY 1 à 6).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- GROUPE 2 -->
+                    <div class="faq-group" id="faq-mem">
+                        <h3>2. Forensic Mémoire & Inode 0</h3>
+
+                        <div class="faq-item">
+                            <h4>Qu'est-ce qu'une mutation mémoire anonyme Inode 0 (r-xp) ?</h4>
+                            <p>
+                                Dans un exécutable ordinaire, les pages contenant du code binaire exécutable proviennent d'un fichier physique adossé sur le disque dur (avec un numéro d'Inode valide). 
+                            </p>
+                            <p>
+                                Une allocation anonyme (Inode 0) possédant les permissions de lecture et d'exécution (<code>r-xp</code>) est la signature classique d'une injection de code en mémoire vive (shellcode, balise Cobalt Strike, réflexion de DLL Linux via <code>memfd_create</code> ou bascule dynamique via <code>mprotect</code>). <code>rap rx</code> traque précisément ces segments orphelins.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment sont traités les faux positifs des navigateurs et de Cinnamon ?</h4>
+                            <p>
+                                Les navigateurs modernes (Chromium, Firefox) et les moteurs d'interfaces (Cinnamon, GNOME GJS, Python) utilisent des compilateurs Just-In-Time (JIT) ou des trampolines <code>libffi</code> qui allouent légitimement du code dynamique en mémoire.
+                            </p>
+                            <p>
+                                Pour éviter de saturer l'administrateur de faux positifs, RAPTOR intègre le registre <code>assets/rules/mem_whitelist.conf</code>[cite: 16]. Par défaut, les processus approuvés sont éliminés du flux. Si un analyste souhaite inspecter l'intégralité des régions mémoires JIT, l'option <code>-v</code> (verbose) les affiche avec la mention <code>[LISTE BLANCHE]</code>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- GROUPE 3 -->
+                    <div class="faq-group" id="faq-net">
+                        <h3>3. Net-Guard & Flux Réseau</h3>
+
+                        <div class="faq-item">
+                            <h4>Pourquoi RAPTOR n'utilise-t-il pas netstat ou ss ?</h4>
+                            <p>
+                                Sur une machine compromise, les binaires standards d'administration comme <code>netstat</code>, <code>ss</code>, <code>ps</code> ou <code>lsof</code> peuvent être remplacés par des versions corrompues par un rootkit.
+                            </p>
+                            <p>
+                                RAPTOR décode mathématiquement la table binaire du noyau directement à la source dans <code>/proc/net/tcp</code>. Cette approche est à la fois inviolable par les rootkits ordinaires de l'espace utilisateur et instantanée (aucun fork de sous-processus externe).
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment fonctionne la qualification des sockets distants ?</h4>
+                            <p>
+                                Chaque adresse IP distante est convertie en entier non signé 32 bits et confrontée à des calculs de masques CIDR contre les registres <code>fw_officiel.conf</code> et <code>fw_custom.conf</code> :
+                            </p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li><strong>APPROUVÉ :</strong> Réseaux locaux privés RFC 1918 (192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12) et boucle locale.</li>
+                                <li><strong>EXTERNE :</strong> Connexions web sortantes vers des ports officiels répertoriés (443 HTTPS, 80 HTTP, 53 DNS).</li>
+                                <li><strong>SUSPECT :</strong> Connexions sortantes vers des ports inhabituels ou non déclarés.</li>
+                                <li><strong>HOSTILE :</strong> Correspondance exacte avec un relais C2 ou un nœud d'attaque répertorié (déclenche le code retour POSIX 1).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- GROUPE 4 -->
+                    <div class="faq-group" id="faq-cinetique">
+                        <h3>4. Neutralisation & Gardes-fous</h3>
+
+                        <div class="faq-item">
+                            <h4>Est-il possible d'abattre accidentellement le système avec rap kill ?</h4>
+                            <p>
+                                <strong>Non.</strong> Le binaire intègre la barrière stricte <code>rap_check_safety_pid</code>. L'utilitaire refuse catégoriquement d'exécuter un tir cinétique si le PID ciblé est :
+                            </p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li>Le <strong>PID 1</strong> (systemd / init), ce qui provoquerait un Kernel Panic immédiat.</li>
+                                <li>Le <strong>processus courant</strong> de <code>rap</code>.</li>
+                                <li>Le <strong>PPID</strong> (le shell Bash ou le terminal depuis lequel travaille l'administrateur).</li>
+                                <li>Un <strong>thread interne du noyau</strong> (comme <code>kthreadd</code> ou <code>kworker</code>, dont les tables mémoires sont vides).</li>
+                            </ul>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Quelle est la différence entre rap kill et rap freeze ?</h4>
+                            <p>
+                                <code>rap kill</code> transmet un signal <code>SIGKILL</code> non interceptable pour anéantir immédiatement le processus menaçant.
+                            </p>
+                            <p>
+                                <code>rap freeze</code> émet un signal <code>SIGSTOP</code>. Le processus est immédiatement suspendu dans l'état noyau <code>T</code> (Stopped) : il ne peut plus émettre sur le réseau, ni exécuter de code, ni effacer de fichiers, mais sa mémoire virtuelle reste intacte. Cela permet à un enquêteur forensique d'analyser la mémoire ou d'en extraire un dump complet (via <code>/proc/[PID]/mem</code> ou <code>gdb</code>).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- GROUPE 5 -->
+                    <div class="faq-group" id="faq-contrib">
+                        <h3>5. Rejoindre l'Équipe & Signaler un Bogue</h3>
+
+                        <div class="faq-item">
+                            <h4>Quels sont les objectifs prioritaires pour les développeurs ?</h4>
+                            <p>
+                                Le projet recherche activement des contributeurs pour :
+                            </p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li>Traquer les bogues résiduels et éprouver les sondes sous diverses distributions Linux (Debian, Arch, RHEL, Alpine).</li>
+                                <li>Enrichir les fichiers de signatures réseau et de liste blanche mémoire.</li>
+                                <li>Développer de nouveaux greffons d'audit (eBPF, détection des canaux cachés ICMP, etc.).</li>
+                                <li>Maintenir la documentation et les pages de manuel à jour.</li>
+                            </ul>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment signaler un problème ou soumettre un patch ?</h4>
+                            <p>
+                                Consultez la section <a href="community.html">Communauté</a> pour découvrir les règles de codage (norme C99, fonctions numérotées, en-têtes obligatoires) et ouvrez une Pull Request ou une Issue sur notre dépôt GitHub officiel.
+                            </p>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================================================================
+         3. PIED DE PAGE INSTITUTIONNEL
+         ====================================================================== -->
+    <footer class="raptor-footer">
+        <div class="container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+                <div>&copy; 2026 RAPTOR DEFENSE Project. Base de connaissances officielle.</div>
+                <div><a href="index.html" style="color: #ABB2BF;">Retour à l'accueil</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/faq-nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!-- ==========================================================================
+ * NOM DU SCRIPT   : docs/community.html
+ * RÉVISION        : Rev 1.2
+ * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
+ * RESPONSABILITÉ  : Espace communautaire, gouvernance, appel aux développeurs C
+ *                   et ingénieurs Linux, charte de contribution stricte,
+ *                   traque collaborative des bogues et divulgation de sécurité.
+ *
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
+ *   - Intégration du canal officiel d'échange et de contact direct via la
+ *     communauté Reddit r/RaptorSecurity (https://www.reddit.com/r/RaptorSecurity/).
+ *   - Ajout d'un bandeau d'appel invitant les contributeurs à manifester leur
+ *     intérêt, présenter leurs compétences et échanger directement avec le projet.
+ *   - Ajout du lien Reddit dans les actions principales et le pied de page.
+ * ========================================================================== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPTOR DEFENSE // Hub Communauté & Gouvernance</title>
+    <meta name="description" content="Rejoignez l'équipe de développement de RAPTOR DEFENSE : traque de bogues, enrichissement des sondes et ingénierie C99 souveraine.">
+    <link rel="stylesheet" href="css/raptor-core.css">
+    <link rel="icon" type="image/png" href="raptor-icon.png">
+</head>
+<body>
+
+    <!-- ======================================================================
+         1. EN-TÊTE INSTITUTIONNEL
+         ====================================================================== -->
+    <header class="raptor-header">
+        <div class="container">
+            <a href="index.html" class="raptor-brand">
+                <img src="raptor-icon.png" alt="Logo Officiel RAPTOR DEFENSE">
+                <span>RAPTOR<span class="version-badge">v2.0</span></span>
+            </a>
+
+            <nav class="raptor-nav">
+                <a href="index.html">Accueil</a>
+                <a href="man.html">Manuel (Man)</a>
+                <a href="faq.html">FAQ Technique</a>
+                <a href="community.html" class="active">Communauté</a>
+            </nav>
+
+            <div class="raptor-header-actions">
+                <a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener" class="btn-github">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================================================================
+         2. BANNIÈRE HERO COMMUNAUTÉ & CONTACT DIRECT
+         ====================================================================== -->
+    <section class="raptor-hero">
+        <div class="container">
+            <div class="raptor-hero-badge">
+                APPEL AUX DÉVELOPPEURS SYSTÈMES & AUDITEURS FORENSIQUES
+            </div>
+            <h1>Bâtir l'Arsenal Souverain Ensemble</h1>
+            <p class="raptor-hero-subtitle">
+                RAPTOR DEFENSE rassemble des ingénieurs C, administrateurs d'infrastructures critiques et chercheurs en sécurité offensive/défensive pour auditer le code, éliminer les bogues et concevoir la surveillance Linux de nouvelle génération.
+            </p>
+
+            <div class="raptor-hero-actions">
+                <a href="https://www.reddit.com/r/RaptorSecurity/" target="_blank" rel="noopener" class="btn-primary">
+                    Rejoindre sur Reddit (r/RaptorSecurity)
+                </a>
+                <a href="#chantiers" class="btn-secondary">Chantiers Prioritaires</a>
+                <a href="#normes" class="btn-secondary">Charte d'Ingénierie C99</a>
+            </div>
+
+            <!-- Encart d'accueil et prise de contact sur Reddit -->
+            <div class="raptor-join-banner" style="margin-top: 32px;">
+                <div class="raptor-join-content">
+                    <h3>Manifestez votre intérêt pour le projet sur Reddit !</h3>
+                    <p>
+                        Vous souhaitez faire partie de l'équipe de développement, proposer des correctifs, tester RAPTOR sur vos distributions ou partager vos idées ? Rejoignez notre communauté officielle sur <strong>r/RaptorSecurity</strong> et venez vous présenter pour établir le contact direct avec l'équipe de tête.
+                    </p>
+                </div>
+                <a href="https://www.reddit.com/r/RaptorSecurity/" target="_blank" rel="noopener" class="btn-primary" style="white-space: nowrap;">
+                    Accéder au Subreddit
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         3. CHANTIERS PRIORITAIRES (APPEL AUX CONTRIBUTIONS)
+         ====================================================================== -->
+    <section class="raptor-section" id="chantiers">
+        <div class="container">
+            <div class="section-header">
+                <h2>Chantiers de Développement Ouverts</h2>
+                <p>Les fronts d'ingénierie sur lesquels vos compétences peuvent faire la différence immédiatement.</p>
+            </div>
+
+            <div class="cards-grid">
+                <!-- Chantier 1 -->
+                <div class="raptor-card">
+                    <div class="card-icon">BUG</div>
+                    <h3>Banc d'Essai & Traque de Bogues</h3>
+                    <p>
+                        Éprouver la suite logicielle (<code>raptor</code>, <code>rap</code>, <code>rapless</code>) sur divers noyaux et distributions Linux (Debian, Arch, RHEL, Alpine musl, Ubuntu). Repérer les fuites mémoire résiduelles avec Valgrind et corriger les comportements limites sous stress.
+                    </p>
+                    <div class="card-footer-tag">COMPÉTENCES : C99, GDB, Valgrind, POSIX</div>
+                </div>
+
+                <!-- Chantier 2 -->
+                <div class="raptor-card">
+                    <div class="card-icon">MEM</div>
+                    <h3>Registres de Souveraineté</h3>
+                    <p>
+                        Maintenir et affiner <code>mem_whitelist.conf</code> pour neutraliser les faux positifs induits par les nouveaux moteurs JIT (V8, WebKit, Dart) et les couches d'émulation (Wine, Proton, Flatpak), sans jamais dégrader la sensibilité face aux vrais shellcodes Inode 0.
+                    </p>
+                    <div class="card-footer-tag">COMPÉTENCES : Forensic Linux, /proc maps</div>
+                </div>
+
+                <!-- Chantier 3 -->
+                <div class="raptor-card">
+                    <div class="card-icon">NET</div>
+                    <h3>Flux C2 & Threat Intel</h3>
+                    <p>
+                        Enrichir le registre <code>fw_officiel.conf</code> avec les plages d'infrastructures malveillantes avérées (relais Cobalt Strike, serveurs C2 actifs, nœuds d'exfiltration furtifs) et optimiser la résolution BGP/ASN locale.
+                    </p>
+                    <div class="card-footer-tag">COMPÉTENCES : Réseaux IPv4/IPv6, CIDR, Net-Guard</div>
+                </div>
+
+                <!-- Chantier 4 -->
+                <div class="raptor-card">
+                    <div class="card-icon">MOD</div>
+                    <h3>Nouveaux Greffons d'Audit</h3>
+                    <p>
+                        Développer de nouveaux modules respectant l'interface <code>RaptorPlugin</code> : détection des canaux cachés ICMP, inspection eBPF des appels système furtifs, ou surveillance d'intégrité des modules noyau (LKM rootkits).
+                    </p>
+                    <div class="card-footer-tag">COMPÉTENCES : Noyau Linux, Greffons C isolés</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         4. NORMES D'INGÉNIERIE & CHARTE DE CODE STRICTE
+         ====================================================================== -->
+    <section class="raptor-section" id="normes" style="background-color: var(--color-bg-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
+        <div class="container">
+            <div class="section-header">
+                <h2>Norme d'Ingénierie & Rigueur du Code</h2>
+                <p>Aucun code "bouclé à la va-vite". Le projet applique une discipline chirurgicale pour garantir la fiabilité opérationnelle sur les systèmes de production.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+                <div style="background-color: #FFFFFF; border: 1px solid var(--color-border); border-left: 4px solid var(--color-primary-red); padding: 24px; border-radius: var(--border-radius-sm);">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px;">1. Standard C99 Strict & Survie 0 Heap</h3>
+                    <p style="font-size: 0.92rem; color: var(--color-text-muted); line-height: 1.6;">
+                        Les outils de la trousse CLI (<code>rap</code> et <code>rapless</code>) doivent s'exécuter sans aucune allocation dynamique (<code>malloc</code>/<code>free</code> proscrits). Les tampons sont strictement bornés sur la pile d'exécution.
+                    </p>
+                </div>
+
+                <div style="background-color: #FFFFFF; border: 1px solid var(--color-border); border-left: 4px solid var(--color-primary-red); padding: 24px; border-radius: var(--border-radius-sm);">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px;">2. Modularité & Greffons Isolés</h3>
+                    <p style="font-size: 0.92rem; color: var(--color-text-muted); line-height: 1.6;">
+                        Chaque nouvelle sonde d'inspection doit être implémentée sous forme de composant indépendant sans jamais altérer le cœur central. Les extensions s'enregistrent via le bus ou la table déclarative.
+                    </p>
+                </div>
+
+                <div style="background-color: #FFFFFF; border: 1px solid var(--color-border); border-left: 4px solid var(--color-primary-red); padding: 24px; border-radius: var(--border-radius-sm);">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px;">3. Documentation & En-têtes Numérotés</h3>
+                    <p style="font-size: 0.92rem; color: var(--color-text-muted); line-height: 1.6;">
+                        Chaque fichier source doit comporter obligatoirement son cartouche normalisé : nom du script, numéro de révision, bloc descriptif des nouvelles intégrations et énumération exhaustive de chaque fonction numérotée.
+                    </p>
+                </div>
+
+                <div style="background-color: #FFFFFF; border: 1px solid var(--color-border); border-left: 4px solid var(--color-primary-red); padding: 24px; border-radius: var(--border-radius-sm);">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px;">4. Gardes-fous & Codes POSIX</h3>
+                    <p style="font-size: 0.92rem; color: var(--color-text-muted); line-height: 1.6;">
+                        Toute fonction cinétique doit vérifier le garde-fou <code>rap_check_safety_pid</code>. Chaque utilitaire doit renvoyer rigoureusement les codes de sortie POSIX normalisés (0 = Sain, 1 = Menace, 2 = Erreur).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         5. WORKFLOW GIT & PARTICIPATION
+         ====================================================================== -->
+    <section class="raptor-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Flux de Contribution Git</h2>
+                <p>Processus standard pour soumettre une correction de bogue ou proposer une nouvelle fonctionnalité.</p>
+            </div>
+
+            <div class="man-viewer-box" style="max-width: 860px; margin: 0 auto 40px auto;">
+                <div class="man-viewer-header">
+                    <span class="man-viewer-title">bash — Cycle de contribution standard</span>
+                    <button class="man-btn-copy" onclick="navigator.clipboard.writeText('git checkout -b feature/nom-de-votre-sonde\ncmake -B build -DCMAKE_BUILD_TYPE=Debug\ncmake --build build\nctest --test-dir build\ngit commit -m \'Rev 1.1: Intégration de la fonction 111 (audit_ebpf)\'')">Copier le flux</button>
+                </div>
+                <div class="man-content" style="padding: 20px 24px;">
+<span style="color: #636D83;"># 1. Créer une branche dédiée pour votre correctif ou greffon</span>
+<span style="color: #E5C07B;">git checkout</span> -b feature/nom-de-votre-sonde
+
+<span style="color: #636D83;"># 2. Compiler en mode Debug pour activer les contrôles de sécurité</span>
+<span style="color: #E5C07B;">cmake</span> -B build -DCMAKE_BUILD_TYPE=Debug
+<span style="color: #E5C07B;">cmake</span> --build build
+
+<span style="color: #636D83;"># 3. Vérifier le comportement unitaire</span>
+<span style="color: #8C1D18; font-weight: bold;">./build/rap</span> hunt
+
+<span style="color: #636D83;"># 4. Rédiger un commit explicite avec numéro de révision</span>
+<span style="color: #E5C07B;">git commit</span> -m "Rev 1.1: Intégration de la fonction 111 (audit_ebpf)"
+<span style="color: #E5C07B;">git push</span> origin feature/nom-de-votre-sonde</div>
+            </div>
+
+            <!-- Signalement de sécurité -->
+            <div id="securite" style="max-width: 860px; margin: 0 auto; background-color: var(--color-subtle-red); border: 1px solid rgba(140, 29, 24, 0.2); border-left: 4px solid var(--color-primary-red); padding: 24px; border-radius: var(--border-radius-sm);">
+                <h3 style="color: var(--color-primary-red); font-size: 1.15rem; margin-bottom: 8px;">Divulgation Responsable des Vulnérabilités (Security Advisories)</h3>
+                <p style="font-size: 0.92rem; color: var(--color-text-main); margin-bottom: 12px; line-height: 1.6;">
+                    Si vous découvrez une vulnérabilité critique affectant l'intégrité de l'hôte ou une méthode de contournement des sondes mémoire de RAPTOR, <strong>ne créez pas d'Issue publique</strong>.
+                </p>
+                <p style="font-size: 0.92rem; color: var(--color-text-muted); margin-bottom: 0;">
+                    Transmettez directement votre rapport technique chiffré via notre canal de sécurité dédié sur GitHub Security Advisories pour permettre à l'équipe de publier un correctif coordonné.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         6. PIED DE PAGE INSTITUTIONNEL
+         ====================================================================== -->
+    <footer class="raptor-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                        <img src="raptor-icon.png" alt="RAPTOR Logo" style="height: 32px; width: 32px; border-radius: 50%;">
+                        <span style="color: #FFFFFF; font-weight: 700; font-size: 1.1rem;">RAPTOR DEFENSE</span>
+                    </div>
+                    <p style="font-size: 0.88rem; line-height: 1.6; color: #8C96A5;">
+                        Projet d'ingénierie forensique et d'audit défensif souverain pour systèmes d'exploitation Linux. Zéro compromis sur la mémoire, indépendance technologique totale.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Documentation</h5>
+                    <ul>
+                        <li><a href="man.html">Manuel rap(1)</a></li>
+                        <li><a href="man.html#rapless">Téléscripteur rapless(1)</a></li>
+                        <li><a href="faq.html">FAQ Faux Positifs (JIT/FFI)</a></li>
+                        <li><a href="faq.html#netguard">Règles Net-Guard</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Projet & Équipe</h5>
+                    <ul>
+                        <li><a href="https://www.reddit.com/r/RaptorSecurity/" target="_blank" rel="noopener" style="color: #FFFFFF; font-weight: 600;">Communauté Reddit</a></li>
+                        <li><a href="community.html">Rejoindre l'équipe</a></li>
+                        <li><a href="community.html#chantiers">Chantiers ouverts</a></li>
+                        <li><a href="community.html#normes">Charte de code</a></li>
+                        <li><a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener">Dépôt Git</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Gouvernance</h5>
+                    <ul>
+                        <li><a href="#normes">Normes d'ingénierie</a></li>
+                        <li><a href="#securite">Divulgation sécurité</a></li>
+                        <li><a href="index.html#compilation">Compilation CMake</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>
+                    &copy; 2026 RAPTOR DEFENSE Project. Développé pour la communauté des bâtisseurs et auditeurs de systèmes.
+                </div>
+                <div>
+                    Inspiré des fondations libres et souveraines UNIX.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

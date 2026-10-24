@@ -1,0 +1,787 @@
+/* ============================================================================
+ * NOM DU SCRIPT   : docs/css/raptor-core.css
+ * RÉVISION        : Rev 1.1
+ * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
+ * RESPONSABILITÉ  : Socle stylistique global, variables graphiques souveraines,
+ *                   architecture de mise en page institutionnelle (style FreeBSD),
+ *                   composants de navigation, simulateur de terminal et grilles.
+ *
+ * BLOC DESCRIPTIF DES NOUVELLES INTEGRATIONS (Rev 1.1) :
+ *   - Normalisation de la palette chromatique officielle : Rouge institutionnel
+ *     (#8C1D18), rouge vermillon (#B71C1C), blanc pur et gris technique.
+ *   - En-tête d'autorité avec alignement du logo officiel, navigation et barre de recherche.
+ *   - Ajout d'un filtre d'inversion chromatique (brightness/invert) sur l'image
+ *     de marque pour forcer le blanc/transparence du logo sur le fond rouge.
+ *   - Grille de cartes modulaires pour l'exposition des sondes du noyau.
+ *   - Émulateur d'affichage de manuel Unix (troff/groff) pour les man pages.
+ *   - Agencement à deux colonnes pour la FAQ technique avec sommaire flottant (Sticky TOC).
+ *   - Rendu entièrement responsive sans dépendance logicielle externe.
+ *
+ * SECTIONS NUMÉROTÉES :
+ *   1. VARIABLES CSS & PALETTE OFFICIELLE
+ *   2. RÉINITIALISATION & SOCLE TYPOGRAPHIQUE
+ *   3. EN-TÊTE INSTITUTIONNEL & NAVIGATION
+ *   4. BANNIÈRE HERO & APPEL AUX DÉVELOPPEURS
+ *   5. GRILLE MODULAIRE DES PILIERS TECHNIQUES
+ *   6. CONTENEURS TECHNIQUES & RENDU MAN PAGES UNIX
+ *   7. STRUCTURE FAQ À DOUBLE COLONNE (STICKY SIDEBAR)
+ *   8. PIED DE PAGE & BADGES COMMUNAUTAIRES
+ *   9. ADAPTATION RESPONSIVE (MEDIA QUERIES)
+ * ============================================================================
+ */
+
+/* ============================================================================
+ * 1. VARIABLES CSS & PALETTE OFFICIELLE
+ * ============================================================================
+ */
+:root {
+    /* Nuances de rouge souverain */
+    --color-primary-red       : #8C1D18; /* Rouge institutionnel style FreeBSD */
+    --color-primary-hover     : #A8231E; /* Rouge actif au survol */
+    --color-accent-red        : #B71C1C; /* Rouge vermillon pour alertes et accents */
+    --color-subtle-red        : #FBEBEB; /* Fond teinté discret pour surbrillance */
+
+    /* Nuances neutres & surfaces */
+    --color-bg-main           : #FFFFFF; /* Fond de page blanc pur */
+    --color-bg-surface        : #F8F9FA; /* Fond de cartes et blocs secondaires */
+    --color-bg-subtle         : #F1F3F5; /* Fond d'encadrés techniques */
+    --color-border            : #E2E6EA; /* Ligne de séparation neutre */
+    --color-border-dark       : #CED4DA; /* Bordure d'accentuation */
+
+    /* Typographie */
+    --color-text-main         : #1E232A; /* Texte principal gris ardoise profond */
+    --color-text-muted        : #5A6578; /* Texte secondaire et métadonnées */
+    --color-text-light        : #8C96A5; /* Légendes et séparateurs */
+
+    /* Terminal & Man Pages */
+    --color-term-bg           : #16181D; /* Fond sombre de console d'audit */
+    --color-term-text         : #ECEFF4; /* Texte de console clair */
+    --color-term-prompt       : #8C1D18; /* Invite de commande en rouge */
+    --color-term-green        : #2EA043; /* Statut nominal / OK */
+    --color-term-amber        : #D29922; /* Statut d'avertissement */
+
+    /* Polices */
+    --font-sans               : system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono               : "JetBrains Mono", "Fira Code", "DejaVu Sans Mono", "Courier New", monospace;
+
+    /* Métriques structurelles */
+    --header-height           : 68px;
+    --container-max-width     : 1240px;
+    --border-radius-sm        : 4px;
+    --border-radius-md        : 6px;
+    --shadow-subtle           : 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-card             : 0 2px 8px rgba(0, 0, 0, 0.06);
+    --transition-standard     : 0.2s ease-in-out;
+}
+
+/* ============================================================================
+ * 2. RÉINITIALISATION & SOCLE TYPOGRAPHIQUE
+ * ============================================================================
+ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + 20px);
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg-main);
+    color: var(--color-text-main);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: var(--color-primary-red);
+    text-decoration: none;
+    transition: color var(--transition-standard);
+}
+
+a:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+}
+
+h1, h2, h3, h4 {
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--color-text-main);
+}
+
+h1 { font-size: 2.25rem; margin-bottom: 1rem; }
+h2 { font-size: 1.75rem; margin-bottom: 0.75rem; }
+h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+
+p {
+    margin-bottom: 1rem;
+    color: var(--color-text-main);
+}
+
+code, pre {
+    font-family: var(--font-mono);
+}
+
+.container {
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+/* ============================================================================
+ * 3. EN-TÊTE INSTITUTIONNEL & NAVIGATION
+ * ============================================================================
+ */
+.raptor-header {
+    background-color: var(--color-primary-red);
+    height: var(--header-height);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.raptor-header .container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.raptor-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #FFFFFF;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+    text-decoration: none !important;
+}
+
+.raptor-brand img {
+    height: 44px;
+    width: 44px;
+    object-fit: contain;
+    border-radius: 50%;
+    filter: brightness(0) invert(1); /* Rehausse les contours et lignes de l'image en blanc éclatant */
+}
+
+.raptor-brand span {
+    color: #FFFFFF;
+}
+
+.raptor-brand .version-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.raptor-nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.raptor-nav a {
+    color: #FFFFFF;
+    font-size: 0.95rem;
+    font-weight: 500;
+    opacity: 0.9;
+    text-decoration: none;
+    transition: opacity var(--transition-standard);
+}
+
+.raptor-nav a:hover,
+.raptor-nav a.active {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 6px;
+}
+
+.raptor-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.raptor-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.raptor-search-box input {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius-sm);
+    padding: 6px 12px 6px 32px;
+    font-size: 0.85rem;
+    color: #FFFFFF;
+    width: 180px;
+    transition: width var(--transition-standard), background-color var(--transition-standard);
+}
+
+.raptor-search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.raptor-search-box input:focus {
+    outline: none;
+    background-color: #FFFFFF;
+    color: var(--color-text-main);
+    width: 240px;
+}
+
+.raptor-search-box svg {
+    position: absolute;
+    left: 10px;
+    width: 14px;
+    height: 14px;
+    fill: rgba(255, 255, 255, 0.7);
+    pointer-events: none;
+}
+
+.btn-github {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #FFFFFF;
+    color: var(--color-primary-red);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: var(--border-radius-sm);
+    transition: background-color var(--transition-standard), color var(--transition-standard);
+    text-decoration: none !important;
+}
+
+.btn-github:hover {
+    background-color: var(--color-bg-surface);
+    color: var(--color-primary-hover);
+}
+
+/* ============================================================================
+ * 4. BANNIÈRE HERO & APPEL AUX DÉVELOPPEURS
+ * ============================================================================
+ */
+.raptor-hero {
+    background: linear-gradient(180deg, var(--color-bg-surface) 0%, var(--color-bg-main) 100%);
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 0;
+    text-align: center;
+}
+
+.raptor-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--color-subtle-red);
+    color: var(--color-primary-red);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(140, 29, 24, 0.2);
+    margin-bottom: 20px;
+}
+
+.raptor-hero h1 {
+    font-size: 2.75rem;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+}
+
+.raptor-hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    max-width: 780px;
+    margin: 0 auto 32px auto;
+}
+
+.raptor-hero-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.btn-primary {
+    background-color: var(--color-primary-red);
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 12px 24px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-primary-red);
+    transition: background-color var(--transition-standard);
+    text-decoration: none !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-hover);
+    color: #FFFFFF;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--color-text-main);
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 12px 24px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border-dark);
+    transition: all var(--transition-standard);
+    text-decoration: none !important;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-bg-surface);
+    border-color: var(--color-text-main);
+}
+
+.raptor-join-banner {
+    max-width: 820px;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-primary-red);
+    padding: 20px 24px;
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    gap: 20px;
+}
+
+.raptor-join-content h3 {
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+}
+
+.raptor-join-content p {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+}
+
+/* ============================================================================
+ * 5. GRILLE MODULAIRE DES PILIERS TECHNIQUES
+ * ============================================================================
+ */
+.raptor-section {
+    padding: 64px 0;
+}
+
+.section-header {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 48px auto;
+}
+
+.section-header h2 {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.section-header p {
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 24px;
+}
+
+.raptor-card {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 28px;
+    box-shadow: var(--shadow-subtle);
+    transition: transform var(--transition-standard), box-shadow var(--transition-standard);
+    display: flex;
+    flex-direction: column;
+}
+
+.raptor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--color-border-dark);
+}
+
+.card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--border-radius-sm);
+    background-color: var(--color-subtle-red);
+    color: var(--color-primary-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+}
+
+.raptor-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.raptor-card p {
+    font-size: 0.92rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.card-footer-tag {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    color: var(--color-primary-red);
+    font-weight: 600;
+}
+
+/* ============================================================================
+ * 6. CONTENEURS TECHNIQUES & RENDU MAN PAGES UNIX
+ * ============================================================================
+ */
+.man-archive-container {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.man-selector-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    background-color: #FFFFFF;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+}
+
+.man-selector-bar label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.man-select {
+    padding: 6px 12px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--border-radius-sm);
+    background-color: #FFFFFF;
+    color: var(--color-text-main);
+}
+
+.man-select:focus {
+    outline: 2px solid var(--color-primary-red);
+    outline-offset: -1px;
+}
+
+.man-viewer-box {
+    background-color: var(--color-term-bg);
+    border: 1px solid #000000;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.man-viewer-header {
+    background-color: #21252B;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #2B313A;
+}
+
+.man-viewer-title {
+    color: #ABB2BF;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+}
+
+.man-btn-copy {
+    background: transparent;
+    border: 1px solid #4B5263;
+    color: #ABB2BF;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    transition: all var(--transition-standard);
+}
+
+.man-btn-copy:hover {
+    color: #FFFFFF;
+    border-color: #ABB2BF;
+}
+
+.man-content {
+    padding: 24px 28px;
+    color: var(--color-term-text);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre-wrap;
+}
+
+.man-section-heading {
+    color: #E06C75; /* Rouge bordeaux pour titres NAME, SYNOPSIS... */
+    font-weight: 700;
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.man-section-heading:first-of-type {
+    margin-top: 0;
+}
+
+.man-flag {
+    color: #E5C07B; /* Jaune/Ambre pour les options -q, -r */
+}
+
+/* ============================================================================
+ * 7. STRUCTURE FAQ À DOUBLE COLONNE (STICKY SIDEBAR)
+ * ============================================================================
+ */
+.faq-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.faq-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
+    max-height: calc(100vh - var(--header-height) - 48px);
+    overflow-y: auto;
+}
+
+.faq-sidebar h4 {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.faq-toc-list {
+    list-style: none;
+}
+
+.faq-toc-list li {
+    margin-bottom: 8px;
+}
+
+.faq-toc-list a {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--color-text-main);
+    padding: 4px 8px;
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+}
+
+.faq-toc-list a:hover {
+    background-color: #FFFFFF;
+    color: var(--color-primary-red);
+    border-left-color: var(--color-primary-red);
+}
+
+.faq-toc-list a.active {
+    background-color: var(--color-subtle-red);
+    color: var(--color-primary-red);
+    font-weight: 600;
+    border-left-color: var(--color-primary-red);
+}
+
+.faq-content {
+    background-color: #FFFFFF;
+}
+
+.faq-group {
+    margin-bottom: 48px;
+}
+
+.faq-group h3 {
+    font-size: 1.4rem;
+    border-bottom: 2px solid var(--color-subtle-red);
+    padding-bottom: 10px;
+    margin-bottom: 24px;
+    color: var(--color-primary-red);
+}
+
+.faq-item {
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 24px;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-item h4 {
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+}
+
+/* ============================================================================
+ * 8. PIED DE PAGE & BADGES COMMUNAUTAIRES
+ * ============================================================================
+ */
+.raptor-footer {
+    background-color: #1A1D20;
+    color: #ABB2BF;
+    padding: 56px 0 24px 0;
+    border-top: 3px solid var(--color-primary-red);
+    margin-top: 80px;
+    font-size: 0.9rem;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-col h5 {
+    color: #FFFFFF;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+}
+
+.footer-col ul {
+    list-style: none;
+}
+
+.footer-col ul li {
+    margin-bottom: 10px;
+}
+
+.footer-col a {
+    color: #ABB2BF;
+    text-decoration: none;
+}
+
+.footer-col a:hover {
+    color: #FFFFFF;
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    padding-top: 24px;
+    border-top: 1px solid #2B313A;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: #636D83;
+}
+
+/* ============================================================================
+ * 9. ADAPTATION RESPONSIVE (MEDIA QUERIES)
+ * ============================================================================
+ */
+@media (max-width: 992px) {
+    .faq-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .faq-sidebar {
+        position: static;
+        max-height: none;
+        margin-bottom: 32px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .raptor-header .container {
+        flex-wrap: wrap;
+        height: auto;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        gap: 12px;
+    }
+
+    .raptor-nav {
+        order: 3;
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        padding-top: 10px;
+    }
+
+    .raptor-hero h1 {
+        font-size: 2rem;
+    }
+
+    .raptor-join-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+}

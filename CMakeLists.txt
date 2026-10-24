@@ -1,6 +1,6 @@
 # ==============================================================================
 # NOM DU SCRIPT   : CMakeLists.txt
-# RÉVISION        : Rev 1.5
+# RÉVISION        : Rev 1.7
 # PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
 # RESPONSABILITÉ  : Configuration générale du système de construction CMake.
 #                   - Cible C99 avec extensions GNU (Linux/POSIX) et standard Windows.
@@ -10,6 +10,8 @@
 #                   - Intégration modulaire de l'UI et des 6 greffons système.
 #                   - Intégration de Net-Guard et de Net-Intel (plugin_asn_intel.c).
 #                   - Assemblage de l'exécutable unifié 'raptor'.
+#                   - Intégration modulaire du mode CLI de secours (Sections 16 & 17) :
+#                     binaire d'urgence 'rap' et téléscripteur autonome 'rapless'.
 # ==============================================================================
 
 cmake_minimum_required(VERSION 3.16...3.30)
@@ -139,7 +141,7 @@ else()
 endif()
 
 # ------------------------------------------------------------------------------
-# 7. LIAISON DES BIBLIOTHÈQUES
+# 7. LIAISON DES BIBLIOTHÈQUES (RAPTOR GRAPHIQUE)
 # ------------------------------------------------------------------------------
 target_link_libraries(raptor PRIVATE raylib)
 
@@ -155,5 +157,49 @@ elseif(WIN32)
         gdi32
         user32
         shell32
+    )
+endif()
+
+# ------------------------------------------------------------------------------
+# 8. OUTILS DE SECOURS EN LIGNE DE COMMANDE (CLI - SECTIONS 16 & 17)
+# ------------------------------------------------------------------------------
+if(UNIX)
+    # 8.1. Téléscripteur autonome d'urgence (0 heap, zéro dépendance externe)
+    add_executable(rapless
+        src/cli/rapless.c
+    )
+    target_include_directories(rapless PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cli
+    )
+    target_compile_options(rapless PRIVATE -Wall -Wextra -Wformat=2)
+
+    # 8.2. Dispatcher chirurgical modulaire en ligne de commande
+    set(RAP_CLI_SOURCES
+        src/cli/rap_main.c
+        src/cli/rap_common.c
+        src/cli/cmd_status.c
+        src/cli/cmd_top.c
+        src/cli/cmd_hunt.c
+        src/cli/cmd_rx.c
+        src/cli/cmd_preload.c
+        src/cli/cmd_heur.c
+        src/cli/cmd_net.c
+        src/cli/cmd_kill.c
+        src/cli/cmd_man.c
+    )
+
+    add_executable(rap
+        ${RAP_CLI_SOURCES}
+    )
+    target_include_directories(rap PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cli
+    )
+    target_compile_options(rap PRIVATE -Wall -Wextra -Wformat=2)
+
+    # 8.3. Règles d'installation standardisées (/usr/local/bin)
+    install(TARGETS raptor rap rapless
+        RUNTIME DESTINATION bin
+        OPTIONAL
     )
 endif()

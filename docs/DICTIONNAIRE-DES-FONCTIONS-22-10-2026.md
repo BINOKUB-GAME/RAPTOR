@@ -501,3 +501,96 @@ typedef struct {
 * **87. `raptor_notify_evaluate_threats`**
   * **Prototype :** `void raptor_notify_evaluate_threats(int current_threats, const char* primary_threat_name)`
   * **Rôle :** Moteur d'arbitrage d'alertes avec filtre anti-rebond temporel (délai de garde de 30 secondes). Déclenche instantanément la notification lors d'une transition critique (passage de 0 à N menaces) et notifie le retour au statut nominal lors de la résolution de l'incident.
+
+---
+
+### SECTION 16 — MODE CLI DE SECOURS & OUTILS CHIRURGICAUX (`src/cli/`)
+
+* **88. `rap_dispatch_command`** (`src/cli/rap_main.c`)
+  * **Prototype :** `int rap_dispatch_command(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Micro-routeur central du binaire `rap`. Parcourt la table déclarative des greffons (`g_commands`) pour acheminer l'exécution vers la fonction dédiée (`status`, `top`, `hunt`, `rx`, `preload`, `net`, `kill`, `freeze`, `man`). Sans argument, bascule automatiquement vers l'affichage du manuel.
+  * **Retour :** Code de sortie POSIX normalisé (`RAP_EXIT_OK`, `RAP_EXIT_THREAT` ou `RAP_EXIT_ERROR`).
+
+* **89. `rap_cmd_status`** (`src/cli/cmd_status.c`)
+  * **Prototype :** `int rap_cmd_status(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Diagnostic vital instantané de l'hôte en moins de 15 ms sans allocation dynamique. Lit `/proc/meminfo` (RAM totale et disponible), dénombre les processus actifs sous `/proc` et audite l'existence de l'altération globale `/etc/ld.so.preload`.
+  * **Retour :** `RAP_EXIT_OK` (0) si le système est intègre, `RAP_EXIT_THREAT` (1) si `/etc/ld.so.preload` est présent.
+
+* **90. `rap_cmd_top`** (`src/cli/cmd_top.c`)
+  * **Prototype :** `int rap_cmd_top(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Analyse et ordonne les processus consommant le plus de mémoire vive résidente réelle (`VmRSS` dans `/proc/[PID]/status`). Élimine strictement les threads noyau (`rss == 0`) et applique un tri d'insertion statique borné dans la pile (0 octet sur le tas).
+  * **Retour :** `RAP_EXIT_OK` (0) après affichage, `RAP_EXIT_ERROR` (2) si `/proc` est inaccessible.
+
+* **91. `rap_cmd_hunt`** (`src/cli/cmd_hunt.c`)
+  * **Prototype :** `int rap_cmd_hunt(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Moteur d'audit universel combiné. Coordonne séquentiellement la traque des mutations mémoires anonymes (`rap_cmd_rx`) et des détournements du chargeur dynamique (`rap_cmd_preload`) en une passe unique d'investigation.
+  * **Retour :** `RAP_EXIT_THREAT` (1) si au moins une menace est identifiée par l'une des sondes, sinon `RAP_EXIT_OK` (0).
+
+* **92. `rap_cmd_rx`** (`src/cli/cmd_rx.c`)
+  * **Prototype :** `int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Traque chirurgicale dans `/proc/[PID]/maps` des segments mémoires virtuels anonymes convertis en exécutable (`r-xp`) avec un Inode à `0` sans ancrage fichier. Filtre automatiquement les faux positifs légitimes via `rap_is_mem_whitelisted` sauf si le drapeau `-v` (verbose) est activé.
+  * **Retour :** `RAP_EXIT_THREAT` (1) en cas de mutation clandestine non autorisée, `RAP_EXIT_OK` (0) si le système est intègre.
+
+* **93. `rap_cmd_preload`** (`src/cli/cmd_preload.c`)
+  * **Prototype :** `int rap_cmd_preload(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Détection des rootkits userland via un audit à double palier : contrôle d'accès direct au fichier de persistance `/etc/ld.so.preload` et extraction sécurisée des variables d'environnement délimitées par des zéros binaires (`/proc/[PID]/environ`) pour intercepter `LD_PRELOAD=`.
+  * **Retour :** `RAP_EXIT_THREAT` (1) en cas de détournement détecté, sinon `RAP_EXIT_OK` (0).
+
+* **94. `rap_cmd_net`** (`src/cli/cmd_net.c`)
+  * **Prototype :** `int rap_cmd_net(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Inspection passive directe de `/proc/net/tcp` sans dépendance externe (`netstat`/`ss`). Décode les adresses binaires IPv4 (little-endian), isole les sockets en communication active (`TCP_ESTABLISHED`) et qualifie chaque flux en temps réel via l'intelligence Net-Guard (`rap_net_eval_ip`).
+  * **Retour :** `RAP_EXIT_THREAT` (1) si une connexion pointe vers une adresse IP hostile, sinon `RAP_EXIT_OK` (0).
+
+* **95. `rap_cmd_kill`** (`src/cli/cmd_kill.c`)
+  * **Prototype :** `int rap_cmd_kill(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Neutralisation cinétique chirurgicale d'un processus hostile par émission du signal non rattrapable `SIGKILL`. Valide préalablement la cible via `rap_check_safety_pid` et applique une demande de confirmation interactive sauf présence du drapeau `-f` (`--force`).
+  * **Retour :** `RAP_EXIT_OK` (0) en cas de succès, `RAP_EXIT_ERROR` (2) en cas de refus de sécurité ou d'échec système.
+
+* **96. `rap_cmd_freeze`** (`src/cli/cmd_kill.c`)
+  * **Prototype :** `int rap_cmd_freeze(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Suspension conservatoire immédiate d'une menace via le signal `SIGSTOP`. Fige l'exécution de la cible en la plaçant dans l'état noyau `T` (*Stopped*) tout en préservant intacte sa mémoire virtuelle pour copie ou analyse forensique ultérieure.
+  * **Retour :** `RAP_EXIT_OK` (0) si la cible est figée avec succès, `RAP_EXIT_ERROR` (2) en cas de refus de sécurité ou d'échec.
+
+* **97. `rap_cmd_man`** (`src/cli/cmd_man.c`)
+  * **Prototype :** `int rap_cmd_man(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Manuel de référence autonome embarqué intégralement en mémoire morte (`.rodata`). Restitue la documentation technique complète (syntaxe, commandes, codes de sortie POSIX, pipelines) et l'aide unitaire par sous-commande sans dépendre du disque, de `man` ou de `groff`.
+  * **Retour :** Toujours `RAP_EXIT_OK` (0).
+
+* **98. `rap_output_formatter`** (`src/cli/rap_common.c`)
+  * **Prototype :** `void rap_output_formatter(const RapConfig *cfg, const char *c1, const char *c2, const char *c3, const char *c4)`
+  * **Rôle :** Moteur transversal de formatage d'affichage sur 4 colonnes. Aligne proprement les colonnes avec espacement calibré en mode TTY interactif, ou génère un flux brut délimité par tabulations (`\t`) sans fioritures en mode redirection ou extraction machine (`-r` / `--raw`).
+  * **Retour :** Aucun (`void`).
+
+* **99. `rap_check_safety_pid`** (`src/cli/rap_common.c`)
+  * **Prototype :** `int rap_check_safety_pid(const RapConfig *cfg, pid_t pid)`
+  * **Rôle :** Barrière de sécurité inviolable prévenant les tirs fratricides et les arrêts critiques accidentels. Rejette catégoriquement le ciblage du PID 1 (`init`/`systemd`), du PID courant de l'utilitaire, du PPID (shell parent de l'opérateur) et des threads internes du noyau Linux (`maps` vide).
+  * **Retour :** `0` si le PID est valide et autorisé, `-1` en cas d'interdiction de tir formelle.
+
+* **100. `rap_parse_flags`** (`src/cli/rap_main.c`)
+  * **Prototype :** `int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg)`
+  * **Rôle :** Analyseur d'arguments universels en ligne de commande. Extrait les drapeaux de combat (`-q`, `-r`, `-f`, `-v`, `-n`, `-h`), détecte si la sortie standard est connectée à un terminal (`isatty`) et réaligne le tableau `argv` pour isoler le verbe d'action à exécuter.
+  * **Retour :** Toujours `0`.
+
+* **107. `rap_is_mem_whitelisted`** (`src/cli/rap_common.c`)
+  * **Prototype :** `int rap_is_mem_whitelisted(const char *comm)`
+  * **Rôle :** Moteur d'assainissement passif des allocations dynamiques. Charge sans allocation dynamique (`0 heap`) les règles de `assets/rules/mem_whitelist.conf` (format `TYPE | MOTIF | DESC`), prend en compte la troncature `TASK_COMM_LEN` (15 octets) du noyau et écarte le bruit des moteurs JIT (Chromium) et des trampolines FFI (Cinnamon/GTK).
+  * **Retour :** `1` si le processus figure dans la liste blanche légitime, sinon `0`.
+
+* **108. `rap_net_eval_ip`** (`src/cli/rap_common.c`)
+  * **Prototype :** `int rap_net_eval_ip(uint32_t ip, uint16_t port, char *out_desc, size_t desc_size)`
+  * **Rôle :** Évaluateur CIDR autonome adossé aux registres souverains Net-Guard (`fw_officiel.conf` et `fw_custom.conf`). Intercepte instantanément les adresses IP répertoriées hostiles (relais C2/Tor), approuve les flux privés locaux (RFC 1918) et qualifie les communications sortantes standards (HTTPS:443, HTTP:80, DNS:53, SSH:22).
+  * **Retour :** Constante entière de qualification (`RAP_NET_APPROVED`, `RAP_NET_STANDARD`, `RAP_NET_SUSPECT`, `RAP_NET_HOSTILE`).
+
+* **109. `rap_cmd_heur`** (`src/cli/cmd_heur.c`)
+  * **Prototype :** `int rap_cmd_heur(int argc, char **argv, const RapConfig *cfg)`
+  * **Rôle :** Parcourt l'arborescence `/proc` pour traquer l'ensemble des anomalies comportementales et d'exécution clandestine. Résout le lien symbolique `/proc/[PID]/exe` de chaque tâche active, applique les filtres heuristiques experts (`rap_heur_check_process`) et projette les alertes formatées en console.
+  * **Retour :** `RAP_EXIT_THREAT` (1) en cas d'anomalie détectée (binaire fantôme, zone volatile, usurpation), `RAP_EXIT_OK` (0) si le système est intègre, ou `RAP_EXIT_ERROR` (2) si `/proc` est inaccessible.
+
+* **110. `rap_heur_check_process`** (`src/cli/cmd_heur.c`)
+  * **Prototype :** `int rap_heur_check_process(pid_t pid, const char *comm, const char *exe_path, char *out_anomaly, size_t out_sz)`
+  * **Rôle :** Évalue unitairement la posture de sécurité d'un processus via trois filtres défensifs sans allocation dynamique :
+    1. Détection des binaires fantômes exécutés en mémoire vive après suppression sur le disque (`(deleted)`).
+    2. Détection d'exécutions clandestines depuis des répertoires temporaires ou volatils suspects (`/tmp`, `/var/tmp`, `/dev/shm`, `/run/user/`).
+    3. Détection d'usurpation d'identité système (*Masquerading*) sur les démons officiels (`systemd`, `sshd`, `cron`, `rsyslogd`) et faux threads `kworker`.
+    Neutralise automatiquement les faux positifs lorsque `/proc/[PID]/exe` est inaccessible sans privilèges root.
+  * **Retour :** `1` si une anomalie heuristique est avérée avec qualification dans `out_anomaly`, sinon `0`.

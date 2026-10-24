@@ -1,399 +1,257 @@
+<!-- ==========================================================================
+ * NOM DU SCRIPT   : docs/index.html
+ * RÉVISION        : Rev 1.1
+ * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
+ * RESPONSABILITÉ  : Page d'accueil officielle, présentation de l'architecture
+ *                   souveraine, appel aux contributeurs / développeurs C/Linux,
+ *                   vitrine des sondes de combat et guide d'amorçage.
+ *
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
+ *   - Correction du type MIME du favicon (image/png).
+ *   - Rétablissement du texte de l'en-tête (charte institutionnelle).
+ *   - Alignement canonique de l'URL git clone (https://github.com/BINOKUB-GAME/RAPTOR.git).
+ *   - Synchronisation du bouton de copie rapide du terminal d'amorçage.
+ * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAPTOR v2.0 // EDR & Système Défensif Souverain Linux</title>
-    <meta name="description" content="EDR/HIDS souverain en C99/Raylib pour Linux x86_64. Traque mémoire RWX, mutations R-X Inode 0, chargeur dynamique LD_PRELOAD et filtrage Net-Guard.">
-    <style>
-        :root {
-            --bg-body: #05090f;
-            --bg-panel: #09101a;
-            --bg-card: #0d1726;
-            --border: #18283d;
-            --border-hover: #00d2ff;
-            --cyan: #00d2ff;
-            --cyan-glow: rgba(0, 210, 255, 0.25);
-            --green: #00e676;
-            --amber: #ffbb00;
-            --red: #ff3355;
-            --text-title: #f0f7ff;
-            --text-body: #c2d5ec;
-            --text-muted: #738ba8;
-            --font-mono: "DejaVu Sans Mono", "SF Mono", Consolas, monospace;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-body);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            max-width: 960px;
-            width: 100%;
-        }
-
-        /* --- EN-TÊTE / BRANDING & LOGO --- */
-        header {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 28px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--cyan);
-            box-shadow: 0 0 12px var(--cyan);
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 26px;
-        }
-
-        /* Respect strict du ratio 268/275 */
-        .logo-frame {
-            flex-shrink: 0;
-            width: 90px;
-            height: calc(90px * (275 / 268)); /* 92.35px */
-            aspect-ratio: 268 / 275;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            filter: drop-shadow(0 0 14px var(--cyan-glow));
-        }
-
-        .logo-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        .header-text {
-            flex-grow: 1;
-        }
-
-        .badge-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #081a24;
-            border: 1px solid var(--green);
-            color: var(--green);
-            padding: 3px 10px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            font-family: var(--font-mono);
-            border-radius: 4px;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
-        }
-
-        .badge-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--green);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--green);
-        }
-
-        h1 {
-            color: var(--text-title);
-            font-size: 2.1rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            line-height: 1.2;
-            margin-bottom: 6px;
-        }
-
-        h1 span {
-            color: var(--cyan);
-        }
-
-        p.subtitle {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            max-width: 720px;
-        }
-
-        /* --- BANDEAU DES MÉTRIQUES DU MOTEUR --- */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-
-        .metric-card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 18px 20px;
-        }
-
-        .metric-value {
-            font-family: var(--font-mono);
-            font-size: 1.35rem;
-            font-weight: bold;
-            color: var(--cyan);
-            margin-bottom: 4px;
-        }
-
-        .metric-label {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* --- CARTES PRINCIPALES --- */
-        .card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 28px;
-            margin-bottom: 24px;
-            transition: border-color 0.2s ease;
-        }
-
-        .card:hover {
-            border-color: rgba(0, 210, 255, 0.4);
-        }
-
-        h2 {
-            color: var(--cyan);
-            font-size: 1.25rem;
-            letter-spacing: 0.5px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-        }
-
-        .handbook-desc {
-            color: var(--text-body);
-            font-size: 1rem;
-            margin-bottom: 22px;
-            line-height: 1.6;
-        }
-
-        /* --- BOUTONS D'ACTION --- */
-        .btn-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #0070ba;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            border: 1px solid var(--cyan);
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 10px rgba(0, 112, 186, 0.3);
-        }
-
-        .btn:hover {
-            background: #008be3;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(0, 210, 255, 0.4);
-        }
-
-        .btn-secondary {
-            background: #111a26;
-            border: 1px solid var(--border);
-            color: var(--text-body);
-            box-shadow: none;
-        }
-
-        .btn-secondary:hover {
-            background: #182535;
-            border-color: var(--text-muted);
-            transform: translateY(-1px);
-        }
-
-        /* --- LISTE TECHNIQUE DES SECTIONS --- */
-        .features-list {
-            list-style: none;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .feature-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 16px;
-        }
-
-        .feature-item strong {
-            display: block;
-            color: var(--text-title);
-            font-size: 0.95rem;
-            margin-bottom: 6px;
-        }
-
-        .feature-item p {
-            color: var(--text-muted);
-            font-size: 0.88rem;
-            line-height: 1.45;
-        }
-
-        code {
-            font-family: var(--font-mono);
-            font-size: 0.82rem;
-            color: var(--cyan);
-            background: #08111c;
-            padding: 2px 5px;
-            border-radius: 3px;
-            border: 1px solid rgba(0, 210, 255, 0.2);
-        }
-
-        /* --- PIED DE PAGE --- */
-        footer {
-            margin-top: 36px;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border);
-            padding-top: 24px;
-            font-family: var(--font-mono);
-        }
-
-        @media (max-width: 700px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            .features-list {
-                grid-template-columns: 1fr;
-            }
-            .btn-group {
-                flex-direction: column;
-            }
-            .btn {
-                justify-content: center;
-            }
-        }
-    </style>
+    <title>RAPTOR DEFENSE // Système d'Audit Souverain & Hub Développeurs</title>
+    <meta name="description" content="Boîte à outils défensive et forensique souveraine pour Linux en C99 (< 2 Mo RAM). Rejoignez l'équipe de développement.">
+    <link rel="stylesheet" href="css/raptor-core.css">
+    <link rel="icon" type="image/png" href="raptor-icon.png">
 </head>
 <body>
-    <div class="container">
-        
-        <!-- HEADER AVEC LOGO RAPTOR -->
-        <header>
-            <div class="header-content">
-                <div class="logo-frame">
-                    <img src="RAPTOR-ICONE.png" alt="Logo Officiel RAPTOR v2.0" width="268" height="275">
-                </div>
-                <div class="header-text">
-                    <div class="badge-status">
-                        <span class="badge-dot"></span>
-                        V2.0 RELEASE SOUVERAINE // PRODUCTION ACTIVE
-                    </div>
-                    <h1>RAPTOR <span>DEFENSE</span></h1>
-                    <p class="subtitle">Système d'Audit Forensique, Traque Mémoire & Surveillance Passive Linux (HIDS / EDR Léger C99).</p>
-                </div>
-            </div>
-        </header>
 
-        <!-- MÉTRIQUES SYSTÈME -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value">C99 / POSIX</div>
-                <div class="metric-label">Socle & Interface Raylib 5.0</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">0 ms // 60 FPS</div>
-                <div class="metric-label">Double-Fork Asynchrone</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">87 FONCTIONS</div>
-                <div class="metric-label">Dictionnaire Forensique Tracé</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">0 TÉLÉMÉTRIE</div>
-                <div class="metric-label">Audit 100 % Local & Souverain</div>
+    <!-- ======================================================================
+         1. EN-TÊTE INSTITUTIONNEL (STYLE FREEBSD)
+         ====================================================================== -->
+    <header class="raptor-header">
+        <div class="container">
+            <a href="index.html" class="raptor-brand">
+                <img src="raptor-icon.png" alt="Logo Officiel RAPTOR DEFENSE">
+                <span>RAPTOR<span class="version-badge">v2.0</span></span>
+            </a>
+
+            <nav class="raptor-nav">
+                <a href="index.html" class="active">Accueil</a>
+                <a href="man.html">Manuel (Man)</a>
+                <a href="faq.html">FAQ Technique</a>
+                <a href="community.html">Communauté</a>
+            </nav>
+
+            <div class="raptor-header-actions">
+                <div class="raptor-search-box">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    <input type="text" placeholder="Recherche rapide...">
+                </div>
+                <a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener" class="btn-github">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
             </div>
         </div>
+    </header>
 
-        <!-- DOCUMENTATION & HANDBOOK -->
-        <div class="card">
-            <h2>MANUEL OFFICIEL D'EXPLOITATION FORENSIQUE</h2>
-            <p class="handbook-desc">
-                Le <strong>Raptor Handbook (Volumes 1, 2 & 3)</strong> compile l'intégralité des procédures d'investigation mémoire, l'analyse différentielle de dérive RAM ($T_{-1}$ vs $T_0$), la traque des mutations anonymes R-X orphelines (Inode 0), l'interception des chargeurs dynamiques <code>LD_PRELOAD</code> et les règles de souveraineté réseau Net-Guard.
+    <!-- ======================================================================
+         2. BANNIÈRE HERO & APPEL AUX DÉVELOPPEURS
+         ====================================================================== -->
+    <section class="raptor-hero">
+        <div class="container">
+            <div class="raptor-hero-badge">
+                PROJET D'INGÉNIERIE SOUVERAINE // LICENCE LIBRE & OUVERTE
+            </div>
+            <h1>RAPTOR DEFENSE</h1>
+            <p class="raptor-hero-subtitle">
+                Système d'audit passif, forensique chirurgical et surveillance mémoire pour Linux. Conçu pour opérer sous famine mémoire extrême (&lt; 2 Mo RAM) sans aucune allocation dynamique en situation de survie.
             </p>
-            <div class="btn-group">
-                <a href="RAPTOR-HANDBOOK-v2.0.pdf" class="btn" target="_blank">
-                    Télécharger le Handbook (PDF v2.0)
-                </a>
-                <a href="https://github.com/BINOKUB-GAME/RAPTOR" class="btn btn-secondary" target="_blank" rel="noopener">
-                    Code Source (GitHub)
-                </a>
+
+            <div class="raptor-hero-actions">
+                <a href="#compilation" class="btn-primary">Compiler le Projet (CMake)</a>
+                <a href="man.html" class="btn-secondary">Consulter le Manuel rap(1)</a>
+            </div>
+
+            <!-- Encart d'appel à constitution d'équipe -->
+            <div class="raptor-join-banner">
+                <div class="raptor-join-content">
+                    <h3>Rejoignez l'équipe de développement RAPTOR</h3>
+                    <p>
+                        Nous fédérons des programmeurs C / systèmes, administrateurs Unix et analystes forensiques pour éprouver le code, traquer les bogues, enrichir les listes de souveraineté et étendre les greffons du noyau.
+                    </p>
+                </div>
+                <a href="community.html" class="btn-primary" style="white-space: nowrap;">Rejoindre le Projet</a>
             </div>
         </div>
+    </section>
 
-        <!-- SECTIONS DU MOTEUR DÉFENSIF -->
-        <div class="card">
-            <h2>CAPACITÉS FORENSIQUES & PILIERS DÉFENSIFS</h2>
-            <div class="features-list">
-                <div class="feature-item">
-                    <strong>Section 13 : Mutations Mémoire R-X & Inode 0</strong>
-                    <p>Traque le contournement <code>mprotect()</code> et identifie le code machine sans ancrage disque avec registre souverain d'exclusion externe.</p>
+    <!-- ======================================================================
+         3. LES 6 PILIERS DÉFENSIFS (GRILLE DE CARTES MODULAIRES)
+         ====================================================================== -->
+    <section class="raptor-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Architecture & Outils de Combat</h2>
+                <p>Une batterie de sondes indépendantes interrogeant directement l'arborescence <code>/proc</code> sans dépendance logicielle lourde.</p>
+            </div>
+
+            <div class="cards-grid">
+                <!-- Carte 1 -->
+                <div class="raptor-card">
+                    <div class="card-icon">RX</div>
+                    <h3>Traque Mémoire Inode 0</h3>
+                    <p>
+                        Inspecte chirurgicalement <code>/proc/[PID]/maps</code> pour débusquer les pages exécutables clandestines (<code>r-xp</code>) orphelines de fichier disque. Filtre passivement les compilateurs JIT légitimes et trampolines libffi via <code>mem_whitelist.conf</code>.
+                    </p>
+                    <div class="card-footer-tag">COMMANDE : rap rx [-v]</div>
                 </div>
-                <div class="feature-item">
-                    <strong>Section 14 : Preload-Hunter (Rootkits Userland)</strong>
-                    <p>Audit passif de <code>/etc/ld.so.preload</code> et inspection chirurgicale des variables <code>LD_PRELOAD</code> dans <code>/proc/[PID]/environ</code>.</p>
+
+                <!-- Carte 2 -->
+                <div class="raptor-card">
+                    <div class="card-icon">NET</div>
+                    <h3>Net-Guard Souverain</h3>
+                    <p>
+                        Analyse passive des sockets sous <code>/proc/net/tcp</code>. Évaluation mathématique CIDR (/8 à /32) confrontée aux registres souverains pour qualifier instantanément les flux LAN RFC 1918, les sorties HTTPS et neutraliser les nœuds C2 hostiles.
+                    </p>
+                    <div class="card-footer-tag">COMMANDE : rap net [-n &lt;N&gt;]</div>
                 </div>
-                <div class="feature-item">
-                    <strong>Section 11 & 12 : Net-Guard & Cascade BGP/ASN</strong>
-                    <p>Corrélation Socket &harr; Inode &harr; PID, anti-combosquatting Levenshtein et résolution inverse BGP sans latence.</p>
+
+                <!-- Carte 3 -->
+                <div class="raptor-card">
+                    <div class="card-icon">PL</div>
+                    <h3>Chasseur LD_PRELOAD</h3>
+                    <p>
+                        Traque les rootkits userland furtifs par une inspection à double palier : contrôle d'intégrité de la persistance globale sous <code>/etc/ld.so.preload</code> et audit des variables d'environnement actives dans <code>/proc/[PID]/environ</code>.
+                    </p>
+                    <div class="card-footer-tag">COMMANDE : rap preload</div>
                 </div>
-                <div class="feature-item">
-                    <strong>Section 15 : Notifications Freedesktop Asynchrones</strong>
-                    <p>Alertes visuelles de bureau via architecture double-fork (0 ms d'impact sur Raylib, 0 zombie) avec filtre anti-rebond temporel.</p>
+
+                <!-- Carte 4 -->
+                <div class="raptor-card">
+                    <div class="card-icon">HR</div>
+                    <h3>Analyseur Heuristique</h3>
+                    <p>
+                        Détecte les binaires supprimés du disque en cours d'exécution (<code>deleted</code>), les lancements suspects depuis des répertoires volatils (<code>/tmp</code>, <code>/dev/shm</code>) et l'usurpation de démons système critiques (Masquerading).
+                    </p>
+                    <div class="card-footer-tag">COMMANDE : rap heur</div>
+                </div>
+
+                <!-- Carte 5 -->
+                <div class="raptor-card">
+                    <div class="card-icon">0H</div>
+                    <h3>Téléscripteur rapless</h3>
+                    <p>
+                        Pager autonome d'urgence opérant strictement en 0 heap (zéro allocation dynamique). Capable d'indexer et naviguer dans des dizaines de milliers de lignes du noyau (/proc/kallsyms) en cas d'effondrement du terminal ou du serveur X11/Wayland.
+                    </p>
+                    <div class="card-footer-tag">UTILITAIRE : rapless</div>
+                </div>
+
+                <!-- Carte 6 -->
+                <div class="raptor-card">
+                    <div class="card-icon">PID</div>
+                    <h3>Riposte Cinétique Protégée</h3>
+                    <p>
+                        Neutralisation chirurgicale immédiate (<code>SIGKILL</code>) ou gel conservatoire forensique (<code>SIGSTOP</code> en état <code>T</code>). Verrous stricts interdisant tout tir sur le PID 1, sur soi-même, sur le shell parent ou sur les threads du noyau.
+                    </p>
+                    <div class="card-footer-tag">COMMANDES : rap kill | freeze</div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- FOOTER -->
-        <footer>
-            RAPTOR v2.0 &bull; Conçu pour Linux x86_64 &bull; Architecture par greffons &bull; Zéro télémétrie
-        </footer>
+    <!-- ======================================================================
+         4. GUIDE DE COMPILATION & AMORÇAGE
+         ====================================================================== -->
+    <section class="raptor-section" id="compilation" style="background-color: var(--color-bg-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
+        <div class="container">
+            <div class="section-header">
+                <h2>Déploiement & Compilation Souveraine</h2>
+                <p>Aucune dépendance externe requise pour la trousse CLI de secours. Norme C99 stricte.</p>
+            </div>
 
-    </div>
+            <div class="man-viewer-box" style="max-width: 860px; margin: 0 auto;">
+                <div class="man-viewer-header">
+                    <span class="man-viewer-title">bash — Terminal de compilation</span>
+                    <button class="man-btn-copy" onclick="navigator.clipboard.writeText('git clone https://github.com/BINOKUB-GAME/RAPTOR.git\ncd RAPTOR\ncmake -B build -DCMAKE_BUILD_TYPE=Release\ncmake --build build\n./build/rap hunt')">Copier les commandes</button>
+                </div>
+                <div class="man-content" style="padding: 20px 24px;">
+<span style="color: #636D83;"># 1. Rapatrier le dépôt source</span>
+<span style="color: #E5C07B;">git clone</span> https://github.com/BINOKUB-GAME/RAPTOR.git
+<span style="color: #E5C07B;">cd</span> RAPTOR
+
+<span style="color: #636D83;"># 2. Configurer et compiler avec optimisations de combat (-O3)</span>
+<span style="color: #E5C07B;">cmake</span> -B build -DCMAKE_BUILD_TYPE=Release
+<span style="color: #E5C07B;">cmake</span> --build build
+
+<span style="color: #636D83;"># 3. Lancer l'audit de sécurité universel combiné</span>
+<span style="color: #8C1D18; font-weight: bold;">./build/rap</span> hunt
+
+<span style="color: #636D83;"># 4. Naviguer dans les flux massifs avec le téléscripteur 0 heap</span>
+<span style="color: #8C1D18; font-weight: bold;">./build/rap</span> hunt | ./build/rapless</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         5. PIED DE PAGE INSTITUTIONNEL
+         ====================================================================== -->
+    <footer class="raptor-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                        <img src="raptor-icon.png" alt="RAPTOR Logo" style="height: 32px; width: 32px; border-radius: 50%;">
+                        <span style="color: #FFFFFF; font-weight: 700; font-size: 1.1rem;">RAPTOR DEFENSE</span>
+                    </div>
+                    <p style="font-size: 0.88rem; line-height: 1.6; color: #8C96A5;">
+                        Projet d'ingénierie forensique et d'audit défensif souverain pour systèmes d'exploitation Linux. Zéro compromis sur la mémoire, indépendance technologique totale.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Documentation</h5>
+                    <ul>
+                        <li><a href="man.html">Manuel rap(1)</a></li>
+                        <li><a href="man.html#rapless">Téléscripteur rapless(1)</a></li>
+                        <li><a href="faq.html">FAQ Faux Positifs (JIT/FFI)</a></li>
+                        <li><a href="faq.html#netguard">Règles Net-Guard</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Projet & Équipe</h5>
+                    <ul>
+                        <li><a href="community.html">Rejoindre l'équipe</a></li>
+                        <li><a href="community.html#bugs">Signaler un bogue</a></li>
+                        <li><a href="community.html#plugins">Développer un greffon</a></li>
+                        <li><a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener">Dépôt Git</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Gouvernance</h5>
+                    <ul>
+                        <li><a href="community.html#charte">Charte de contribution</a></li>
+                        <li><a href="community.html#securite">Divulgation sécurité</a></li>
+                        <li><a href="community.html#licence">Licence C99 Souveraine</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>
+                    &copy; 2026 RAPTOR DEFENSE Project. Développé pour la communauté des bâtisseurs et auditeurs de systèmes.
+                </div>
+                <div>
+                    Inspiré des fondations libres et souveraines UNIX.
+                </div>
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>
