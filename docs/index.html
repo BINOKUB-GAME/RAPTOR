@@ -3,150 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAPTOR v2.0 // EDR & Système Défensif Linux</title>
+    <title>RAPTOR v2.0 // EDR & Système Défensif Souverain Linux</title>
+    <meta name="description" content="EDR/HIDS souverain en C99/Raylib pour Linux x86_64. Traque mémoire RWX, mutations R-X Inode 0, chargeur dynamique LD_PRELOAD et filtrage Net-Guard.">
     <style>
         :root {
-            --bg-main: #060b13;
-            --panel-bg: #0a111a;
-            --border: #16263a;
+            --bg-body: #05090f;
+            --bg-panel: #09101a;
+            --bg-card: #0d1726;
+            --border: #18283d;
+            --border-hover: #00d2ff;
             --cyan: #00d2ff;
+            --cyan-glow: rgba(0, 210, 255, 0.25);
             --green: #00e676;
-            --text-white: #ebf5ff;
-            --text-muted: #87a0be;
+            --amber: #ffbb00;
+            --red: #ff3355;
+            --text-title: #f0f7ff;
+            --text-body: #c2d5ec;
+            --text-muted: #738ba8;
+            --font-mono: "DejaVu Sans Mono", "SF Mono", Consolas, monospace;
         }
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-white);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-body);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
             padding: 40px 20px;
             display: flex;
             justify-content: center;
         }
+
         .container {
-            max-width: 900px;
+            max-width: 960px;
             width: 100%;
         }
+
+        /* --- EN-TÊTE / BRANDING & LOGO --- */
         header {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 24px;
-            margin-bottom: 32px;
-        }
-        h1 {
-            color: var(--cyan);
-            font-size: 1.8rem;
-            margin: 0 0 8px 0;
-            letter-spacing: 1px;
-        }
-        .badge {
-            display: inline-block;
-            background: #101c2c;
+            background: var(--bg-panel);
             border: 1px solid var(--border);
-            color: var(--green);
-            padding: 4px 10px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            border-radius: 4px;
-            margin-bottom: 12px;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
         }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--cyan);
+            box-shadow: 0 0 12px var(--cyan);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        /* Respect strict du ratio 268/275 */
+        .logo-frame {
+            flex-shrink: 0;
+            width: 90px;
+            height: calc(90px * (275 / 268)); /* 92.35px */
+            aspect-ratio: 268 / 275;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 0 14px var(--cyan-glow));
+        }
+
+        .logo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .header-text {
+            flex-grow: 1;
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #081a24;
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--green);
+        }
+
+        h1 {
+            color: var(--text-title);
+            font-size: 2.1rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        h1 span {
+            color: var(--cyan);
+        }
+
         p.subtitle {
             color: var(--text-muted);
-            margin: 0;
             font-size: 1.05rem;
-            line-height: 1.5;
+            max-width: 720px;
         }
-        .card {
-            background: var(--panel-bg);
+
+        /* --- BANDEAU DES MÉTRIQUES DU MOTEUR --- */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .metric-card {
+            background: var(--bg-panel);
             border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 24px;
-            margin-bottom: 24px;
+            padding: 18px 20px;
         }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            font-weight: bold;
+            color: var(--cyan);
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- CARTES PRINCIPALES --- */
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 28px;
+            margin-bottom: 24px;
+            transition: border-color 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 210, 255, 0.4);
+        }
+
         h2 {
             color: var(--cyan);
-            font-size: 1.2rem;
-            margin-top: 0;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             border-bottom: 1px solid var(--border);
             padding-bottom: 10px;
         }
-        ul {
-            color: var(--text-muted);
-            line-height: 1.8;
-            padding-left: 20px;
+
+        .handbook-desc {
+            color: var(--text-body);
+            font-size: 1rem;
+            margin-bottom: 22px;
+            line-height: 1.6;
         }
-        li strong {
-            color: var(--text-white);
-        }
+
+        /* --- BOUTONS D'ACTION --- */
         .btn-group {
             display: flex;
-            gap: 16px;
-            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 14px;
         }
+
         .btn {
-            display: inline-block;
-            background: #0077cc;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #0070ba;
             color: #ffffff;
             text-decoration: none;
-            padding: 12px 20px;
+            padding: 12px 24px;
             border-radius: 4px;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 0.95rem;
-            transition: background 0.2s;
             border: 1px solid var(--cyan);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 10px rgba(0, 112, 186, 0.3);
         }
+
         .btn:hover {
-            background: #0091f5;
+            background: #008be3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(0, 210, 255, 0.4);
         }
+
         .btn-secondary {
-            background: #142030;
-            border-color: var(--border);
-            color: var(--text-white);
+            background: #111a26;
+            border: 1px solid var(--border);
+            color: var(--text-body);
+            box-shadow: none;
         }
+
         .btn-secondary:hover {
-            background: #1c2e46;
+            background: #182535;
+            border-color: var(--text-muted);
+            transform: translateY(-1px);
         }
+
+        /* --- LISTE TECHNIQUE DES SECTIONS --- */
+        .features-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .feature-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .feature-item strong {
+            display: block;
+            color: var(--text-title);
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .feature-item p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--cyan);
+            background: #08111c;
+            padding: 2px 5px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+        }
+
+        /* --- PIED DE PAGE --- */
         footer {
-            margin-top: 40px;
+            margin-top: 36px;
             text-align: center;
             color: var(--text-muted);
             font-size: 0.85rem;
             border-top: 1px solid var(--border);
-            padding-top: 20px;
+            padding-top: 24px;
+            font-family: var(--font-mono);
+        }
+
+        @media (max-width: 700px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .features-list {
+                grid-template-columns: 1fr;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        
+        <!-- HEADER AVEC LOGO RAPTOR -->
         <header>
-            <div class="badge">VERSION v2.0 ACTIVE // PRODUCTION SOUVERAINE</div>
-            <h1>RAPTOR DEFENSE</h1>
-            <p class="subtitle">Système d'Audit Défensif, Analyse Passive & Traque Mémoire Linux (EDR/HIDS léger C99).</p>
+            <div class="header-content">
+                <div class="logo-frame">
+                    <img src="RAPTOR-ICONE.png" alt="Logo Officiel RAPTOR v2.0" width="268" height="275">
+                </div>
+                <div class="header-text">
+                    <div class="badge-status">
+                        <span class="badge-dot"></span>
+                        V2.0 RELEASE SOUVERAINE // PRODUCTION ACTIVE
+                    </div>
+                    <h1>RAPTOR <span>DEFENSE</span></h1>
+                    <p class="subtitle">Système d'Audit Forensique, Traque Mémoire & Surveillance Passive Linux (HIDS / EDR Léger C99).</p>
+                </div>
+            </div>
         </header>
 
-        <div class="card">
-            <h2>DOCUMENTATION OPÉRATEUR</h2>
-            <p style="color: var(--text-muted); line-height: 1.6;">
-                Le <strong>Raptor Handbook</strong> compile l'intégralité des procédures d'investigation, la taxonomie des alertes mémoire (RWX / R-X Inode 0), la traque des détournements de chargeurs dynamiques (LD_PRELOAD) et la gestion des flux réseau souverains Net-Guard.
-            </p>
-            <div class="btn-group">
-                <a href="RAPTOR-HANDBOOK-v2.0.pdf" class="btn">Consulter le Handbook - PDF </a>
-                <a href="https://github.com/BINOKUB-GAME/RAPTOR" class="btn btn-secondary">Dépôt GitHub</a>
+        <!-- MÉTRIQUES SYSTÈME -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">C99 / POSIX</div>
+                <div class="metric-label">Socle & Interface Raylib 5.0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">0 ms // 60 FPS</div>
+                <div class="metric-label">Double-Fork Asynchrone</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">87 FONCTIONS</div>
+                <div class="metric-label">Dictionnaire Forensique Tracé</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">0 TÉLÉMÉTRIE</div>
+                <div class="metric-label">Audit 100 % Local & Souverain</div>
             </div>
         </div>
 
+        <!-- DOCUMENTATION & HANDBOOK -->
         <div class="card">
-            <h2>CAPACITÉS DU MOTEUR DÉFENSIF</h2>
-            <ul>
-                <li><strong>Section 13 :</strong> Traque chirurgicale des mutations clandestines <code>mprotect()</code> et pages orphelines Inode 0.</li>
-                <li><strong>Section 14 :</strong> Preload-Hunter (audit passif de <code>/etc/ld.so.preload</code> et des environnements <code>/proc/[PID]/environ</code>).</li>
-                <li><strong>Section 15 :</strong> Notifications bureau asynchrones Freedesktop via double-fork (0 ms sur Raylib, 0 zombie).</li>
-                <li><strong>Net-Guard & Net-Intel :</strong> Filtrage CIDR, anti-combosquatting Levenshtein et résolution asynchrone BGP/ASN Team Cymru.</li>
-            </ul>
+            <h2>MANUEL OFFICIEL D'EXPLOITATION FORENSIQUE</h2>
+            <p class="handbook-desc">
+                Le <strong>Raptor Handbook (Volumes 1, 2 & 3)</strong> compile l'intégralité des procédures d'investigation mémoire, l'analyse différentielle de dérive RAM ($T_{-1}$ vs $T_0$), la traque des mutations anonymes R-X orphelines (Inode 0), l'interception des chargeurs dynamiques <code>LD_PRELOAD</code> et les règles de souveraineté réseau Net-Guard.
+            </p>
+            <div class="btn-group">
+                <a href="RAPTOR-HANDBOOK-v2.0.pdf" class="btn" target="_blank">
+                    Télécharger le Handbook (PDF v2.0)
+                </a>
+                <a href="https://github.com/BINOKUB-GAME/RAPTOR" class="btn btn-secondary" target="_blank" rel="noopener">
+                    Code Source (GitHub)
+                </a>
+            </div>
         </div>
 
+        <!-- SECTIONS DU MOTEUR DÉFENSIF -->
+        <div class="card">
+            <h2>CAPACITÉS FORENSIQUES & PILIERS DÉFENSIFS</h2>
+            <div class="features-list">
+                <div class="feature-item">
+                    <strong>Section 13 : Mutations Mémoire R-X & Inode 0</strong>
+                    <p>Traque le contournement <code>mprotect()</code> et identifie le code machine sans ancrage disque avec registre souverain d'exclusion externe.</p>
+                </div>
+                <div class="feature-item">
+                    <strong>Section 14 : Preload-Hunter (Rootkits Userland)</strong>
+                    <p>Audit passif de <code>/etc/ld.so.preload</code> et inspection chirurgicale des variables <code>LD_PRELOAD</code> dans <code>/proc/[PID]/environ</code>.</p>
+                </div>
+                <div class="feature-item">
+                    <strong>Section 11 & 12 : Net-Guard & Cascade BGP/ASN</strong>
+                    <p>Corrélation Socket &harr; Inode &harr; PID, anti-combosquatting Levenshtein et résolution inverse BGP sans latence.</p>
+                </div>
+                <div class="feature-item">
+                    <strong>Section 15 : Notifications Freedesktop Asynchrones</strong>
+                    <p>Alertes visuelles de bureau via architecture double-fork (0 ms d'impact sur Raylib, 0 zombie) avec filtre anti-rebond temporel.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
         <footer>
-            RAPTOR v2.0 &bull; Conçu pour Linux x86_64 &bull; Zéro télémétrie &bull; 100 % Souverain
+            RAPTOR v2.0 &bull; Conçu pour Linux x86_64 &bull; Architecture par greffons &bull; Zéro télémétrie
         </footer>
+
     </div>
 </body>
 </html>
