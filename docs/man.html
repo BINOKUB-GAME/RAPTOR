@@ -1,12 +1,14 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/man.html
- * RÉVISION        : Rev 1.1
+ * RÉVISION        : Rev 1.2
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Interface interactive de consultation des pages de manuel
  *                   UNIX en ligne (Section 1 Commandes, Section 5 Formats).
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
- *   - Remplacement du lien générique GitHub par https://github.com/BINOKUB-GAME/RAPTOR.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
+ *   - Nettoyage des styles inline rigides (width: 260px, margin-left: auto).
+ *   - Regroupement des actions de recherche dans des conteneurs responsives.
+ *   - Adaptation fluide de la grille des sélecteurs pour les écrans mobiles.
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -49,7 +51,7 @@
     </header>
 
     <!-- ======================================================================
-         2. SECTION DE RECHERCHE & ARCHIVE (STYLE FREEBSD MAN PAGES)
+         2. SECTION DE RECHERCHE & ARCHIVE
          ====================================================================== -->
     <main class="raptor-section" style="padding-top: 40px;">
         <div class="container">
@@ -60,26 +62,32 @@
                 </p>
             </div>
 
-            <!-- Barre d'interrogation et sélecteurs -->
+            <!-- Barre d'outils responsive -->
             <div class="man-selector-bar">
-                <input type="text" id="manSearchInput" placeholder="Rechercher une commande (ex: rx, kill, net)..." 
-                       style="padding: 7px 12px; font-family: var(--font-mono); font-size: 0.85rem; border: 1px solid var(--color-border-dark); border-radius: var(--border-radius-sm); width: 260px;">
-                
-                <button type="button" id="btnManExec" class="btn-primary" style="padding: 7px 16px; font-size: 0.85rem; cursor: pointer;">man</button>
-                <button type="button" id="btnAproposExec" class="btn-secondary" style="padding: 7px 16px; font-size: 0.85rem; cursor: pointer;">apropos</button>
+                <div class="man-search-group">
+                    <input type="text" id="manSearchInput" placeholder="Rechercher une commande (ex: rx, kill, net)...">
+                    <div class="man-btn-group">
+                        <button type="button" id="btnManExec" class="btn-primary">man</button>
+                        <button type="button" id="btnAproposExec" class="btn-secondary">apropos</button>
+                    </div>
+                </div>
 
-                <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
-                    <label for="manSectionSelect">Section :</label>
-                    <select id="manSectionSelect" class="man-select">
-                        <option value="all">Toutes les sections</option>
-                        <option value="1" selected>1 - Commandes de Secours (rap, rapless)</option>
-                        <option value="5">5 - Formats de Règles (.conf)</option>
-                    </select>
+                <div class="man-dropdowns-group">
+                    <div class="man-select-field">
+                        <label for="manSectionSelect">Section :</label>
+                        <select id="manSectionSelect" class="man-select">
+                            <option value="all">Toutes les sections</option>
+                            <option value="1" selected>1 - Commandes de Secours (rap, rapless)</option>
+                            <option value="5">5 - Formats de Règles (.conf)</option>
+                        </select>
+                    </div>
 
-                    <label for="manCommandSelect" style="margin-left: 8px;">Page :</label>
-                    <select id="manCommandSelect" class="man-select">
-                        <!-- Rempli dynamiquement par man-engine.js -->
-                    </select>
+                    <div class="man-select-field">
+                        <label for="manCommandSelect">Page :</label>
+                        <select id="manCommandSelect" class="man-select">
+                            <!-- Rempli dynamiquement par man-engine.js -->
+                        </select>
+                    </div>
                 </div>
             </div>
 
