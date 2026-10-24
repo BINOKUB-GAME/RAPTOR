@@ -877,6 +877,7 @@ code, pre {
     }
 
     .man-search-group {
+        flex: none;
         flex-direction: column;
         align-items: stretch;
         width: 100%;
