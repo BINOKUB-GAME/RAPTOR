@@ -40,9 +40,9 @@ CTestTestfile.cmake
 *.dll
 *.exe
 
-# Exécutable RAPTOR généré
-raptor
-raptor.exe
+# Exécutable RAPTOR généré à la racine
+/raptor
+/raptor.exe
 
 # ------------------------------------------------------------------------------
 # 3. RAPPORTS D'AUDIT LOCAUX & LOGS ÉPHÉMÈRES

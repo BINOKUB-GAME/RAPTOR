@@ -1,12 +1,12 @@
 # ==============================================================================
 # NOM DU SCRIPT   : CMakeLists.txt
-# RÉVISION        : Rev 1.10
+# RÉVISION        : Rev 1.11
 # PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
 # RESPONSABILITÉ  : Configuration générale du système de construction CMake.
 #                   - Cible C99 avec extensions GNU (Linux/POSIX) et standard Windows.
 #                   - Définition par défaut du profil de build Release (-O3).
-#                   - Neutralisation des avertissements de dépréciation de Raylib.
-#                   - Intégration autonome de Raylib via FetchContent.
+#                   - Neutralisation des avertissements de dépréciation et tiers de Raylib.
+#                   - Intégration autonome de Raylib via FetchContent en mode SYSTEM.
 #                   - Intégration modulaire de l'UI et des 6 greffons système.
 #                   - Intégration de Net-Guard et de Net-Intel (plugin_asn_intel.c).
 #                   - Assemblage de l'exécutable unifié 'raptor'.
@@ -14,13 +14,12 @@
 #                     binaire d'urgence 'rap' et téléscripteur autonome 'rapless'.
 #                   - Chaîne de compilation automatisée de la documentation SSOT.
 #
-# BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.10) :
-#   - Ajout de 'docs/DICTIONNAIRE-DES-FONCTIONS-22-10-2026.md' dans les dépendances
-#     de la commande personnalisée de génération SSOT.
-#   - Déclenchement automatique de 'tools/gen_man.py' lors de toute modification
-#     du dictionnaire des fonctions ou du manuel 'docs/man/rap.1.md'.
-#   - Production unifiée de 'src/cli/rap_man_data.h' (manuel + dictionnaire .rodata)
-#     et de 'docs/js/man_data.js' (Sections 1, 3 et 5 pour docs/man.html).
+# BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.11) :
+#   - Isolation de _GNU_SOURCE=1 sur les cibles applicatives (raptor, rap, rapless)
+#     pour éliminer les conflits de redéfinition avec GLFW.
+#   - Marquage SYSTEM sur la bibliothèque externe Raylib pour supprimer le bruit
+#     d'avertissement (-Wstringop-overflow) lors de la compilation des tiers.
+#   - Maintien de la surveillance SSOT sur docs/man/rap.1.md et le dictionnaire.
 # ==============================================================================
 
 cmake_minimum_required(VERSION 3.16...3.30)
@@ -42,10 +41,6 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
 
-if(UNIX)
-    add_compile_definitions(_GNU_SOURCE=1)
-endif()
-
 # ------------------------------------------------------------------------------
 # 2. RÉPERTOIRES D'INCLUSION
 # ------------------------------------------------------------------------------
@@ -54,7 +49,7 @@ include_directories(
 )
 
 # ------------------------------------------------------------------------------
-# 3. GESTION AUTONOME DE RAYLIB (FETCHCONTENT)
+# 3. GESTION AUTONOME DE RAYLIB (FETCHCONTENT - MODE SILENCIEUX SYSTEM)
 # ------------------------------------------------------------------------------
 include(FetchContent)
 
@@ -65,6 +60,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/raysan5/raylib.git
     GIT_TAG 5.0
     GIT_SHALLOW TRUE
+    SYSTEM
 )
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(raylib)
@@ -143,6 +139,10 @@ target_include_directories(raptor PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
 )
 
+if(UNIX)
+    target_compile_definitions(raptor PRIVATE _GNU_SOURCE=1)
+endif()
+
 if(MSVC)
     target_compile_options(raptor PRIVATE /W4 /utf-8)
 else()
@@ -180,6 +180,7 @@ if(UNIX)
     target_include_directories(rapless PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cli
     )
+    target_compile_definitions(rapless PRIVATE _GNU_SOURCE=1)
     target_compile_options(rapless PRIVATE -Wall -Wextra -Wformat=2)
 
     # 8.2. Génération automatique de la documentation unique (SSOT)
@@ -220,7 +221,6 @@ if(UNIX)
         ${RAP_CLI_SOURCES}
     )
 
-    # Dépendance stricte : le binaire 'rap' exige la production de rap_man_data.h
     add_dependencies(rap gen_man)
 
     target_include_directories(rap PRIVATE
@@ -228,6 +228,7 @@ if(UNIX)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cli
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine
     )
+    target_compile_definitions(rap PRIVATE _GNU_SOURCE=1)
     target_compile_options(rap PRIVATE -Wall -Wextra -Wformat=2)
 
     # 8.4. Règles d'installation standardisées (/usr/local/bin)
