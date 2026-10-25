@@ -1,14 +1,16 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/man.html
- * RÉVISION        : Rev 1.3
+ * RÉVISION        : Rev 1.4
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Interface interactive de consultation des pages de manuel
- *                   UNIX en ligne (Section 1 Commandes, Section 5 Formats).
+ *                   UNIX en ligne (Section 1 Commandes, Section 3 Dictionnaire
+ *                   des Fonctions & API C99, Section 5 Formats de Règles).
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.3) :
- *   - Intégration du script de données unifié 'js/man_data.js' (généré via SSOT).
- *   - Ajout du raccourci rapide pour la sentinelle anti-rançongiciel (#rap-sentry).
- *   - Découplage strict : le fichier HTML consomme la base sans redondance.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.4) :
+ *   - Ajout de la Section 3 dans le sélecteur : Dictionnaire des Fonctions & API C99.
+ *   - Prise en charge des entrées hiérarchiques (sections thématiques et fonctions).
+ *   - Enrichissement du bandeau de raccourcis rapides (#sec-17, #fn-114).
+ *   - Adaptation du champ de recherche textuel (commandes, sections, identifiants).
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -16,7 +18,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAPTOR DEFENSE // Manual Pages Archive</title>
-    <meta name="description" content="Archive en ligne des pages de manuel de RAPTOR DEFENSE (rap, rapless, formats de règles).">
+    <meta name="description" content="Archive en ligne des pages de manuel de RAPTOR DEFENSE (rap, rapless, dictionnaire des fonctions, formats de règles).">
     <link rel="stylesheet" href="css/raptor-core.css">
     <link rel="icon" type="image/png" href="raptor-icon.png">
 </head>
@@ -58,14 +60,14 @@
             <div style="margin-bottom: 24px;">
                 <h1 style="font-size: 2rem; margin-bottom: 8px;">Archive des Pages de Manuel</h1>
                 <p style="color: var(--color-text-muted); font-size: 0.95rem;">
-                    Documentation d'exploitation des utilitaires de combat et des registres de configuration souverains.
+                    Documentation d'exploitation des utilitaires de combat, dictionnaire technique des fonctions et registres de configuration souverains.
                 </p>
             </div>
 
             <!-- Barre d'outils responsive -->
             <div class="man-selector-bar">
                 <div class="man-search-group">
-                    <input type="text" id="manSearchInput" placeholder="Rechercher une commande (ex: rx, sentry, kill)...">
+                    <input type="text" id="manSearchInput" placeholder="Rechercher une commande, section ou fonction (ex: rx, sentry, 114)...">
                     <div class="man-btn-group">
                         <button type="button" id="btnManExec" class="btn-primary">man</button>
                         <button type="button" id="btnAproposExec" class="btn-secondary">apropos</button>
@@ -78,6 +80,7 @@
                         <select id="manSectionSelect" class="man-select">
                             <option value="all">Toutes les sections</option>
                             <option value="1" selected>1 - Commandes de Secours (rap, rapless)</option>
+                            <option value="3">3 - Dictionnaire des Fonctions & API C99</option>
                             <option value="5">5 - Formats de Règles (.conf)</option>
                         </select>
                     </div>
@@ -115,6 +118,8 @@
                     <a href="#rap-heur">rap-heur(1)</a> &bull; 
                     <a href="#rap-net">rap-net(1)</a> &bull; 
                     <a href="#rap-sentry">rap-sentry(1)</a> &bull; 
+                    <a href="#sec-17">sec-17(3)</a> &bull; 
+                    <a href="#fn-114">fn-114(3)</a> &bull; 
                     <a href="#rap-kill">rap-kill(1)</a> &bull; 
                     <a href="#rap-freeze">rap-freeze(1)</a> &bull; 
                     <a href="#rapless">rapless(1)</a> &bull; 

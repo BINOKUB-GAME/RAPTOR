@@ -1,17 +1,16 @@
 /* ============================================================================
  * NOM DU SCRIPT   : docs/js/man-engine.js
- * RÉVISION        : Rev 1.1
+ * RÉVISION        : Rev 1.2
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Moteur autonome d'affichage et de recherche des pages de
- *                   manuel Unix (troff/groff) pour docs/man.html.
- *                   Découplé des données : consomme window.RAP_MAN_DATABASE généré
- *                   automatiquement par tools/gen_man.py depuis docs/man/rap.1.md.
+ *                   manuel Unix (Sections 1, 3 et 5) pour docs/man.html.
+ *                   Découplé des données : consomme window.RAP_MAN_DATABASE.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
- *   - Découplage strict entre moteur d'affichage et données (SSOT).
- *   - Consommation dynamique de window.RAP_MAN_DATABASE (généré dans js/man_data.js).
- *   - Prise en charge native de rap-sentry et de tout futur module sans retouche JS.
- *   - Préservation des commandes 'man', 'apropos', coloration et synchronisation hash.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
+ *   - Gestion du clic 'apropos' à vide avec panneau d'aide guidée.
+ *   - Extraction automatique des descriptions du Dictionnaire (Section 3).
+ *   - Bascule automatique du sélecteur de section lors d'un clic sur un résultat apropos.
+ *   - Coloration et navigation fluide pour les sections 1, 3 et 5.
  *
  * LISTE DES FONCTIONS NUMÉROTÉES :
  *   1. man_engine_populate_select : Remplissage dynamique du sélecteur par section.
@@ -39,7 +38,7 @@
 
     /* ========================================================================
      * 1. man_engine_populate_select
-     * Remplissage du menu déroulant selon la section active (1, 5 ou all)
+     * Remplissage du menu déroulant selon la section active (1, 3, 5 ou all)
      * ========================================================================
      */
     function man_engine_populate_select(filterSection) {
@@ -67,13 +66,19 @@
         const item = MAN_DATABASE[key];
         if (!item) {
             elTitle.textContent = "ERREUR // PAGE INTROUVABLE";
-            elContent.textContent = `Aucune page de manuel trouvée pour '${key}'.\nUtilisez 'apropos' pour une recherche par mot-clé.`;
+            elContent.textContent = `Aucune page trouvée pour '${key}'.\nUtilisez le bouton 'apropos' pour rechercher par mot-clé dans l'ensemble du système.`;
             return;
+        }
+
+        /* Si la page appartient à une section différente du filtre actif, basculer le filtre */
+        if (elSection && elSection.value !== "all" && elSection.value !== item.section) {
+            elSection.value = item.section;
+            man_engine_populate_select(item.section);
         }
 
         elTitle.textContent = item.title.toUpperCase();
 
-        // Coloration des sections Unix standard (NAME, SYNOPSIS, etc.) et drapeaux
+        /* Coloration des en-têtes standard Unix et des drapeaux */
         let formatted = item.content
             .replace(/^([A-Z][A-Z\s]+)$/gm, '<span class="man-section-heading">$1</span>')
             .replace(/(\s)(-[a-zA-Z0-9_-]+)/g, '$1<span class="man-flag">$2</span>');
@@ -83,7 +88,7 @@
             elSelect.value = key;
         }
 
-        // Mise à jour de l'ancre URL sans recharger la page
+        /* Mise à jour de l'ancre URL */
         history.replaceState(null, null, `#${key}`);
     }
 
@@ -103,6 +108,10 @@
             man_engine_render(cleanKey);
         } else if (MAN_DATABASE["rap-" + cleanKey]) {
             man_engine_render("rap-" + cleanKey);
+        } else if (MAN_DATABASE["sec-" + cleanKey]) {
+            man_engine_render("sec-" + cleanKey);
+        } else if (MAN_DATABASE["fn-" + cleanKey]) {
+            man_engine_render("fn-" + cleanKey);
         } else {
             man_engine_apropos();
         }
@@ -116,31 +125,66 @@
     function man_engine_apropos() {
         if (!elSearchInput || !elTitle || !elContent) return;
         const term = elSearchInput.value.trim().toLowerCase();
-        if (!term) return;
+
+        /* Cas champ vide : aide explicative immédiate */
+        if (!term) {
+            elTitle.textContent = "APROPOS // GUIDE D'UTILISATION";
+            elContent.innerHTML = `<span class="man-section-heading">RECHERCHE THÉMATIQUE APROPOS</span>\n\n` +
+                `La commande <span style="color: #E5C07B; font-weight: bold;">apropos</span> recherche un mot-clé dans l'ensemble des pages de manuel et du dictionnaire d'ingénierie.\n\n` +
+                `Entrez un mot-clé dans la barre de recherche ci-dessus, par exemple :\n` +
+                `  &bull; <span style="color: #61AFEF;">rx</span>          : Traque mémoire et allocations Inode 0\n` +
+                `  &bull; <span style="color: #61AFEF;">sentry</span>      : Sentinelle passive et fanotify\n` +
+                `  &bull; <span style="color: #61AFEF;">netguard</span>    : Qualification réseau et règles CIDR\n` +
+                `  &bull; <span style="color: #61AFEF;">114</span>         : Fiche unitaire de la fonction 114\n` +
+                `  &bull; <span style="color: #61AFEF;">preload</span>     : Détection des rootkits userland`;
+            return;
+        }
 
         let results = [];
         for (const key in MAN_DATABASE) {
             const item = MAN_DATABASE[key];
-            if (key.includes(term) || item.content.toLowerCase().includes(term)) {
-                const lines = item.content.split("\n");
+            const contentLower = item.content.toLowerCase();
+            const titleLower = item.title.toLowerCase();
+
+            if (key.includes(term) || contentLower.includes(term) || titleLower.includes(term)) {
                 let desc = "";
+
+                /* 1. Recherche du bloc NAME classique (Section 1 et 5) */
+                const lines = item.content.split("\n");
                 for (let i = 0; i < lines.length; i++) {
-                    if (lines[i].startsWith("NAME")) {
-                        desc = lines[i + 1] ? lines[i + 1].trim() : key;
+                    if (lines[i].trim() === "NAME") {
+                        desc = lines[i + 1] ? lines[i + 1].trim() : "";
                         break;
                     }
                 }
-                results.push(`${key}(${item.section})\t- ${desc}`);
+
+                /* 2. Repli pour le dictionnaire (Section 3) : extraction du titre propre */
+                if (!desc && item.title) {
+                    desc = item.title.replace(/^[A-Z0-9_\-]+\([0-9]\)\s*[—\-]\s*/i, "");
+                }
+
+                results.push({
+                    key: key,
+                    section: item.section,
+                    desc: desc || key
+                });
             }
         }
 
         elTitle.textContent = `APROPOS // RÉSULTATS POUR "${term.toUpperCase()}"`;
         if (results.length > 0) {
-            elContent.innerHTML = `<span class="man-section-heading">RÉSULTATS DE LA RECHERCHE</span>\n\n` + 
-                results.map(r => `&bull; <a href="#${r.split('(')[0]}" style="color: #E5C07B; font-weight: bold;">${r.split('\t')[0]}</a>\t${r.split('\t')[1]}`).join("\n");
-            
+            let output = `<span class="man-section-heading">RÉSULTATS DE LA RECHERCHE (${results.length})</span>\n\n`;
+            output += results.map(r => {
+                const badge = `${r.key}(${r.section})`;
+                const paddedBadge = badge.padEnd(18, ' ');
+                return `&bull; <a href="#${r.key}" style="color: #E5C07B; font-weight: bold; text-decoration: none;">${paddedBadge}</a> - ${r.desc}`;
+            }).join("\n");
+
+            elContent.innerHTML = output;
+
+            /* Liaison des clics sur les résultats */
             elContent.querySelectorAll("a").forEach(a => {
-                a.addEventListener("click", function(e) {
+                a.addEventListener("click", function (e) {
                     e.preventDefault();
                     const targetKey = this.getAttribute("href").substring(1);
                     man_engine_render(targetKey);
@@ -153,7 +197,7 @@
 
     /* ========================================================================
      * 5. man_engine_init
-     * Initialisation globale et liaison des événements
+     * Initialisation globale et écouteurs d'événements
      * ========================================================================
      */
     function man_engine_init() {

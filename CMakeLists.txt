@@ -1,6 +1,6 @@
 # ==============================================================================
 # NOM DU SCRIPT   : CMakeLists.txt
-# RÉVISION        : Rev 1.9
+# RÉVISION        : Rev 1.10
 # PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
 # RESPONSABILITÉ  : Configuration générale du système de construction CMake.
 #                   - Cible C99 avec extensions GNU (Linux/POSIX) et standard Windows.
@@ -14,11 +14,13 @@
 #                     binaire d'urgence 'rap' et téléscripteur autonome 'rapless'.
 #                   - Chaîne de compilation automatisée de la documentation SSOT.
 #
-# BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.9) :
-#   - Intégration du générateur de documentation unifiée SSOT (tools/gen_man.py).
-#   - Création de la cible personnalisée 'gen_man' dépendante de 'docs/man/rap.1.md'.
-#   - Établissement de la dépendance de compilation : 'rap' dépend de 'gen_man'.
-#   - Génération synchrone de 'src/cli/rap_man_data.h' et 'docs/manual_content.html'.
+# BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.10) :
+#   - Ajout de 'docs/DICTIONNAIRE-DES-FONCTIONS-22-10-2026.md' dans les dépendances
+#     de la commande personnalisée de génération SSOT.
+#   - Déclenchement automatique de 'tools/gen_man.py' lors de toute modification
+#     du dictionnaire des fonctions ou du manuel 'docs/man/rap.1.md'.
+#   - Production unifiée de 'src/cli/rap_man_data.h' (manuel + dictionnaire .rodata)
+#     et de 'docs/js/man_data.js' (Sections 1, 3 et 5 pour docs/man.html).
 # ==============================================================================
 
 cmake_minimum_required(VERSION 3.16...3.30)
@@ -186,9 +188,10 @@ if(UNIX)
         COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/tools/gen_man.py
         DEPENDS 
             ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/rap.1.md 
+            ${CMAKE_CURRENT_SOURCE_DIR}/docs/DICTIONNAIRE-DES-FONCTIONS-22-10-2026.md
             ${CMAKE_CURRENT_SOURCE_DIR}/tools/gen_man.py
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMENT "[SSOT] Generation automatique de rap_man_data.h et manual_content.html"
+        COMMENT "[SSOT] Generation automatique de rap_man_data.h et man_data.js"
         VERBATIM
     )
 

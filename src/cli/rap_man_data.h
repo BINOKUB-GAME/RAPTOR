@@ -2,12 +2,15 @@
  * NOM DU SCRIPT   : src/cli/rap_man_data.h
  * RÉVISION        : Généré automatiquement par tools/gen_man.py (SSOT)
  * PROJET          : RAPTOR DEFENSE v2.0 // Arsenal Souverain C99
- * RESPONSABILITÉ  : Constante .rodata contenant le texte complet du manuel.
+ * RESPONSABILITÉ  : Constantes .rodata pour le manuel et le dictionnaire hiérarchique.
  * ============================================================================ */
 
 #ifndef RAP_MAN_DATA_H
 #define RAP_MAN_DATA_H
 
+#include <stddef.h>
+
+/* Manuel CLI principal (Section 1 et 5) */
 static const char g_rap_man_data[] =
     "\n"
     "RAP(1)                      RAPTOR DEFENSE                      RAP(1)\n"
@@ -360,5 +363,2499 @@ static const char g_rap_man_data[] =
     "EXEMPLES\n"
     "     IP | 192.168.0.0/16    | APPROUVÉ | Réseau local privé (RFC 1918)\n"
     "     IP | 45.33.32.156      | HOSTILE  | Relais C2 Cobalt Strike répertorié\n";
+
+/* Dictionnaire intégral brut pour consultation paginée (rap man fn) */
+static const char g_rap_fn_full_data[] =
+    "# DICTIONNAIRE OFFICIEL DES STRUCTURES ET FONCTIONS // RAPTOR v2.0\n"
+    "## RÉFÉRENTIEL TECHNIQUE D'INGÉNIERIE ET D'API (CONSOLIDÉ AU 24-10-2026)\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 1 : MODÈLE DE DONNÉES UNIVERSEL (src/core/raptor_data.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 01 : raptor_data.c -- raptor_data_context_create -- Allocation du contexte\n"
+    "  • Signature C : RaptorReportContext* raptor_data_context_create(void);\n"
+    "  • Utilité     : Alloue dynamiquement en mémoire vive et initialise la structure\n"
+    "                  centrale du rapport destinée à recevoir les données des greffons.\n"
+    "\n"
+    "Fonction 02 : raptor_data.c -- raptor_data_section_add -- Création de section\n"
+    "  • Signature C : RaptorSection* raptor_data_section_add(RaptorReportContext* ctx, const char* id, const char* title);\n"
+    "  • Utilité     : Ajoute un conteneur thématique autonome dans le contexte pour\n"
+    "                  regrouper les cartes, tables et alertes produites par un greffon.\n"
+    "\n"
+    "Fonction 03 : raptor_data.c -- raptor_data_card_add -- Insertion de métrique clé\n"
+    "  • Signature C : bool raptor_data_card_add(RaptorSection* sec, const char* label, const char* val, float pct, RaptorSeverity sev);\n"
+    "  • Utilité     : Enregistre un indicateur synthétique (valeur, pourcentage, niveau\n"
+    "                  de criticité) affiché sous forme de tuile métrique dans l'interface.\n"
+    "\n"
+    "Fonction 04 : raptor_data.c -- raptor_data_table_create -- Initialisation de tableau\n"
+    "  • Signature C : RaptorTable* raptor_data_table_create(RaptorSection* sec, const char* title, size_t col_count, const char** col_names);\n"
+    "  • Utilité     : Instancie une structure de tableau bidimensionnel avec ses en-têtes\n"
+    "                  de colonnes au sein d'une section donnée.\n"
+    "\n"
+    "Fonction 05 : raptor_data.c -- raptor_data_table_row_add -- Insertion de ligne de données\n"
+    "  • Signature C : bool raptor_data_table_row_add(RaptorTable* table, const char** cell_texts, const RaptorSeverity* cell_sevs);\n"
+    "  • Utilité     : Ajoute une ligne complète de cellules textuelles associées à des\n"
+    "                  codes de couleur/sévérité dans le tableau spécifié.\n"
+    "\n"
+    "Fonction 06 : raptor_data.c -- raptor_data_alert_add -- Notification de sécurité\n"
+    "  • Signature C : bool raptor_data_alert_add(RaptorSection* sec, RaptorSeverity sev, const char* message);\n"
+    "  • Utilité     : Consigne un message d'avertissement ou de confirmation dans la section\n"
+    "                  avec un niveau d'alerte défini (OK, AVERTISSEMENT, CRITIQUE).\n"
+    "\n"
+    "Fonction 07 : raptor_data.c -- raptor_data_get_section_count -- Dénombrement des sections\n"
+    "  • Signature C : size_t raptor_data_get_section_count(const RaptorReportContext* ctx);\n"
+    "  • Utilité     : Renvoie le nombre total de sections actuellement peuplées dans le\n"
+    "                  contexte de rapport actif.\n"
+    "\n"
+    "Fonction 08 : raptor_data.c -- raptor_data_get_section -- Accès sécurisé par index\n"
+    "  • Signature C : const RaptorSection* raptor_data_get_section(const RaptorReportContext* ctx, size_t index);\n"
+    "  • Utilité     : Fournit un pointeur en lecture seule vers une section précise à partir\n"
+    "                  de son rang séquentiel dans la collection.\n"
+    "\n"
+    "Fonction 09 : raptor_data.c -- raptor_data_context_clear -- Purge dynamique du contexte\n"
+    "  • Signature C : void raptor_data_context_clear(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Libère récursivement l'ensemble des sections, tables et alertes\n"
+    "                  tout en maintenant le conteneur principal alloué pour le Live Monitoring 3s.\n"
+    "\n"
+    "Fonction 10 : raptor_data.c -- raptor_data_context_destroy -- Destruction totale\n"
+    "  • Signature C : void raptor_data_context_destroy(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Désalloue complètement l'arbre de mémoire du contexte et libère\n"
+    "                  le pointeur racine lors de l'arrêt définitif de l'application.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 2 : REGISTRE DE GREFFONS ET BUS SYSTÈME (src/core/raptor_registry.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 11 : raptor_registry.c -- raptor_registry_init -- Initialisation du bus\n"
+    "  • Signature C : void raptor_registry_init(void);\n"
+    "  • Utilité     : Prépare la table interne d'enregistrement et réinitialise les\n"
+    "                  compteurs de modules d'inspection disponibles.\n"
+    "\n"
+    "Fonction 12 : raptor_registry.c -- raptor_registry_register -- Enregistrement de greffon\n"
+    "  • Signature C : bool raptor_registry_register(const RaptorPlugin* plugin);\n"
+    "  • Utilité     : Inscrit un greffon d'audit dans la table globale sans nécessiter\n"
+    "                  de modification des fichiers sources du noyau central.\n"
+    "\n"
+    "Fonction 13 : raptor_registry.c -- raptor_registry_run_all -- Déclenchement séquentiel\n"
+    "  • Signature C : bool raptor_registry_run_all(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Parcourt l'ensemble des greffons actifs et exécute leur méthode\n"
+    "                  `run_audit` pour peupler le contexte en une seule passe.\n"
+    "\n"
+    "Fonction 14 : raptor_registry.c -- raptor_registry_get_count -- Comptage des greffons\n"
+    "  • Signature C : size_t raptor_registry_get_count(void);\n"
+    "  • Utilité     : Retourne le nombre total de greffons actuellement enregistrés et\n"
+    "                  disponibles pour les audits.\n"
+    "\n"
+    "Fonction 15 : raptor_registry.c -- raptor_registry_get_by_idx -- Accès greffon par index\n"
+    "  • Signature C : const RaptorPlugin* raptor_registry_get_by_idx(size_t index);\n"
+    "  • Utilité     : Permet d'interroger la configuration, le nom et les métadonnées d'un\n"
+    "                  greffon via son index dans le registre.\n"
+    "\n"
+    "Fonction 16 : raptor_registry.c -- raptor_registry_cleanup -- Déchargement global\n"
+    "  • Signature C : void raptor_registry_cleanup(void);\n"
+    "  • Utilité     : Déclenche l'appel de nettoyage `cleanup()` sur chaque greffon et\n"
+    "                  vide la table interne des pointeurs de modules.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 3 : MOTEUR D'ANALYSE DIFFÉRENTIELLE (src/core/raptor_differential.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 17 : raptor_differential.c -- raptor_diff_init -- Initialisation différentielle\n"
+    "  • Signature C : void raptor_diff_init(void);\n"
+    "  • Utilité     : Configure les structures mémoire destinées à conserver l'empreinte\n"
+    "                  historique nécessaire au calcul des dérives temporelles.\n"
+    "\n"
+    "Fonction 18 : raptor_differential.c -- raptor_diff_compute -- Calcul des dérivées RAM\n"
+    "  • Signature C : bool raptor_diff_compute(const RaptorReportContext* current, RaptorSection* out_diff_sec);\n"
+    "  • Utilité     : Compare l'état T(n) avec l'état T(n-1), identifie les fuites de mémoire\n"
+    "                  (Mo/min) et peuple la section du cahier différentiel.\n"
+    "\n"
+    "Fonction 19 : raptor_differential.c -- raptor_diff_snapshot_save -- Sauvegarde d'instantané\n"
+    "  • Signature C : void raptor_diff_snapshot_save(const RaptorReportContext* current);\n"
+    "  • Utilité     : Copie et fige les métriques de processus actuelles en tant que nouvel\n"
+    "                  état de référence pour les comparaisons futures.\n"
+    "\n"
+    "Fonction 20 : raptor_differential.c -- raptor_diff_cleanup -- Nettoyage différentiel\n"
+    "  • Signature C : void raptor_diff_cleanup(void);\n"
+    "  • Utilité     : Libère l'intégralité des instantanés historiques archivés en RAM.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 4 : JOURNALISATION FORENSIQUE PERMANENTE (src/report/report_audit_log.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 21 : report_audit_log.c -- audit_log_get_system_btime -- Extraction du boot time\n"
+    "  • Signature C : static unsigned long long audit_log_get_system_btime(void);\n"
+    "  • Utilité     : Lit `/proc/stat` et extrait le timestamp Unix `btime` correspondant\n"
+    "                  à l'instant de démarrage matériel de la machine hôte.\n"
+    "\n"
+    "Fonction 22 : report_audit_log.c -- audit_log_compute_start_time -- Calcul de spawn\n"
+    "  • Signature C : static void audit_log_compute_start_time(int pid, char* out_buf, size_t buf_sz);\n"
+    "  • Utilité     : Parse le 22e champ (`starttime`) de `/proc/[PID]/stat` et convertit\n"
+    "                  les ticks processeur en heure locale absolue de démarrage (HH:MM:SS).\n"
+    "\n"
+    "Fonction 23 : report_audit_log.c -- audit_log_get_next_sequence_number -- Séquençage auto\n"
+    "  • Signature C : static int audit_log_get_next_sequence_number(void);\n"
+    "  • Utilité     : Parcourt `AUDIT.TXT` à la recherche du motif `AUDIT NO #XX` pour\n"
+    "                  déterminer et retourner le prochain numéro incrémental unique.\n"
+    "\n"
+    "Fonction 24 : report_audit_log.c -- raptor_audit_log_capture_target -- Capture pré-mortem\n"
+    "  • Signature C : bool raptor_audit_log_capture_target(int pid, RaptorIncidentDetail* out_detail);\n"
+    "  • Utilité     : Extrait dynamiquement toutes les preuves du processus dans `/proc`\n"
+    "                  (binaire, CWD, start time, PPID, commande parent, CWD parent) avant arrêt.\n"
+    "\n"
+    "Fonction 25 : report_audit_log.c -- raptor_audit_log_commit -- Écriture persistante\n"
+    "  • Signature C : bool raptor_audit_log_commit(const RaptorIncidentDetail* detail, const char* action_status);\n"
+    "  • Utilité     : Formate et écrit le bloc d'audit horodaté dans `AUDIT.TXT` en mode\n"
+    "                  ajout permanent (`a+`) avec forçage d'écriture physique sur disque.\n"
+    "\n"
+    "Fonction 26 : report_audit_log.c -- raptor_audit_log_notify_detection -- Alerte temps réel\n"
+    "  • Signature C : bool raptor_audit_log_notify_detection(int pid, const char* classification);\n"
+    "  • Utilité     : Déclenche l'écriture immédiate d'un audit dès qu'une anomalie heuristique\n"
+    "                  apparaît, avec filtrage dédoublonné pour éviter la saturation du fichier.\n"
+    "\n"
+    "Fonction 27 : report_audit_log.c -- raptor_audit_log_forget_pid -- Purge du cache anti-flood\n"
+    "  • Signature C : void raptor_audit_log_forget_pid(int pid);\n"
+    "  • Utilité     : Supprime un identifiant PID de la table des processus déjà logués\n"
+    "                  lors de sa destruction, autorisant la traque immédiate en cas de réapparition.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 5 : GREFFON PROCESSUS, MÉMOIRE ET RWX (src/plugins/plugin_memory_rwx.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 28 : plugin_memory_rwx.c -- proc_mem_is_trusted_path -- Filtrage des chemins sûrs\n"
+    "  • Signature C : static bool proc_mem_is_trusted_path(const char* exe_path);\n"
+    "  • Utilité     : Valide si le binaire provient strictement des répertoires systèmes\n"
+    "                  légitimes (`/usr/bin/`, `/usr/lib/`, `/bin/`, `/sbin/`, `/app/`).\n"
+    "\n"
+    "Fonction 29 : plugin_memory_rwx.c -- proc_mem_is_legit_jit -- Détection des moteurs JIT\n"
+    "  • Signature C : static bool proc_mem_is_legit_jit(const char* comm, const char* exe);\n"
+    "  • Utilité     : Écarte les faux positifs en reconnaissant les interpréteurs légitimes\n"
+    "                  allouant de la mémoire exécutable (navigateurs, Python, machines virtuelles).\n"
+    "\n"
+    "Fonction 30 : plugin_memory_rwx.c -- proc_mem_scan_maps_rwx -- Inspection des pages mémoire\n"
+    "  • Signature C : static bool proc_mem_scan_maps_rwx(uint32_t pid, bool is_jit, bool is_trusted);\n"
+    "  • Utilité     : Analyse `/proc/[PID]/maps` pour repérer les segments illégitimes\n"
+    "                  possédant simultanément les droits Read-Write-Execute (`rwx`).\n"
+    "\n"
+    "Fonction 31 : plugin_memory_rwx.c -- proc_mem_read_stats -- Empreinte RAM du processus\n"
+    "  • Signature C : static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len, char* out_exe, size_t exe_len, uint64_t* out_rss);\n"
+    "  • Utilité     : Lit le nom d'exécutable, résout le lien `/proc/[PID]/exe` et calcule\n"
+    "                  la consommation résidente RSS en mémoire physique.\n"
+    "\n"
+    "Fonction 32 : plugin_memory_rwx.c -- proc_mem_run_audit -- Exécution de l'audit mémoire\n"
+    "  • Signature C : static bool proc_mem_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Parcourt l'arborescence `/proc`, audite la mémoire de chaque tâche\n"
+    "                  active et consigne les résultats dans la section dédiée du rapport.\n"
+    "\n"
+    "Fonction 33 : plugin_memory_rwx.c -- proc_mem_register -- Enregistrement automatique\n"
+    "  • Signature C : __attribute__((constructor)) static void proc_mem_register(void);\n"
+    "  • Utilité     : Enregistre le greffon mémoire auprès du registre central dès le\n"
+    "                  chargement du binaire en mémoire par le système d'exploitation.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 6 : GREFFON SURVEILLANCE RÉSEAU (src/plugins/plugin_network_sockets.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 34 : plugin_network_sockets.c -- net_sock_build_inode_cache -- Résolution Inode/PID\n"
+    "  • Signature C : static bool net_sock_build_inode_cache(void);\n"
+    "  • Utilité     : Analyse tous les descripteurs ouverts dans `/proc/[PID]/fd` pour\n"
+    "                  construire la table de correspondance rapide entre numéros d'inodes et PID.\n"
+    "\n"
+    "Fonction 35 : plugin_network_sockets.c -- net_sock_resolve_pid -- Recherche propriétaire O(1)\n"
+    "  • Signature C : static uint32_t net_sock_resolve_pid(uint64_t target_inode);\n"
+    "  • Utilité     : Retourne instantanément l'identifiant PID associé à un socket réseau\n"
+    "                  à partir de son numéro d'inode noyau.\n"
+    "\n"
+    "Fonction 36 : plugin_network_sockets.c -- net_sock_decode_hex_endpoint -- Décodage IP/Port\n"
+    "  • Signature C : static void net_sock_decode_hex_endpoint(const char* hex_ip, uint32_t hex_port, char* out_ip, size_t ip_len, uint16_t* out_port);\n"
+    "  • Utilité     : Convertit la représentation hexadécimale brute (format endianess noyau)\n"
+    "                  en adresse IP décimale lisible et port réseau standard.\n"
+    "\n"
+    "Fonction 37 : plugin_network_sockets.c -- net_sock_parse_file -- Analyse des tables réseau\n"
+    "  • Signature C : static void net_sock_parse_file(const char* net_path, const char* proto, RaptorTable* out_table);\n"
+    "  • Utilité     : Parse `/proc/net/tcp` et `/proc/net/udp` pour répertorier les ports en\n"
+    "                  écoute (`LISTEN`) et les canaux établis (`ESTABLISHED`).\n"
+    "\n"
+    "Fonction 38 : plugin_network_sockets.c -- net_sock_run_audit -- Exécution de l'audit réseau\n"
+    "  • Signature C : static bool net_sock_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Orchestre la collecte des flux réseau, résout les processus propriétaires\n"
+    "                  et libère le cache des descripteurs après analyse.\n"
+    "\n"
+    "Fonction 39 : plugin_network_sockets.c -- net_sock_register -- Enregistrement automatique\n"
+    "  • Signature C : __attribute__((constructor)) static void net_sock_register(void);\n"
+    "  • Utilité     : Inscrit le greffon réseau dans le registre central dès l'initialisation\n"
+    "                  du binaire exécutable.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 7 : GREFFON HEURISTIQUE & LIGNÉE PARENT (src/plugins/plugin_heuristics_expert.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 40 : plugin_heuristics_expert.c -- heuristics_is_suspicious_path -- Détection chemins volatils\n"
+    "  • Signature C : static bool heuristics_is_suspicious_path(const char* path);\n"
+    "  • Utilité     : Identifie si un processus s'exécute depuis des zones temporaires ou\n"
+    "                  volatiles suspectes (`/tmp`, `/var/tmp`, `/dev/shm`, `/run/user`).\n"
+    "\n"
+    "Fonction 41 : plugin_heuristics_expert.c -- heuristics_is_system_masquerade -- Détection d'usurpation\n"
+    "  • Signature C : static bool heuristics_is_system_masquerade(const char* comm, const char* exe_target);\n"
+    "  • Utilité     : Repère les processus non officiels usurpant le nom de démons critiques\n"
+    "                  (`systemd`, `sshd`, `cron`, `kworker`) hors des dossiers systèmes.\n"
+    "\n"
+    "Fonction 42 : plugin_heuristics_expert.c -- heuristics_get_parent_info -- Traque généalogique (PPID)\n"
+    "  • Signature C : static void heuristics_get_parent_info(const char* pid_str, char* out_ppid, size_t ppid_sz, char* out_pcomm, size_t pcomm_sz, char* out_pcmd, size_t pcmd_sz);\n"
+    "  • Utilité     : Extrait le PID parent via `/proc/[PID]/stat` et reconstitue la ligne\n"
+    "                  de commande exacte et l'exécutable créateur depuis `/proc/[PPID]/cmdline`.\n"
+    "\n"
+    "Fonction 43 : plugin_heuristics_expert.c -- heuristics_check_process -- Évaluation unitaire\n"
+    "  • Signature C : static void heuristics_check_process(const char* pid_str, size_t* out_masquerades, size_t* out_deleted, size_t* out_suspicious_paths, RaptorTable* tbl);\n"
+    "  • Utilité     : Exécute l'ensemble des filtres heuristiques sur un processus, remplit la table\n"
+    "                  d'incident et déclenche la notification persistante dans `AUDIT.TXT`.\n"
+    "\n"
+    "Fonction 44 : plugin_heuristics_expert.c -- plugin_heuristics_init -- Initialisation greffon\n"
+    "  • Signature C : static bool plugin_heuristics_init(void);\n"
+    "  • Utilité     : Prépare les états internes et structures du greffon heuristique.\n"
+    "\n"
+    "Fonction 45 : plugin_heuristics_expert.c -- plugin_heuristics_run_audit -- Exécution globale heuristique\n"
+    "  • Signature C : static bool plugin_heuristics_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Parcourt `/proc`, identifie les menaces comportementales, compile les cartes\n"
+    "                  d'usurpation et qualifie la criticité défensive globale.\n"
+    "\n"
+    "Fonction 46 : plugin_heuristics_expert.c -- plugin_heuristics_cleanup -- Nettoyage greffon\n"
+    "  • Signature C : static void plugin_heuristics_cleanup(void);\n"
+    "  • Utilité     : Libère les structures locales allouées lors de l'exécution de l'audit.\n"
+    "\n"
+    "Fonction 47 : plugin_heuristics_expert.c -- plugin_heuristics_register_constructor -- Auto-enregistrement\n"
+    "  • Signature C : __attribute__((constructor)) static void plugin_heuristics_register_constructor(void);\n"
+    "  • Utilité     : Enregistre dynamiquement le greffon heuristique au chargement du programme.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 8 : MOTEURS DE RESTITUTION UNIVERSELS (src/report/)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formattée\n"
+    "  • Signature C : void raptor_report_cli_print(const RaptorReportContext* ctx);\n"
+    "  • Utilité     : Rendu textuel intégral du rapport dans le terminal avec codes\n"
+    "                  ANSI pour les couleurs de sévérité et colonnage structuré.\n"
+    "\n"
+    "Fonction 49 : report_html.c -- raptor_report_html_generate -- Export de rapport web\n"
+    "  • Signature C : bool raptor_report_html_generate(const RaptorReportContext* ctx, const char* filepath);\n"
+    "  • Utilité     : Génère un rapport d'audit au format HTML souverain autonome avec\n"
+    "                  thème sombre, visualisations interactives et tableaux filtrables.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 9 : MOTEUR GRAPHIQUE ET CONTRÔLEURS DE VUES (src/ui/)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 50 : ui_engine.c -- raptor_ui_init -- Initialisation graphique Raylib\n"
+    "  • Signature C : bool raptor_ui_init(int width, int height, const char* title);\n"
+    "  • Utilité     : Configure la fenêtre Raylib, applique les dimensions, le titre,\n"
+    "                  la synchronisation verticale (VSync) et la cible de 60 FPS.\n"
+    "\n"
+    "Fonction 51 : ui_engine.c -- raptor_ui_run -- Boucle de surveillance active\n"
+    "  • Signature C : void raptor_ui_run(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Pilote la boucle de rendu principale, orchestre l'affichage des onglets\n"
+    "                  et intègre le timer cyclique de 3s pour le rafraîchissement continu.\n"
+    "\n"
+    "Fonction 52 : ui_engine.c -- raptor_ui_shutdown -- Libération graphique\n"
+    "  • Signature C : void raptor_ui_shutdown(void);\n"
+    "  • Utilité     : Décharge les textures vectorielles (icônes) et détruit proprement\n"
+    "                  la fenêtre graphique Raylib à la fermeture.\n"
+    "\n"
+    "Fonction 53 : view_ai.c -- view_ai_detect_os -- Identification du système hôte\n"
+    "  • Signature C : static void view_ai_detect_os(char* out_name, size_t max_len);\n"
+    "  • Utilité     : Interroge `/etc/os-release` pour afficher le nom exact de la distribution\n"
+    "                  (ex: Linux Mint Debian Edition) dans le bandeau du rapport IA.\n"
+    "\n"
+    "Fonction 54 : view_ai.c -- view_ai_draw_pid_badge -- Affichage badges d'alerte PID\n"
+    "  • Signature C : static float view_ai_draw_pid_badge(const char* role_title, const char* pid_val, float posX, float posY);\n"
+    "  • Utilité     : Dessine un conteneur visuel haute visibilité (bordure jaune vif 2 px,\n"
+    "                  fond sombre, texte blanc) mettant en évidence les identifiants cibles et parents.\n"
+    "\n"
+    "Fonction 55 : view_ai.c -- ui_view_ai_draw -- Contrôleur du rapport IA [ 05 ]\n"
+    "  • Signature C : void ui_view_ai_draw(const RaptorReportContext* ctx);\n"
+    "  • Utilité     : Consolide l'audit explicatif souverain, affiche le modèle Z-Score, trace\n"
+    "                  la lignée du spawn et intègre le garde-fou strict interdisant le kill du PID 1.\n"
+    "\n"
+    "Fonction 56 : view_processes.c -- ui_view_processes_draw -- Contrôleur Processus & RAM [ 02 ]\n"
+    "  • Signature C : void ui_view_processes_draw(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Affiche la table filtrable des processus, gère la sélection interactive,\n"
+    "                  exécute la capture forensique, ordonne le signal de kill et consigne l'événement.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 10 : POINT D'ENTRÉE DU SYSTÈME (src/main.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 57 : main.c -- main -- Orchestrateur d'amorçage\n"
+    "  • Signature C : int main(int argc, char** argv);\n"
+    "  • Utilité     : Parse les arguments de ligne de commande (`--cli` ou interface GUI),\n"
+    "                  initialise le registre, lance le premier audit et passe le relais à l'UI.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 11 : GREFFON RAPTOR NET-GUARD DÉFENSIF (src/plugins/plugin_net_guard.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 58 : plugin_net_guard.c -- net_guard_trim -- Assainissement de chaîne\n"
+    "  • Signature C : char* net_guard_trim(char* str);\n"
+    "  • Utilité     : Élimine les espaces blancs et sauts de ligne superflus en début\n"
+    "                  et fin de chaîne pour fiabiliser le parsing des fichiers de règles.\n"
+    "\n"
+    "Fonction 59 : plugin_net_guard.c -- net_guard_validate_ip -- Validation arithmétique IP & CIDR\n"
+    "  • Signature C : bool net_guard_validate_ip(const char* ip_str, uint32_t* out_ip, uint32_t* out_mask, uint16_t* out_port);\n"
+    "  • Utilité     : Contrôle rigoureusement les plages IPv4 (0-255), extrait le port\n"
+    "                  éventuel (1-65535) et calcule le masque binaire réseau à partir de la notation CIDR (/1 à /32).\n"
+    "\n"
+    "Fonction 60 : plugin_net_guard.c -- net_guard_load_file -- Parsing tolérant de registre .conf\n"
+    "  • Signature C : bool net_guard_load_file(const char* filepath, bool is_custom_source);\n"
+    "  • Utilité     : Lit ligne par ligne les fichiers de configuration, ignore les commentaires,\n"
+    "                  segmente les champs par séparateur pipe (|) et peuple les tables mémoires DOM et IP.\n"
+    "\n"
+    "Fonction 61 : plugin_net_guard.c -- net_guard_init -- Initialisation et fusion en RAM\n"
+    "  • Signature C : bool net_guard_init(void);\n"
+    "  • Utilité     : Réinitialise les tables du registre et charge successivement le socle\n"
+    "                  officiel (fw_officiel.conf) puis les ajouts locaux (fw_custom.conf) sans conflit.\n"
+    "\n"
+    "Fonction 62 : plugin_net_guard.c -- net_guard_add_custom_rule -- Sérialisation et persistance IHM\n"
+    "  • Signature C : bool net_guard_add_custom_rule(NetGuardRuleType type, const char* target, const char* param, const char* desc);\n"
+    "  • Utilité     : Formate avec espacements canoniques une nouvelle règle saisie dans l'IHM,\n"
+    "                  l'écrit en mode ajout permanent dans fw_custom.conf et actualise la table active.\n"
+    "\n"
+    "Fonction 63 : plugin_net_guard.c -- net_guard_remove_rule -- Suppression atomique de règle\n"
+    "  • Signature C : bool net_guard_remove_rule(NetGuardRuleType type, size_t index);\n"
+    "  • Utilité     : Supprime une règle personnalisée selon son index mémoire et réécrit\n"
+    "                  proprement l'intégralité du fichier fw_custom.conf sans toucher au registre officiel.\n"
+    "\n"
+    "Fonction 64 : plugin_net_guard.c -- net_guard_match_domain -- Détection anti-combosquatting\n"
+    "  • Signature C : NetGuardVerdict net_guard_match_domain(const char* hostname, char* out_reason, size_t reason_sz);\n"
+    "  • Utilité     : Analyse le nom de domaine demandé, vérifie la présence d'une marque protégée,\n"
+    "                  valide les domaines officiels autorisés et lève l'alerte CRITIQUE si un mot-clé suspect y est accolé.\n"
+    "\n"
+    "Fonction 65 : plugin_net_guard.c -- net_guard_match_ip -- Qualification binaire des endpoints IP\n"
+    "  • Signature C : NetGuardVerdict net_guard_match_ip(const char* remote_ip, uint16_t port, char* out_reason, size_t reason_sz);\n"
+    "  • Utilité     : Applique le masque de sous-réseau sur l'adresse distante pour déterminer\n"
+    "                  instantanément si le socket pointe vers une cible APPROUVÉ (vert) ou HOSTILE (rouge critique).\n"
+    "\n"
+    "Fonction 66 : plugin_net_guard.c -- net_guard_run_audit -- Moteur d'audit périodique réseau\n"
+    "  • Signature C : bool net_guard_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Orchestre la lecture de /proc/net/tcp et /proc/net/udp, confronte chaque\n"
+    "                  connexion active aux tables de règles et peuple la section générique du rapport de sécurité.\n"
+    "\n"
+    "Fonction 67 : plugin_net_guard.c -- net_guard_cleanup -- Déchargement et purge mémoire\n"
+    "  • Signature C : void net_guard_cleanup(void);\n"
+    "  • Utilité     : Remet à zéro l'ensemble des structures de données du registre Net-Guard\n"
+    "                  lors de la fermeture propre de l'application.\n"
+    "\n"
+    "Fonction 68 : plugin_net_guard.c -- net_guard_register -- Auto-enregistrement constructeur GCC\n"
+    "  • Signature C : __attribute__((constructor)) void net_guard_register(void);\n"
+    "  • Utilité     : Enregistre automatiquement la structure RaptorPlugin de Net-Guard auprès\n"
+    "                  du bus central raptor_registry dès le chargement du binaire en mémoire.\n"
+    "\n"
+    "Fonction 69 : plugin_net_guard.c -- net_guard_update_official_rules -- Rapatriement atomique GitHub\n"
+    "  • Signature C : bool net_guard_update_official_rules(void);\n"
+    "  • Utilité     : Télécharge la dernière mouture de fw_officiel.conf via curl vers un fichier\n"
+    "                  temporaire (.tmp), valide l'en-tête de conformité et applique un remplacement atomique POSIX (rename).\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 12 : RENSEIGNEMENT RÉSEAU, BGP & CDN INTEL (src/plugins/plugin_asn_intel.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 71 : plugin_asn_intel.c -- asn_intel_trim -- Nettoyage canonique\n"
+    "  • Signature C : static char* asn_intel_trim(char* str);\n"
+    "  • Utilité     : Nettoyage canonique des espaces blancs en tête et queue de chaîne.\n"
+    "\n"
+    "Fonction 72 : plugin_asn_intel.c -- asn_intel_parse_cidr -- Décomposition CIDR\n"
+    "  • Signature C : static bool asn_intel_parse_cidr(const char* cidr, uint32_t* out_net, uint32_t* out_mask);\n"
+    "  • Utilité     : Décomposition arithmétique d'une notation CIDR (X.X.X.X/YY), extraction de\n"
+    "                  l'adresse réseau hôte et génération du masque binaire 32 bits.\n"
+    "\n"
+    "Fonction 73 : plugin_asn_intel.c -- asn_intel_load_file -- Parsing à chaud table_static.conf\n"
+    "  • Signature C : static bool asn_intel_load_file(const char* filepath);\n"
+    "  • Utilité     : Chargement dynamique de `assets/rules/table_static.conf` pour peupler la table\n"
+    "                  des plages IP de confiance sans recompilation du binaire.\n"
+    "\n"
+    "Fonction 74 : plugin_asn_intel.c -- asn_intel_match_static -- Évaluation arithmétique locale\n"
+    "  • Signature C : static bool asn_intel_match_static(uint32_t ip, char* out_name, size_t max_len);\n"
+    "  • Utilité     : Évaluation instantanée (0 ms) contre les infrastructures répertoriées via\n"
+    "                  l'opération binaire `(ip & mask) == (net & mask)`.\n"
+    "\n"
+    "Fonction 75 : plugin_asn_intel.c -- asn_intel_query_bgp -- Sonde DNS TXT BGP\n"
+    "  • Signature C : static bool asn_intel_query_bgp(const char* ip_str, uint32_t* out_asn, char* out_cc, size_t cc_sz);\n"
+    "  • Utilité     : Résolution DNS de secours vers le registre Team Cymru (`origin.asn.cymru.com`)\n"
+    "                  pour identifier le numéro d'ASN et le code pays ISO des adresses inconnues.\n"
+    "\n"
+    "Fonction 76 : plugin_asn_intel.c -- asn_intel_lookup -- Moteur central en cascade\n"
+    "  • Signature C : bool raptor_asn_intel_lookup(const char* ip_str, char* out_name, size_t max_len);\n"
+    "  • Utilité     : Cascade d'investigation : 1. Cache dynamique -> 2. `table_static.conf` (0 ms) -> 3. Sonde DNS BGP.\n"
+    "\n"
+    "Fonction 77 : plugin_asn_intel.c -- asn_intel_init -- Initialisation greffon ASN\n"
+    "  • Signature C : static bool asn_intel_init(void);\n"
+    "  • Utilité     : Prépare le mutex d'exclusion mutuelle, configure les caches et charge les règles réseau.\n"
+    "\n"
+    "Fonction 78 : plugin_asn_intel.c -- asn_intel_cleanup -- Vidange et arrêt\n"
+    "  • Signature C : static void asn_intel_cleanup(void);\n"
+    "  • Utilité     : Purge l'intégralité des structures mémoires et détruit le verrou d'exclusion mutuelle.\n"
+    "\n"
+    "Fonction 79 : plugin_asn_intel.c -- asn_intel_register -- Auto-enregistrement\n"
+    "  • Signature C : __attribute__((constructor)) static void asn_intel_register(void);\n"
+    "  • Utilité     : Enregistrement constructeur GCC du greffon sur le bus RaptorPlugin.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 13 : TRAQUE MÉMOIRE ANONYME & MUTATIONS R-X (src/core/mem_stealth.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 80 : mem_stealth.c -- mem_stealth_whitelist_load -- Chargement liste blanche\n"
+    "  • Signature C : bool mem_stealth_whitelist_load(const char* filepath);\n"
+    "  • Utilité     : Charge et analyse `assets/rules/mem_whitelist.conf` (format `TYPE | MOTIF | DESC`),\n"
+    "                  éliminant les faux positifs structurels sur le code dynamique.\n"
+    "\n"
+    "Fonction 81 : mem_stealth.c -- mem_stealth_is_whitelisted -- Filtrage exceptions légitimes\n"
+    "  • Signature C : bool mem_stealth_is_whitelisted(const char* comm, const char* exe);\n"
+    "  • Utilité     : Vérifie si un processus correspond à une signature autorisée (navigateurs,\n"
+    "                  Flatpak, environnements de bureau Cinnamon/GNOME/KDE).\n"
+    "\n"
+    "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0\n"
+    "  • Signature C : bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe, StealthEvent* ev_out);\n"
+    "  • Utilité     : Analyse `/proc/[PID]/maps` pour isoler les allocations anonymes rendues\n"
+    "                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque.\n"
+    "\n"
+    "Fonction 83 : mem_stealth.c -- mem_stealth_dispatch_diff_event -- Propagation différentielle\n"
+    "  • Signature C : void mem_stealth_dispatch_diff_event(const StealthEvent* ev);\n"
+    "  • Utilité     : Injecte les alertes forensiques d'injection dans le tampon circulaire du\n"
+    "                  Cahier Différentiel (Onglet 4).\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 14 : DÉTECTION DES DÉTOURNEMENTS LD_PRELOAD (src/core/preload_hunter.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 84 : preload_hunter.c -- preload_hunter_check_global -- Audit intégrité globale\n"
+    "  • Signature C : bool preload_hunter_check_global(char* out_path, size_t out_len);\n"
+    "  • Utilité     : Détecte la persistance d'un rootkit utilisateur en vérifiant l'accès\n"
+    "                  et le contenu de `/etc/ld.so.preload`.\n"
+    "\n"
+    "Fonction 85 : preload_hunter.c -- preload_hunter_scan_process_env -- Audit variables d'environnement\n"
+    "  • Signature C : bool preload_hunter_scan_process_env(pid_t pid, char* out_preload_lib, size_t out_len);\n"
+    "  • Utilité     : Scanne `/proc/[PID]/environ` (délimiteurs `\\0`) pour intercepter\n"
+    "                  toute injection ciblée via la variable `LD_PRELOAD=`.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 15 : NOTIFICATIONS BUREAU ASYNCHRONES (src/core/raptor_notify.c)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 86 : raptor_notify.c -- raptor_notify_send_desktop -- Émission asynchrone FreeDesktop\n"
+    "  • Signature C : void raptor_notify_send_desktop(const char* title, const char* body, bool is_critical);\n"
+    "  • Utilité     : Envoie une notification via `notify-send` avec double fork (`fork()` / `_exit(0)`)\n"
+    "                  garantissant zéro saccade graphique sur la boucle Raylib (60 FPS).\n"
+    "\n"
+    "Fonction 87 : raptor_notify.c -- raptor_notify_evaluate_threats -- Arbitrage d'alertes\n"
+    "  • Signature C : void raptor_notify_evaluate_threats(int current_threats, const char* primary_threat_name);\n"
+    "  • Utilité     : Filtre anti-rebond temporel (30 secondes) déclenchant l'alerte sur\n"
+    "                  transition critique et signalant le retour au calme.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 16 : MODE CLI DE SECOURS & OUTILS CHIRURGICAUX (src/cli/)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 88 : rap_main.c -- rap_dispatch_command -- Micro-routeur déclaratif\n"
+    "  • Signature C : int rap_dispatch_command(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Achemine les requêtes CLI vers les gestionnaires spécialisés via la\n"
+    "                  table déclarative `g_commands`.\n"
+    "\n"
+    "Fonction 89 : cmd_status.c -- rap_cmd_status -- Bilan vital instantané\n"
+    "  • Signature C : int rap_cmd_status(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Diagnostic vital en moins de 15 ms (RAM totale, processus actifs,\n"
+    "                  intégrité de `/etc/ld.so.preload`).\n"
+    "\n"
+    "Fonction 90 : cmd_top.c -- rap_cmd_top -- Top consommateurs VmRSS\n"
+    "  • Signature C : int rap_cmd_top(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Trie les processus par mémoire résidente physique réelle sans\n"
+    "                  allocation sur le tas (tri d'insertion statique sur la pile).\n"
+    "\n"
+    "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné\n"
+    "  • Signature C : int rap_cmd_hunt(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Enchaîne séquentiellement la traque Inode 0 (`rx`), les détournements\n"
+    "                  dynamiques (`preload`) et l'analyse heuristique (`heur`).\n"
+    "\n"
+    "Fonction 92 : cmd_rx.c -- rap_cmd_rx -- Traque mutations exécutables Inode 0\n"
+    "  • Signature C : int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Repère les allocations mémoires anonymes exécutables (`r-xp`)\n"
+    "                  dans `/proc/[PID]/maps` avec filtrage de liste blanche (`-v` pour mode étendu).\n"
+    "\n"
+    "Fonction 93 : cmd_preload.c -- rap_cmd_preload -- Chasseur LD_PRELOAD\n"
+    "  • Signature C : int rap_cmd_preload(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Détecte les rootkits userland via le contrôle double palier\n"
+    "                  (`/etc/ld.so.preload` et `/proc/[PID]/environ`).\n"
+    "\n"
+    "Fonction 94 : cmd_net.c -- rap_cmd_net -- Audit réseau Net-Guard\n"
+    "  • Signature C : int rap_cmd_net(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Analyse `/proc/net/tcp` et qualifie instantanément les connexions\n"
+    "                  actives (APPROUVÉ, EXTERNE, SUSPECT, HOSTILE).\n"
+    "\n"
+    "Fonction 95 : cmd_kill.c -- rap_cmd_kill -- Neutralisation cinétique chirurgicale\n"
+    "  • Signature C : int rap_cmd_kill(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Émet le signal non rattrapable `SIGKILL` avec validation préalable\n"
+    "                  par `rap_check_safety_pid` et confirmation interactive (`-f` pour forcer).\n"
+    "\n"
+    "Fonction 96 : cmd_kill.c -- rap_cmd_freeze -- Suspension conservatoire forensique\n"
+    "  • Signature C : int rap_cmd_freeze(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Gèle un processus suspect via `SIGSTOP` (état `T`) pour figer son\n"
+    "                  activité tout en préservant sa mémoire vive pour analyse forensique.\n"
+    "\n"
+    "Fonction 97 : cmd_man.c -- rap_cmd_man -- Manuel de référence unifié embarqué\n"
+    "  • Signature C : int rap_cmd_man(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Restitue le manuel complet stocké en mémoire morte (`.rodata`),\n"
+    "                  avec bascule automatique vers le téléscripteur `rapless` sur terminal interactif.\n"
+    "\n"
+    "Fonction 98 : rap_common.c -- rap_output_formatter -- Formatage d'affichage universel\n"
+    "  • Signature C : void rap_output_formatter(const RapConfig *cfg, const char *c1, const char *c2, const char *c3, const char *c4);\n"
+    "  • Utilité     : Formate les flux d'audit sur 4 colonnes régulières en mode interactif\n"
+    "                  ou en flux brut délimité par tabulations (`\\t`) en mode `--raw`.\n"
+    "\n"
+    "Fonction 99 : rap_common.c -- rap_check_safety_pid -- Barrière de sécurité cinétique\n"
+    "  • Signature C : int rap_check_safety_pid(const RapConfig *cfg, pid_t pid);\n"
+    "  • Utilité     : Empêche les arrêts accidentels en rejetant le tir sur PID 1,\n"
+    "                  sur soi-même, sur le shell parent et sur les threads internes du noyau.\n"
+    "\n"
+    "Fonction 100 : rap_main.c -- rap_parse_flags -- Parseur d'arguments et drapeaux\n"
+    "  • Signature C : int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg);\n"
+    "  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-n`, `-h`),\n"
+    "                  détecte le mode TTY (`isatty`) et isole le verbe d'action dans `argv`.\n"
+    "\n"
+    "Fonction 107 : rap_common.c -- rap_is_mem_whitelisted -- Filtrage liste blanche mémoire\n"
+    "  • Signature C : int rap_is_mem_whitelisted(const char *comm);\n"
+    "  • Utilité     : Vérifie si un processus figure dans `mem_whitelist.conf` en gérant\n"
+    "                  la troncature noyau à 15 caractères sans allocation dynamique.\n"
+    "\n"
+    "Fonction 108 : rap_common.c -- rap_net_eval_ip -- Qualification CIDR d'endpoint IP\n"
+    "  • Signature C : int rap_net_eval_ip(uint32_t ip, uint16_t port, char *out_desc, size_t desc_size);\n"
+    "  • Utilité     : Évalue une adresse IP contre les registres `fw_officiel.conf` et `fw_custom.conf`\n"
+    "                  pour retourner son niveau de confiance (APPROUVÉ, STANDARD, SUSPECT, HOSTILE).\n"
+    "\n"
+    "Fonction 109 : cmd_heur.c -- rap_cmd_heur -- Traque des anomalies d'exécution\n"
+    "  • Signature C : int rap_cmd_heur(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Parcourt `/proc`, résout `/proc/[PID]/exe` et projette les anomalies\n"
+    "                  comportementales identifiées sur la console de secours.\n"
+    "\n"
+    "Fonction 110 : cmd_heur.c -- rap_heur_check_process -- Évaluation unitaire heuristique\n"
+    "  • Signature C : int rap_heur_check_process(pid_t pid, const char *comm, const char *exe_path, char *out_anomaly, size_t out_sz);\n"
+    "  • Utilité     : Évalue un processus selon trois axes sans allocation dynamique :\n"
+    "                  1. Binaires supprimés du disque en cours d'exécution (`(deleted)`).\n"
+    "                  2. Exécutions depuis des zones volatiles suspectes (`/tmp`, `/dev/shm`).\n"
+    "                  3. Usurpation d'identité de démons systèmes (*Masquerading*).\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 17 : SENTINELLE PASSIVE ANTI-RANÇONGICIEL (FANOTIFY & LEURRES DENSES)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 111 : sentry_engine.c -- sentry_deploy_canary -- Déploiement d'appât dense\n"
+    "  • Signature C : int sentry_deploy_canary(const char *dir_path);\n"
+    "  • Utilité     : Génère un fichier binaire dense de 32 Ko (`!00_raptor_vault.kdbx`)\n"
+    "                  doté de l'en-tête officiel KeePass KDBX4 (Magic Numbers authentiques)\n"
+    "                  et d'un corps à haute entropie généré par LCG. Applique les permissions\n"
+    "                  `0666` via `fchmod` afin de piéger tout compte utilisateur.\n"
+    "  • Retour      : `0` en cas de synchronisation physique (`fdatasync`) réussie, `-1` en cas d'échec.\n"
+    "\n"
+    "Fonction 112 : sentry_engine.c -- sentry_init_fanotify -- Initialisation de la surveillance noyau\n"
+    "  • Signature C : int sentry_init_fanotify(const SentryConfig *config);\n"
+    "  • Utilité     : Configure le sous-système de notification noyau en mode permissionnel\n"
+    "                  synchrone (`FAN_CLASS_CONTENT | FAN_NONBLOCK | FAN_CLOEXEC`). Déploie le\n"
+    "                  leurre si nécessaire et pose une marque de verrouillage d'ouverture\n"
+    "                  synchrone (`FAN_MARK_ADD`, `FAN_OPEN_PERM`) sur chaque cible configurée.\n"
+    "  • Retour      : Descripteur de fichier `fan_fd` valide, ou `-1` en cas d'erreur de privilèges.\n"
+    "\n"
+    "Fonction 113 : sentry_engine.c -- sentry_listen_loop -- Boucle de veille passive bloquante\n"
+    "  • Signature C : int sentry_listen_loop(int fanotify_fd, const SentryConfig *config);\n"
+    "  • Utilité     : Assure le guet passif bloquant sur `poll()` (consommation de 0% CPU au repos).\n"
+    "                  Dépouille les événements noyau dans un tampon statique de 4 Ko aligné\n"
+    "                  sur 8 octets (`__attribute__((aligned(8)))`) sans allocation sur le tas (`0 heap`).\n"
+    "  • Retour      : `0` lors d'un arrêt nominal par signal, `-1` en cas d'erreur de lecture.\n"
+    "\n"
+    "Fonction 114 : sentry_engine.c -- sentry_trigger_reflex -- Riposte cinétique synchrone\n"
+    "  • Signature C : int sentry_trigger_reflex(int fanotify_fd, int fd_event, pid_t pid);\n"
+    "  • Utilité     : Vérifie le garde-fou autonome `sentry_is_protected_pid` (PID <= 1, self, parent).\n"
+    "                  Applique instantanément le gel conservatoire de l'agresseur via `SIGSTOP`\n"
+    "                  (état noyau `T`), ordonne le rejet de l'appel d'ouverture auprès du noyau via\n"
+    "                  `FAN_DENY`, referme le descripteur d'inspection et émet l'alerte console.\n"
+    "  • Retour      : `0` si la neutralisation a réussi, `-1` si le PID était protégé.\n"
+    "\n"
+    "Fonction 115 : sentry_engine.c -- sentry_enter_stealth -- Blindage et invisibilité mémoire\n"
+    "  • Signature C : int sentry_enter_stealth(const char *fake_name);\n"
+    "  • Utilité     : Masque le nom du processus dans la table noyau via `prctl(PR_SET_NAME, \"[kworker/u16:3]\")`,\n"
+    "                  s'attribue l'immunité OOM maximale (`/proc/self/oom_score_adj = -1000`) et\n"
+    "                  verrouille l'intégralité des pages physiques en RAM via `mlockall(MCL_CURRENT | MCL_FUTURE)`.\n"
+    "  • Retour      : `0` en cas de succès opérationnel, `-1` si les limites système restreignent le verrouillage.\n"
+    "\n"
+    "Fonction 116 : cmd_sentry.c -- cmd_sentry_arm -- Armement des leurres sur disque\n"
+    "  • Signature C : static int cmd_sentry_arm(int argc, char **argv);\n"
+    "  • Utilité     : Déploie les fichiers canaris dans les cibles spécifiées en ligne de\n"
+    "                  commande ou applique les répertoires sensibles par défaut (`/home`, `/var/www`, `/var/lib`, `/etc`).\n"
+    "  • Retour      : `0` (succès) si au moins un appât est opérationnel, `2` en cas d'échec global.\n"
+    "\n"
+    "Fonction 117 : cmd_sentry.c -- cmd_sentry_disarm -- Purge et désarmement préventif\n"
+    "  • Signature C : static int cmd_sentry_disarm(int argc, char **argv);\n"
+    "  • Utilité     : Supprime proprement par déliaison physique (`unlink`) les fichiers\n"
+    "                  leurres pour autoriser les opérations de maintenance sans fausse alerte.\n"
+    "  • Retour      : Toujours `0` après affichage du bilan de neutralisation.\n"
+    "\n"
+    "Fonction 118 : cmd_sentry.c -- cmd_sentry_status -- Audit d'intégrité physique des appâts\n"
+    "  • Signature C : static int cmd_sentry_status(int argc, char **argv);\n"
+    "  • Utilité     : Vérifie l'existence et la stricte conformité de taille (32768 octets)\n"
+    "                  des canaris sur l'ensemble des répertoires surveillés (`[ACTIF]`, `[ALTERE]`, `[NON ARME]`).\n"
+    "  • Retour      : Toujours `0`.\n"
+    "\n"
+    "Fonction 119 : cmd_sentry.c -- cmd_sentry_run -- Démarrage du guet passif fanotify\n"
+    "  • Signature C : static int cmd_sentry_run(int argc, char **argv);\n"
+    "  • Utilité     : Initialise `fanotify`, prend en charge le détachement en démon d'arrière-plan\n"
+    "                  (`-d` / `--daemon`) via `fork()` et `setsid()`, active l'invisibilité furtive\n"
+    "                  (`sentry_enter_stealth`), redirige les flux vers `/dev/null` et lance la veille.\n"
+    "  • Retour      : `0` en cas d'arrêt propre, `2` en cas de droits administrateur insuffisants.\n"
+    "\n"
+    "Fonction 120 : cmd_sentry.c -- cmd_sentry -- Aiguilleur CLI sentry\n"
+    "  • Signature C : int cmd_sentry(int argc, char **argv);\n"
+    "  • Utilité     : Point d'entrée principal de la sous-commande `rap sentry`. Parse les\n"
+    "                  arguments et route vers `arm`, `disarm`, `status` ou `run`.\n"
+    "  • Retour      : Code de retour de la sous-commande, ou `2` si la commande est inconnue.\n"
+    "\n"
+    "Fonction 121 : rap_main.c -- rap_cmd_sentry -- Pont déclaratif sentinelle\n"
+    "  • Signature C : int rap_cmd_sentry(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Relie la table déclarative universelle `g_commands` de RAPTOR au point\n"
+    "                  d'entrée de la sentinelle anti-rançongiciel (`cmd_sentry`).\n"
+    "  • Retour      : Code de retour POSIX transmis par `cmd_sentry`.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 18 : OUTILLAGE DE COMPILATION & SOURCE UNIQUE SSOT (tools/)\n"
+    "================================================================================\n"
+    "\n"
+    "Outil 01 : gen_man.py -- parse_ssot_markdown -- Découpage multi-pages\n"
+    "  • Signature Python : def parse_ssot_markdown(md_raw) -> dict\n"
+    "  • Utilité          : Parse le fichier maître `docs/man/rap.1.md` et segmente chaque\n"
+    "                       page de manuel délimitée par les balises `<!-- MAN: key | sec | titre -->`.\n"
+    "\n"
+    "Outil 02 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix\n"
+    "  • Signature Python : def format_unix_header(key, sec) -> str\n"
+    "  • Utilité          : Calibre et génère la bannière d'en-tête troff/groff centrée\n"
+    "                       sur 70 colonnes (ex: `RAP(1)   RAPTOR DEFENSE   RAP(1)`).\n"
+    "\n"
+    "Outil 03 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99\n"
+    "  • Signature Python : def generate_cli_header(pages) -> str\n"
+    "  • Utilité          : Encode l'ensemble des pages de manuel dans le tableau constant\n"
+    "                       `g_rap_man_data[]` de `src/cli/rap_man_data.h` pour inclusion\n"
+    "                       autonome en mémoire morte dans l'exécutable `rap` (zéro heap).\n"
+    "\n"
+    "Outil 04 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS\n"
+    "  • Signature Python : def generate_js_database(pages) -> str\n"
+    "  • Utilité          : Construit la base de données JavaScript `docs/js/man_data.js`\n"
+    "                       alimentant la visionneuse interactive de `docs/man.html`.\n"
+    "\n"
+    "================================================================================\n"
+    "FIN DU RÉFÉRENTIEL TECHNIQUE OFFICIEL // RAPTOR DEFENSE v2.0\n"
+    "================================================================================\n";
+
+/* Structure de repérage hiérarchique (0 allocation dynamique / 0 heap) */
+typedef struct {
+    int section;        /* 1 à 18 (0 si non spécifié) */
+    int fn_id;          /* 0 = Section entière, > 0 = Fonction unitaire */
+    const char *title;  /* Libellé d'identification */
+    const char *content;/* Contenu technique formaté */
+} RapFnDocEntry;
+
+static const RapFnDocEntry g_rap_fn_entries[] = {
+    {
+        1,
+        0,
+        "SECTION 1 : MODÈLE DE DONNÉES UNIVERSEL (src/core/raptor_data.c)",
+    "=== SECTION 1 : MODÈLE DE DONNÉES UNIVERSEL (src/core/raptor_data.c) ===\n"
+    "\n"
+    "Fonction 01 : raptor_data.c -- raptor_data_context_create -- Allocation du contexte\n"
+    "  • Signature C : RaptorReportContext* raptor_data_context_create(void);\n"
+    "  • Utilité     : Alloue dynamiquement en mémoire vive et initialise la structure\n"
+    "                  centrale du rapport destinée à recevoir les données des greffons.\n"
+    "\n"
+    "Fonction 02 : raptor_data.c -- raptor_data_section_add -- Création de section\n"
+    "  • Signature C : RaptorSection* raptor_data_section_add(RaptorReportContext* ctx, const char* id, const char* title);\n"
+    "  • Utilité     : Ajoute un conteneur thématique autonome dans le contexte pour\n"
+    "                  regrouper les cartes, tables et alertes produites par un greffon.\n"
+    "\n"
+    "Fonction 03 : raptor_data.c -- raptor_data_card_add -- Insertion de métrique clé\n"
+    "  • Signature C : bool raptor_data_card_add(RaptorSection* sec, const char* label, const char* val, float pct, RaptorSeverity sev);\n"
+    "  • Utilité     : Enregistre un indicateur synthétique (valeur, pourcentage, niveau\n"
+    "                  de criticité) affiché sous forme de tuile métrique dans l'interface.\n"
+    "\n"
+    "Fonction 04 : raptor_data.c -- raptor_data_table_create -- Initialisation de tableau\n"
+    "  • Signature C : RaptorTable* raptor_data_table_create(RaptorSection* sec, const char* title, size_t col_count, const char** col_names);\n"
+    "  • Utilité     : Instancie une structure de tableau bidimensionnel avec ses en-têtes\n"
+    "                  de colonnes au sein d'une section donnée.\n"
+    "\n"
+    "Fonction 05 : raptor_data.c -- raptor_data_table_row_add -- Insertion de ligne de données\n"
+    "  • Signature C : bool raptor_data_table_row_add(RaptorTable* table, const char** cell_texts, const RaptorSeverity* cell_sevs);\n"
+    "  • Utilité     : Ajoute une ligne complète de cellules textuelles associées à des\n"
+    "                  codes de couleur/sévérité dans le tableau spécifié.\n"
+    "\n"
+    "Fonction 06 : raptor_data.c -- raptor_data_alert_add -- Notification de sécurité\n"
+    "  • Signature C : bool raptor_data_alert_add(RaptorSection* sec, RaptorSeverity sev, const char* message);\n"
+    "  • Utilité     : Consigne un message d'avertissement ou de confirmation dans la section\n"
+    "                  avec un niveau d'alerte défini (OK, AVERTISSEMENT, CRITIQUE).\n"
+    "\n"
+    "Fonction 07 : raptor_data.c -- raptor_data_get_section_count -- Dénombrement des sections\n"
+    "  • Signature C : size_t raptor_data_get_section_count(const RaptorReportContext* ctx);\n"
+    "  • Utilité     : Renvoie le nombre total de sections actuellement peuplées dans le\n"
+    "                  contexte de rapport actif.\n"
+    "\n"
+    "Fonction 08 : raptor_data.c -- raptor_data_get_section -- Accès sécurisé par index\n"
+    "  • Signature C : const RaptorSection* raptor_data_get_section(const RaptorReportContext* ctx, size_t index);\n"
+    "  • Utilité     : Fournit un pointeur en lecture seule vers une section précise à partir\n"
+    "                  de son rang séquentiel dans la collection.\n"
+    "\n"
+    "Fonction 09 : raptor_data.c -- raptor_data_context_clear -- Purge dynamique du contexte\n"
+    "  • Signature C : void raptor_data_context_clear(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Libère récursivement l'ensemble des sections, tables et alertes\n"
+    "                  tout en maintenant le conteneur principal alloué pour le Live Monitoring 3s.\n"
+    "\n"
+    "Fonction 10 : raptor_data.c -- raptor_data_context_destroy -- Destruction totale\n"
+    "  • Signature C : void raptor_data_context_destroy(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Désalloue complètement l'arbre de mémoire du contexte et libère\n"
+    "                  le pointeur racine lors de l'arrêt définitif de l'application.\n"
+    },
+    {
+        1,
+        1,
+        "Fonction 1 : raptor_data.c -- raptor_data_context_create -- Allocation du contexte",
+    "Fonction 01 : raptor_data.c -- raptor_data_context_create -- Allocation du contexte\n"
+    "  • Signature C : RaptorReportContext* raptor_data_context_create(void);\n"
+    "  • Utilité     : Alloue dynamiquement en mémoire vive et initialise la structure\n"
+    "                  centrale du rapport destinée à recevoir les données des greffons.\n"
+    },
+    {
+        1,
+        2,
+        "Fonction 2 : raptor_data.c -- raptor_data_section_add -- Création de section",
+    "Fonction 02 : raptor_data.c -- raptor_data_section_add -- Création de section\n"
+    "  • Signature C : RaptorSection* raptor_data_section_add(RaptorReportContext* ctx, const char* id, const char* title);\n"
+    "  • Utilité     : Ajoute un conteneur thématique autonome dans le contexte pour\n"
+    "                  regrouper les cartes, tables et alertes produites par un greffon.\n"
+    },
+    {
+        1,
+        3,
+        "Fonction 3 : raptor_data.c -- raptor_data_card_add -- Insertion de métrique clé",
+    "Fonction 03 : raptor_data.c -- raptor_data_card_add -- Insertion de métrique clé\n"
+    "  • Signature C : bool raptor_data_card_add(RaptorSection* sec, const char* label, const char* val, float pct, RaptorSeverity sev);\n"
+    "  • Utilité     : Enregistre un indicateur synthétique (valeur, pourcentage, niveau\n"
+    "                  de criticité) affiché sous forme de tuile métrique dans l'interface.\n"
+    },
+    {
+        1,
+        4,
+        "Fonction 4 : raptor_data.c -- raptor_data_table_create -- Initialisation de tableau",
+    "Fonction 04 : raptor_data.c -- raptor_data_table_create -- Initialisation de tableau\n"
+    "  • Signature C : RaptorTable* raptor_data_table_create(RaptorSection* sec, const char* title, size_t col_count, const char** col_names);\n"
+    "  • Utilité     : Instancie une structure de tableau bidimensionnel avec ses en-têtes\n"
+    "                  de colonnes au sein d'une section donnée.\n"
+    },
+    {
+        1,
+        5,
+        "Fonction 5 : raptor_data.c -- raptor_data_table_row_add -- Insertion de ligne de données",
+    "Fonction 05 : raptor_data.c -- raptor_data_table_row_add -- Insertion de ligne de données\n"
+    "  • Signature C : bool raptor_data_table_row_add(RaptorTable* table, const char** cell_texts, const RaptorSeverity* cell_sevs);\n"
+    "  • Utilité     : Ajoute une ligne complète de cellules textuelles associées à des\n"
+    "                  codes de couleur/sévérité dans le tableau spécifié.\n"
+    },
+    {
+        1,
+        6,
+        "Fonction 6 : raptor_data.c -- raptor_data_alert_add -- Notification de sécurité",
+    "Fonction 06 : raptor_data.c -- raptor_data_alert_add -- Notification de sécurité\n"
+    "  • Signature C : bool raptor_data_alert_add(RaptorSection* sec, RaptorSeverity sev, const char* message);\n"
+    "  • Utilité     : Consigne un message d'avertissement ou de confirmation dans la section\n"
+    "                  avec un niveau d'alerte défini (OK, AVERTISSEMENT, CRITIQUE).\n"
+    },
+    {
+        1,
+        7,
+        "Fonction 7 : raptor_data.c -- raptor_data_get_section_count -- Dénombrement des sections",
+    "Fonction 07 : raptor_data.c -- raptor_data_get_section_count -- Dénombrement des sections\n"
+    "  • Signature C : size_t raptor_data_get_section_count(const RaptorReportContext* ctx);\n"
+    "  • Utilité     : Renvoie le nombre total de sections actuellement peuplées dans le\n"
+    "                  contexte de rapport actif.\n"
+    },
+    {
+        1,
+        8,
+        "Fonction 8 : raptor_data.c -- raptor_data_get_section -- Accès sécurisé par index",
+    "Fonction 08 : raptor_data.c -- raptor_data_get_section -- Accès sécurisé par index\n"
+    "  • Signature C : const RaptorSection* raptor_data_get_section(const RaptorReportContext* ctx, size_t index);\n"
+    "  • Utilité     : Fournit un pointeur en lecture seule vers une section précise à partir\n"
+    "                  de son rang séquentiel dans la collection.\n"
+    },
+    {
+        1,
+        9,
+        "Fonction 9 : raptor_data.c -- raptor_data_context_clear -- Purge dynamique du contexte",
+    "Fonction 09 : raptor_data.c -- raptor_data_context_clear -- Purge dynamique du contexte\n"
+    "  • Signature C : void raptor_data_context_clear(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Libère récursivement l'ensemble des sections, tables et alertes\n"
+    "                  tout en maintenant le conteneur principal alloué pour le Live Monitoring 3s.\n"
+    },
+    {
+        1,
+        10,
+        "Fonction 10 : raptor_data.c -- raptor_data_context_destroy -- Destruction totale",
+    "Fonction 10 : raptor_data.c -- raptor_data_context_destroy -- Destruction totale\n"
+    "  • Signature C : void raptor_data_context_destroy(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Désalloue complètement l'arbre de mémoire du contexte et libère\n"
+    "                  le pointeur racine lors de l'arrêt définitif de l'application.\n"
+    },
+    {
+        2,
+        0,
+        "SECTION 2 : REGISTRE DE GREFFONS ET BUS SYSTÈME (src/core/raptor_registry.c)",
+    "=== SECTION 2 : REGISTRE DE GREFFONS ET BUS SYSTÈME (src/core/raptor_registry.c) ===\n"
+    "\n"
+    "Fonction 11 : raptor_registry.c -- raptor_registry_init -- Initialisation du bus\n"
+    "  • Signature C : void raptor_registry_init(void);\n"
+    "  • Utilité     : Prépare la table interne d'enregistrement et réinitialise les\n"
+    "                  compteurs de modules d'inspection disponibles.\n"
+    "\n"
+    "Fonction 12 : raptor_registry.c -- raptor_registry_register -- Enregistrement de greffon\n"
+    "  • Signature C : bool raptor_registry_register(const RaptorPlugin* plugin);\n"
+    "  • Utilité     : Inscrit un greffon d'audit dans la table globale sans nécessiter\n"
+    "                  de modification des fichiers sources du noyau central.\n"
+    "\n"
+    "Fonction 13 : raptor_registry.c -- raptor_registry_run_all -- Déclenchement séquentiel\n"
+    "  • Signature C : bool raptor_registry_run_all(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Parcourt l'ensemble des greffons actifs et exécute leur méthode\n"
+    "                  `run_audit` pour peupler le contexte en une seule passe.\n"
+    "\n"
+    "Fonction 14 : raptor_registry.c -- raptor_registry_get_count -- Comptage des greffons\n"
+    "  • Signature C : size_t raptor_registry_get_count(void);\n"
+    "  • Utilité     : Retourne le nombre total de greffons actuellement enregistrés et\n"
+    "                  disponibles pour les audits.\n"
+    "\n"
+    "Fonction 15 : raptor_registry.c -- raptor_registry_get_by_idx -- Accès greffon par index\n"
+    "  • Signature C : const RaptorPlugin* raptor_registry_get_by_idx(size_t index);\n"
+    "  • Utilité     : Permet d'interroger la configuration, le nom et les métadonnées d'un\n"
+    "                  greffon via son index dans le registre.\n"
+    "\n"
+    "Fonction 16 : raptor_registry.c -- raptor_registry_cleanup -- Déchargement global\n"
+    "  • Signature C : void raptor_registry_cleanup(void);\n"
+    "  • Utilité     : Déclenche l'appel de nettoyage `cleanup()` sur chaque greffon et\n"
+    "                  vide la table interne des pointeurs de modules.\n"
+    },
+    {
+        2,
+        11,
+        "Fonction 11 : raptor_registry.c -- raptor_registry_init -- Initialisation du bus",
+    "Fonction 11 : raptor_registry.c -- raptor_registry_init -- Initialisation du bus\n"
+    "  • Signature C : void raptor_registry_init(void);\n"
+    "  • Utilité     : Prépare la table interne d'enregistrement et réinitialise les\n"
+    "                  compteurs de modules d'inspection disponibles.\n"
+    },
+    {
+        2,
+        12,
+        "Fonction 12 : raptor_registry.c -- raptor_registry_register -- Enregistrement de greffon",
+    "Fonction 12 : raptor_registry.c -- raptor_registry_register -- Enregistrement de greffon\n"
+    "  • Signature C : bool raptor_registry_register(const RaptorPlugin* plugin);\n"
+    "  • Utilité     : Inscrit un greffon d'audit dans la table globale sans nécessiter\n"
+    "                  de modification des fichiers sources du noyau central.\n"
+    },
+    {
+        2,
+        13,
+        "Fonction 13 : raptor_registry.c -- raptor_registry_run_all -- Déclenchement séquentiel",
+    "Fonction 13 : raptor_registry.c -- raptor_registry_run_all -- Déclenchement séquentiel\n"
+    "  • Signature C : bool raptor_registry_run_all(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Parcourt l'ensemble des greffons actifs et exécute leur méthode\n"
+    "                  `run_audit` pour peupler le contexte en une seule passe.\n"
+    },
+    {
+        2,
+        14,
+        "Fonction 14 : raptor_registry.c -- raptor_registry_get_count -- Comptage des greffons",
+    "Fonction 14 : raptor_registry.c -- raptor_registry_get_count -- Comptage des greffons\n"
+    "  • Signature C : size_t raptor_registry_get_count(void);\n"
+    "  • Utilité     : Retourne le nombre total de greffons actuellement enregistrés et\n"
+    "                  disponibles pour les audits.\n"
+    },
+    {
+        2,
+        15,
+        "Fonction 15 : raptor_registry.c -- raptor_registry_get_by_idx -- Accès greffon par index",
+    "Fonction 15 : raptor_registry.c -- raptor_registry_get_by_idx -- Accès greffon par index\n"
+    "  • Signature C : const RaptorPlugin* raptor_registry_get_by_idx(size_t index);\n"
+    "  • Utilité     : Permet d'interroger la configuration, le nom et les métadonnées d'un\n"
+    "                  greffon via son index dans le registre.\n"
+    },
+    {
+        2,
+        16,
+        "Fonction 16 : raptor_registry.c -- raptor_registry_cleanup -- Déchargement global",
+    "Fonction 16 : raptor_registry.c -- raptor_registry_cleanup -- Déchargement global\n"
+    "  • Signature C : void raptor_registry_cleanup(void);\n"
+    "  • Utilité     : Déclenche l'appel de nettoyage `cleanup()` sur chaque greffon et\n"
+    "                  vide la table interne des pointeurs de modules.\n"
+    },
+    {
+        3,
+        0,
+        "SECTION 3 : MOTEUR D'ANALYSE DIFFÉRENTIELLE (src/core/raptor_differential.c)",
+    "=== SECTION 3 : MOTEUR D'ANALYSE DIFFÉRENTIELLE (src/core/raptor_differential.c) ===\n"
+    "\n"
+    "Fonction 17 : raptor_differential.c -- raptor_diff_init -- Initialisation différentielle\n"
+    "  • Signature C : void raptor_diff_init(void);\n"
+    "  • Utilité     : Configure les structures mémoire destinées à conserver l'empreinte\n"
+    "                  historique nécessaire au calcul des dérives temporelles.\n"
+    "\n"
+    "Fonction 18 : raptor_differential.c -- raptor_diff_compute -- Calcul des dérivées RAM\n"
+    "  • Signature C : bool raptor_diff_compute(const RaptorReportContext* current, RaptorSection* out_diff_sec);\n"
+    "  • Utilité     : Compare l'état T(n) avec l'état T(n-1), identifie les fuites de mémoire\n"
+    "                  (Mo/min) et peuple la section du cahier différentiel.\n"
+    "\n"
+    "Fonction 19 : raptor_differential.c -- raptor_diff_snapshot_save -- Sauvegarde d'instantané\n"
+    "  • Signature C : void raptor_diff_snapshot_save(const RaptorReportContext* current);\n"
+    "  • Utilité     : Copie et fige les métriques de processus actuelles en tant que nouvel\n"
+    "                  état de référence pour les comparaisons futures.\n"
+    "\n"
+    "Fonction 20 : raptor_differential.c -- raptor_diff_cleanup -- Nettoyage différentiel\n"
+    "  • Signature C : void raptor_diff_cleanup(void);\n"
+    "  • Utilité     : Libère l'intégralité des instantanés historiques archivés en RAM.\n"
+    },
+    {
+        3,
+        17,
+        "Fonction 17 : raptor_differential.c -- raptor_diff_init -- Initialisation différentielle",
+    "Fonction 17 : raptor_differential.c -- raptor_diff_init -- Initialisation différentielle\n"
+    "  • Signature C : void raptor_diff_init(void);\n"
+    "  • Utilité     : Configure les structures mémoire destinées à conserver l'empreinte\n"
+    "                  historique nécessaire au calcul des dérives temporelles.\n"
+    },
+    {
+        3,
+        18,
+        "Fonction 18 : raptor_differential.c -- raptor_diff_compute -- Calcul des dérivées RAM",
+    "Fonction 18 : raptor_differential.c -- raptor_diff_compute -- Calcul des dérivées RAM\n"
+    "  • Signature C : bool raptor_diff_compute(const RaptorReportContext* current, RaptorSection* out_diff_sec);\n"
+    "  • Utilité     : Compare l'état T(n) avec l'état T(n-1), identifie les fuites de mémoire\n"
+    "                  (Mo/min) et peuple la section du cahier différentiel.\n"
+    },
+    {
+        3,
+        19,
+        "Fonction 19 : raptor_differential.c -- raptor_diff_snapshot_save -- Sauvegarde d'instantané",
+    "Fonction 19 : raptor_differential.c -- raptor_diff_snapshot_save -- Sauvegarde d'instantané\n"
+    "  • Signature C : void raptor_diff_snapshot_save(const RaptorReportContext* current);\n"
+    "  • Utilité     : Copie et fige les métriques de processus actuelles en tant que nouvel\n"
+    "                  état de référence pour les comparaisons futures.\n"
+    },
+    {
+        3,
+        20,
+        "Fonction 20 : raptor_differential.c -- raptor_diff_cleanup -- Nettoyage différentiel",
+    "Fonction 20 : raptor_differential.c -- raptor_diff_cleanup -- Nettoyage différentiel\n"
+    "  • Signature C : void raptor_diff_cleanup(void);\n"
+    "  • Utilité     : Libère l'intégralité des instantanés historiques archivés en RAM.\n"
+    },
+    {
+        4,
+        0,
+        "SECTION 4 : JOURNALISATION FORENSIQUE PERMANENTE (src/report/report_audit_log.c)",
+    "=== SECTION 4 : JOURNALISATION FORENSIQUE PERMANENTE (src/report/report_audit_log.c) ===\n"
+    "\n"
+    "Fonction 21 : report_audit_log.c -- audit_log_get_system_btime -- Extraction du boot time\n"
+    "  • Signature C : static unsigned long long audit_log_get_system_btime(void);\n"
+    "  • Utilité     : Lit `/proc/stat` et extrait le timestamp Unix `btime` correspondant\n"
+    "                  à l'instant de démarrage matériel de la machine hôte.\n"
+    "\n"
+    "Fonction 22 : report_audit_log.c -- audit_log_compute_start_time -- Calcul de spawn\n"
+    "  • Signature C : static void audit_log_compute_start_time(int pid, char* out_buf, size_t buf_sz);\n"
+    "  • Utilité     : Parse le 22e champ (`starttime`) de `/proc/[PID]/stat` et convertit\n"
+    "                  les ticks processeur en heure locale absolue de démarrage (HH:MM:SS).\n"
+    "\n"
+    "Fonction 23 : report_audit_log.c -- audit_log_get_next_sequence_number -- Séquençage auto\n"
+    "  • Signature C : static int audit_log_get_next_sequence_number(void);\n"
+    "  • Utilité     : Parcourt `AUDIT.TXT` à la recherche du motif `AUDIT NO #XX` pour\n"
+    "                  déterminer et retourner le prochain numéro incrémental unique.\n"
+    "\n"
+    "Fonction 24 : report_audit_log.c -- raptor_audit_log_capture_target -- Capture pré-mortem\n"
+    "  • Signature C : bool raptor_audit_log_capture_target(int pid, RaptorIncidentDetail* out_detail);\n"
+    "  • Utilité     : Extrait dynamiquement toutes les preuves du processus dans `/proc`\n"
+    "                  (binaire, CWD, start time, PPID, commande parent, CWD parent) avant arrêt.\n"
+    "\n"
+    "Fonction 25 : report_audit_log.c -- raptor_audit_log_commit -- Écriture persistante\n"
+    "  • Signature C : bool raptor_audit_log_commit(const RaptorIncidentDetail* detail, const char* action_status);\n"
+    "  • Utilité     : Formate et écrit le bloc d'audit horodaté dans `AUDIT.TXT` en mode\n"
+    "                  ajout permanent (`a+`) avec forçage d'écriture physique sur disque.\n"
+    "\n"
+    "Fonction 26 : report_audit_log.c -- raptor_audit_log_notify_detection -- Alerte temps réel\n"
+    "  • Signature C : bool raptor_audit_log_notify_detection(int pid, const char* classification);\n"
+    "  • Utilité     : Déclenche l'écriture immédiate d'un audit dès qu'une anomalie heuristique\n"
+    "                  apparaît, avec filtrage dédoublonné pour éviter la saturation du fichier.\n"
+    "\n"
+    "Fonction 27 : report_audit_log.c -- raptor_audit_log_forget_pid -- Purge du cache anti-flood\n"
+    "  • Signature C : void raptor_audit_log_forget_pid(int pid);\n"
+    "  • Utilité     : Supprime un identifiant PID de la table des processus déjà logués\n"
+    "                  lors de sa destruction, autorisant la traque immédiate en cas de réapparition.\n"
+    },
+    {
+        4,
+        21,
+        "Fonction 21 : report_audit_log.c -- audit_log_get_system_btime -- Extraction du boot time",
+    "Fonction 21 : report_audit_log.c -- audit_log_get_system_btime -- Extraction du boot time\n"
+    "  • Signature C : static unsigned long long audit_log_get_system_btime(void);\n"
+    "  • Utilité     : Lit `/proc/stat` et extrait le timestamp Unix `btime` correspondant\n"
+    "                  à l'instant de démarrage matériel de la machine hôte.\n"
+    },
+    {
+        4,
+        22,
+        "Fonction 22 : report_audit_log.c -- audit_log_compute_start_time -- Calcul de spawn",
+    "Fonction 22 : report_audit_log.c -- audit_log_compute_start_time -- Calcul de spawn\n"
+    "  • Signature C : static void audit_log_compute_start_time(int pid, char* out_buf, size_t buf_sz);\n"
+    "  • Utilité     : Parse le 22e champ (`starttime`) de `/proc/[PID]/stat` et convertit\n"
+    "                  les ticks processeur en heure locale absolue de démarrage (HH:MM:SS).\n"
+    },
+    {
+        4,
+        23,
+        "Fonction 23 : report_audit_log.c -- audit_log_get_next_sequence_number -- Séquençage auto",
+    "Fonction 23 : report_audit_log.c -- audit_log_get_next_sequence_number -- Séquençage auto\n"
+    "  • Signature C : static int audit_log_get_next_sequence_number(void);\n"
+    "  • Utilité     : Parcourt `AUDIT.TXT` à la recherche du motif `AUDIT NO #XX` pour\n"
+    "                  déterminer et retourner le prochain numéro incrémental unique.\n"
+    },
+    {
+        4,
+        24,
+        "Fonction 24 : report_audit_log.c -- raptor_audit_log_capture_target -- Capture pré-mortem",
+    "Fonction 24 : report_audit_log.c -- raptor_audit_log_capture_target -- Capture pré-mortem\n"
+    "  • Signature C : bool raptor_audit_log_capture_target(int pid, RaptorIncidentDetail* out_detail);\n"
+    "  • Utilité     : Extrait dynamiquement toutes les preuves du processus dans `/proc`\n"
+    "                  (binaire, CWD, start time, PPID, commande parent, CWD parent) avant arrêt.\n"
+    },
+    {
+        4,
+        25,
+        "Fonction 25 : report_audit_log.c -- raptor_audit_log_commit -- Écriture persistante",
+    "Fonction 25 : report_audit_log.c -- raptor_audit_log_commit -- Écriture persistante\n"
+    "  • Signature C : bool raptor_audit_log_commit(const RaptorIncidentDetail* detail, const char* action_status);\n"
+    "  • Utilité     : Formate et écrit le bloc d'audit horodaté dans `AUDIT.TXT` en mode\n"
+    "                  ajout permanent (`a+`) avec forçage d'écriture physique sur disque.\n"
+    },
+    {
+        4,
+        26,
+        "Fonction 26 : report_audit_log.c -- raptor_audit_log_notify_detection -- Alerte temps réel",
+    "Fonction 26 : report_audit_log.c -- raptor_audit_log_notify_detection -- Alerte temps réel\n"
+    "  • Signature C : bool raptor_audit_log_notify_detection(int pid, const char* classification);\n"
+    "  • Utilité     : Déclenche l'écriture immédiate d'un audit dès qu'une anomalie heuristique\n"
+    "                  apparaît, avec filtrage dédoublonné pour éviter la saturation du fichier.\n"
+    },
+    {
+        4,
+        27,
+        "Fonction 27 : report_audit_log.c -- raptor_audit_log_forget_pid -- Purge du cache anti-flood",
+    "Fonction 27 : report_audit_log.c -- raptor_audit_log_forget_pid -- Purge du cache anti-flood\n"
+    "  • Signature C : void raptor_audit_log_forget_pid(int pid);\n"
+    "  • Utilité     : Supprime un identifiant PID de la table des processus déjà logués\n"
+    "                  lors de sa destruction, autorisant la traque immédiate en cas de réapparition.\n"
+    },
+    {
+        5,
+        0,
+        "SECTION 5 : GREFFON PROCESSUS, MÉMOIRE ET RWX (src/plugins/plugin_memory_rwx.c)",
+    "=== SECTION 5 : GREFFON PROCESSUS, MÉMOIRE ET RWX (src/plugins/plugin_memory_rwx.c) ===\n"
+    "\n"
+    "Fonction 28 : plugin_memory_rwx.c -- proc_mem_is_trusted_path -- Filtrage des chemins sûrs\n"
+    "  • Signature C : static bool proc_mem_is_trusted_path(const char* exe_path);\n"
+    "  • Utilité     : Valide si le binaire provient strictement des répertoires systèmes\n"
+    "                  légitimes (`/usr/bin/`, `/usr/lib/`, `/bin/`, `/sbin/`, `/app/`).\n"
+    "\n"
+    "Fonction 29 : plugin_memory_rwx.c -- proc_mem_is_legit_jit -- Détection des moteurs JIT\n"
+    "  • Signature C : static bool proc_mem_is_legit_jit(const char* comm, const char* exe);\n"
+    "  • Utilité     : Écarte les faux positifs en reconnaissant les interpréteurs légitimes\n"
+    "                  allouant de la mémoire exécutable (navigateurs, Python, machines virtuelles).\n"
+    "\n"
+    "Fonction 30 : plugin_memory_rwx.c -- proc_mem_scan_maps_rwx -- Inspection des pages mémoire\n"
+    "  • Signature C : static bool proc_mem_scan_maps_rwx(uint32_t pid, bool is_jit, bool is_trusted);\n"
+    "  • Utilité     : Analyse `/proc/[PID]/maps` pour repérer les segments illégitimes\n"
+    "                  possédant simultanément les droits Read-Write-Execute (`rwx`).\n"
+    "\n"
+    "Fonction 31 : plugin_memory_rwx.c -- proc_mem_read_stats -- Empreinte RAM du processus\n"
+    "  • Signature C : static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len, char* out_exe, size_t exe_len, uint64_t* out_rss);\n"
+    "  • Utilité     : Lit le nom d'exécutable, résout le lien `/proc/[PID]/exe` et calcule\n"
+    "                  la consommation résidente RSS en mémoire physique.\n"
+    "\n"
+    "Fonction 32 : plugin_memory_rwx.c -- proc_mem_run_audit -- Exécution de l'audit mémoire\n"
+    "  • Signature C : static bool proc_mem_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Parcourt l'arborescence `/proc`, audite la mémoire de chaque tâche\n"
+    "                  active et consigne les résultats dans la section dédiée du rapport.\n"
+    "\n"
+    "Fonction 33 : plugin_memory_rwx.c -- proc_mem_register -- Enregistrement automatique\n"
+    "  • Signature C : __attribute__((constructor)) static void proc_mem_register(void);\n"
+    "  • Utilité     : Enregistre le greffon mémoire auprès du registre central dès le\n"
+    "                  chargement du binaire en mémoire par le système d'exploitation.\n"
+    },
+    {
+        5,
+        28,
+        "Fonction 28 : plugin_memory_rwx.c -- proc_mem_is_trusted_path -- Filtrage des chemins sûrs",
+    "Fonction 28 : plugin_memory_rwx.c -- proc_mem_is_trusted_path -- Filtrage des chemins sûrs\n"
+    "  • Signature C : static bool proc_mem_is_trusted_path(const char* exe_path);\n"
+    "  • Utilité     : Valide si le binaire provient strictement des répertoires systèmes\n"
+    "                  légitimes (`/usr/bin/`, `/usr/lib/`, `/bin/`, `/sbin/`, `/app/`).\n"
+    },
+    {
+        5,
+        29,
+        "Fonction 29 : plugin_memory_rwx.c -- proc_mem_is_legit_jit -- Détection des moteurs JIT",
+    "Fonction 29 : plugin_memory_rwx.c -- proc_mem_is_legit_jit -- Détection des moteurs JIT\n"
+    "  • Signature C : static bool proc_mem_is_legit_jit(const char* comm, const char* exe);\n"
+    "  • Utilité     : Écarte les faux positifs en reconnaissant les interpréteurs légitimes\n"
+    "                  allouant de la mémoire exécutable (navigateurs, Python, machines virtuelles).\n"
+    },
+    {
+        5,
+        30,
+        "Fonction 30 : plugin_memory_rwx.c -- proc_mem_scan_maps_rwx -- Inspection des pages mémoire",
+    "Fonction 30 : plugin_memory_rwx.c -- proc_mem_scan_maps_rwx -- Inspection des pages mémoire\n"
+    "  • Signature C : static bool proc_mem_scan_maps_rwx(uint32_t pid, bool is_jit, bool is_trusted);\n"
+    "  • Utilité     : Analyse `/proc/[PID]/maps` pour repérer les segments illégitimes\n"
+    "                  possédant simultanément les droits Read-Write-Execute (`rwx`).\n"
+    },
+    {
+        5,
+        31,
+        "Fonction 31 : plugin_memory_rwx.c -- proc_mem_read_stats -- Empreinte RAM du processus",
+    "Fonction 31 : plugin_memory_rwx.c -- proc_mem_read_stats -- Empreinte RAM du processus\n"
+    "  • Signature C : static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len, char* out_exe, size_t exe_len, uint64_t* out_rss);\n"
+    "  • Utilité     : Lit le nom d'exécutable, résout le lien `/proc/[PID]/exe` et calcule\n"
+    "                  la consommation résidente RSS en mémoire physique.\n"
+    },
+    {
+        5,
+        32,
+        "Fonction 32 : plugin_memory_rwx.c -- proc_mem_run_audit -- Exécution de l'audit mémoire",
+    "Fonction 32 : plugin_memory_rwx.c -- proc_mem_run_audit -- Exécution de l'audit mémoire\n"
+    "  • Signature C : static bool proc_mem_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Parcourt l'arborescence `/proc`, audite la mémoire de chaque tâche\n"
+    "                  active et consigne les résultats dans la section dédiée du rapport.\n"
+    },
+    {
+        5,
+        33,
+        "Fonction 33 : plugin_memory_rwx.c -- proc_mem_register -- Enregistrement automatique",
+    "Fonction 33 : plugin_memory_rwx.c -- proc_mem_register -- Enregistrement automatique\n"
+    "  • Signature C : __attribute__((constructor)) static void proc_mem_register(void);\n"
+    "  • Utilité     : Enregistre le greffon mémoire auprès du registre central dès le\n"
+    "                  chargement du binaire en mémoire par le système d'exploitation.\n"
+    },
+    {
+        6,
+        0,
+        "SECTION 6 : GREFFON SURVEILLANCE RÉSEAU (src/plugins/plugin_network_sockets.c)",
+    "=== SECTION 6 : GREFFON SURVEILLANCE RÉSEAU (src/plugins/plugin_network_sockets.c) ===\n"
+    "\n"
+    "Fonction 34 : plugin_network_sockets.c -- net_sock_build_inode_cache -- Résolution Inode/PID\n"
+    "  • Signature C : static bool net_sock_build_inode_cache(void);\n"
+    "  • Utilité     : Analyse tous les descripteurs ouverts dans `/proc/[PID]/fd` pour\n"
+    "                  construire la table de correspondance rapide entre numéros d'inodes et PID.\n"
+    "\n"
+    "Fonction 35 : plugin_network_sockets.c -- net_sock_resolve_pid -- Recherche propriétaire O(1)\n"
+    "  • Signature C : static uint32_t net_sock_resolve_pid(uint64_t target_inode);\n"
+    "  • Utilité     : Retourne instantanément l'identifiant PID associé à un socket réseau\n"
+    "                  à partir de son numéro d'inode noyau.\n"
+    "\n"
+    "Fonction 36 : plugin_network_sockets.c -- net_sock_decode_hex_endpoint -- Décodage IP/Port\n"
+    "  • Signature C : static void net_sock_decode_hex_endpoint(const char* hex_ip, uint32_t hex_port, char* out_ip, size_t ip_len, uint16_t* out_port);\n"
+    "  • Utilité     : Convertit la représentation hexadécimale brute (format endianess noyau)\n"
+    "                  en adresse IP décimale lisible et port réseau standard.\n"
+    "\n"
+    "Fonction 37 : plugin_network_sockets.c -- net_sock_parse_file -- Analyse des tables réseau\n"
+    "  • Signature C : static void net_sock_parse_file(const char* net_path, const char* proto, RaptorTable* out_table);\n"
+    "  • Utilité     : Parse `/proc/net/tcp` et `/proc/net/udp` pour répertorier les ports en\n"
+    "                  écoute (`LISTEN`) et les canaux établis (`ESTABLISHED`).\n"
+    "\n"
+    "Fonction 38 : plugin_network_sockets.c -- net_sock_run_audit -- Exécution de l'audit réseau\n"
+    "  • Signature C : static bool net_sock_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Orchestre la collecte des flux réseau, résout les processus propriétaires\n"
+    "                  et libère le cache des descripteurs après analyse.\n"
+    "\n"
+    "Fonction 39 : plugin_network_sockets.c -- net_sock_register -- Enregistrement automatique\n"
+    "  • Signature C : __attribute__((constructor)) static void net_sock_register(void);\n"
+    "  • Utilité     : Inscrit le greffon réseau dans le registre central dès l'initialisation\n"
+    "                  du binaire exécutable.\n"
+    },
+    {
+        6,
+        34,
+        "Fonction 34 : plugin_network_sockets.c -- net_sock_build_inode_cache -- Résolution Inode/PID",
+    "Fonction 34 : plugin_network_sockets.c -- net_sock_build_inode_cache -- Résolution Inode/PID\n"
+    "  • Signature C : static bool net_sock_build_inode_cache(void);\n"
+    "  • Utilité     : Analyse tous les descripteurs ouverts dans `/proc/[PID]/fd` pour\n"
+    "                  construire la table de correspondance rapide entre numéros d'inodes et PID.\n"
+    },
+    {
+        6,
+        35,
+        "Fonction 35 : plugin_network_sockets.c -- net_sock_resolve_pid -- Recherche propriétaire O(1)",
+    "Fonction 35 : plugin_network_sockets.c -- net_sock_resolve_pid -- Recherche propriétaire O(1)\n"
+    "  • Signature C : static uint32_t net_sock_resolve_pid(uint64_t target_inode);\n"
+    "  • Utilité     : Retourne instantanément l'identifiant PID associé à un socket réseau\n"
+    "                  à partir de son numéro d'inode noyau.\n"
+    },
+    {
+        6,
+        36,
+        "Fonction 36 : plugin_network_sockets.c -- net_sock_decode_hex_endpoint -- Décodage IP/Port",
+    "Fonction 36 : plugin_network_sockets.c -- net_sock_decode_hex_endpoint -- Décodage IP/Port\n"
+    "  • Signature C : static void net_sock_decode_hex_endpoint(const char* hex_ip, uint32_t hex_port, char* out_ip, size_t ip_len, uint16_t* out_port);\n"
+    "  • Utilité     : Convertit la représentation hexadécimale brute (format endianess noyau)\n"
+    "                  en adresse IP décimale lisible et port réseau standard.\n"
+    },
+    {
+        6,
+        37,
+        "Fonction 37 : plugin_network_sockets.c -- net_sock_parse_file -- Analyse des tables réseau",
+    "Fonction 37 : plugin_network_sockets.c -- net_sock_parse_file -- Analyse des tables réseau\n"
+    "  • Signature C : static void net_sock_parse_file(const char* net_path, const char* proto, RaptorTable* out_table);\n"
+    "  • Utilité     : Parse `/proc/net/tcp` et `/proc/net/udp` pour répertorier les ports en\n"
+    "                  écoute (`LISTEN`) et les canaux établis (`ESTABLISHED`).\n"
+    },
+    {
+        6,
+        38,
+        "Fonction 38 : plugin_network_sockets.c -- net_sock_run_audit -- Exécution de l'audit réseau",
+    "Fonction 38 : plugin_network_sockets.c -- net_sock_run_audit -- Exécution de l'audit réseau\n"
+    "  • Signature C : static bool net_sock_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Orchestre la collecte des flux réseau, résout les processus propriétaires\n"
+    "                  et libère le cache des descripteurs après analyse.\n"
+    },
+    {
+        6,
+        39,
+        "Fonction 39 : plugin_network_sockets.c -- net_sock_register -- Enregistrement automatique",
+    "Fonction 39 : plugin_network_sockets.c -- net_sock_register -- Enregistrement automatique\n"
+    "  • Signature C : __attribute__((constructor)) static void net_sock_register(void);\n"
+    "  • Utilité     : Inscrit le greffon réseau dans le registre central dès l'initialisation\n"
+    "                  du binaire exécutable.\n"
+    },
+    {
+        7,
+        0,
+        "SECTION 7 : GREFFON HEURISTIQUE & LIGNÉE PARENT (src/plugins/plugin_heuristics_expert.c)",
+    "=== SECTION 7 : GREFFON HEURISTIQUE & LIGNÉE PARENT (src/plugins/plugin_heuristics_expert.c) ===\n"
+    "\n"
+    "Fonction 40 : plugin_heuristics_expert.c -- heuristics_is_suspicious_path -- Détection chemins volatils\n"
+    "  • Signature C : static bool heuristics_is_suspicious_path(const char* path);\n"
+    "  • Utilité     : Identifie si un processus s'exécute depuis des zones temporaires ou\n"
+    "                  volatiles suspectes (`/tmp`, `/var/tmp`, `/dev/shm`, `/run/user`).\n"
+    "\n"
+    "Fonction 41 : plugin_heuristics_expert.c -- heuristics_is_system_masquerade -- Détection d'usurpation\n"
+    "  • Signature C : static bool heuristics_is_system_masquerade(const char* comm, const char* exe_target);\n"
+    "  • Utilité     : Repère les processus non officiels usurpant le nom de démons critiques\n"
+    "                  (`systemd`, `sshd`, `cron`, `kworker`) hors des dossiers systèmes.\n"
+    "\n"
+    "Fonction 42 : plugin_heuristics_expert.c -- heuristics_get_parent_info -- Traque généalogique (PPID)\n"
+    "  • Signature C : static void heuristics_get_parent_info(const char* pid_str, char* out_ppid, size_t ppid_sz, char* out_pcomm, size_t pcomm_sz, char* out_pcmd, size_t pcmd_sz);\n"
+    "  • Utilité     : Extrait le PID parent via `/proc/[PID]/stat` et reconstitue la ligne\n"
+    "                  de commande exacte et l'exécutable créateur depuis `/proc/[PPID]/cmdline`.\n"
+    "\n"
+    "Fonction 43 : plugin_heuristics_expert.c -- heuristics_check_process -- Évaluation unitaire\n"
+    "  • Signature C : static void heuristics_check_process(const char* pid_str, size_t* out_masquerades, size_t* out_deleted, size_t* out_suspicious_paths, RaptorTable* tbl);\n"
+    "  • Utilité     : Exécute l'ensemble des filtres heuristiques sur un processus, remplit la table\n"
+    "                  d'incident et déclenche la notification persistante dans `AUDIT.TXT`.\n"
+    "\n"
+    "Fonction 44 : plugin_heuristics_expert.c -- plugin_heuristics_init -- Initialisation greffon\n"
+    "  • Signature C : static bool plugin_heuristics_init(void);\n"
+    "  • Utilité     : Prépare les états internes et structures du greffon heuristique.\n"
+    "\n"
+    "Fonction 45 : plugin_heuristics_expert.c -- plugin_heuristics_run_audit -- Exécution globale heuristique\n"
+    "  • Signature C : static bool plugin_heuristics_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Parcourt `/proc`, identifie les menaces comportementales, compile les cartes\n"
+    "                  d'usurpation et qualifie la criticité défensive globale.\n"
+    "\n"
+    "Fonction 46 : plugin_heuristics_expert.c -- plugin_heuristics_cleanup -- Nettoyage greffon\n"
+    "  • Signature C : static void plugin_heuristics_cleanup(void);\n"
+    "  • Utilité     : Libère les structures locales allouées lors de l'exécution de l'audit.\n"
+    "\n"
+    "Fonction 47 : plugin_heuristics_expert.c -- plugin_heuristics_register_constructor -- Auto-enregistrement\n"
+    "  • Signature C : __attribute__((constructor)) static void plugin_heuristics_register_constructor(void);\n"
+    "  • Utilité     : Enregistre dynamiquement le greffon heuristique au chargement du programme.\n"
+    },
+    {
+        7,
+        40,
+        "Fonction 40 : plugin_heuristics_expert.c -- heuristics_is_suspicious_path -- Détection chemins volatils",
+    "Fonction 40 : plugin_heuristics_expert.c -- heuristics_is_suspicious_path -- Détection chemins volatils\n"
+    "  • Signature C : static bool heuristics_is_suspicious_path(const char* path);\n"
+    "  • Utilité     : Identifie si un processus s'exécute depuis des zones temporaires ou\n"
+    "                  volatiles suspectes (`/tmp`, `/var/tmp`, `/dev/shm`, `/run/user`).\n"
+    },
+    {
+        7,
+        41,
+        "Fonction 41 : plugin_heuristics_expert.c -- heuristics_is_system_masquerade -- Détection d'usurpation",
+    "Fonction 41 : plugin_heuristics_expert.c -- heuristics_is_system_masquerade -- Détection d'usurpation\n"
+    "  • Signature C : static bool heuristics_is_system_masquerade(const char* comm, const char* exe_target);\n"
+    "  • Utilité     : Repère les processus non officiels usurpant le nom de démons critiques\n"
+    "                  (`systemd`, `sshd`, `cron`, `kworker`) hors des dossiers systèmes.\n"
+    },
+    {
+        7,
+        42,
+        "Fonction 42 : plugin_heuristics_expert.c -- heuristics_get_parent_info -- Traque généalogique (PPID)",
+    "Fonction 42 : plugin_heuristics_expert.c -- heuristics_get_parent_info -- Traque généalogique (PPID)\n"
+    "  • Signature C : static void heuristics_get_parent_info(const char* pid_str, char* out_ppid, size_t ppid_sz, char* out_pcomm, size_t pcomm_sz, char* out_pcmd, size_t pcmd_sz);\n"
+    "  • Utilité     : Extrait le PID parent via `/proc/[PID]/stat` et reconstitue la ligne\n"
+    "                  de commande exacte et l'exécutable créateur depuis `/proc/[PPID]/cmdline`.\n"
+    },
+    {
+        7,
+        43,
+        "Fonction 43 : plugin_heuristics_expert.c -- heuristics_check_process -- Évaluation unitaire",
+    "Fonction 43 : plugin_heuristics_expert.c -- heuristics_check_process -- Évaluation unitaire\n"
+    "  • Signature C : static void heuristics_check_process(const char* pid_str, size_t* out_masquerades, size_t* out_deleted, size_t* out_suspicious_paths, RaptorTable* tbl);\n"
+    "  • Utilité     : Exécute l'ensemble des filtres heuristiques sur un processus, remplit la table\n"
+    "                  d'incident et déclenche la notification persistante dans `AUDIT.TXT`.\n"
+    },
+    {
+        7,
+        44,
+        "Fonction 44 : plugin_heuristics_expert.c -- plugin_heuristics_init -- Initialisation greffon",
+    "Fonction 44 : plugin_heuristics_expert.c -- plugin_heuristics_init -- Initialisation greffon\n"
+    "  • Signature C : static bool plugin_heuristics_init(void);\n"
+    "  • Utilité     : Prépare les états internes et structures du greffon heuristique.\n"
+    },
+    {
+        7,
+        45,
+        "Fonction 45 : plugin_heuristics_expert.c -- plugin_heuristics_run_audit -- Exécution globale heuristique",
+    "Fonction 45 : plugin_heuristics_expert.c -- plugin_heuristics_run_audit -- Exécution globale heuristique\n"
+    "  • Signature C : static bool plugin_heuristics_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Parcourt `/proc`, identifie les menaces comportementales, compile les cartes\n"
+    "                  d'usurpation et qualifie la criticité défensive globale.\n"
+    },
+    {
+        7,
+        46,
+        "Fonction 46 : plugin_heuristics_expert.c -- plugin_heuristics_cleanup -- Nettoyage greffon",
+    "Fonction 46 : plugin_heuristics_expert.c -- plugin_heuristics_cleanup -- Nettoyage greffon\n"
+    "  • Signature C : static void plugin_heuristics_cleanup(void);\n"
+    "  • Utilité     : Libère les structures locales allouées lors de l'exécution de l'audit.\n"
+    },
+    {
+        7,
+        47,
+        "Fonction 47 : plugin_heuristics_expert.c -- plugin_heuristics_register_constructor -- Auto-enregistrement",
+    "Fonction 47 : plugin_heuristics_expert.c -- plugin_heuristics_register_constructor -- Auto-enregistrement\n"
+    "  • Signature C : __attribute__((constructor)) static void plugin_heuristics_register_constructor(void);\n"
+    "  • Utilité     : Enregistre dynamiquement le greffon heuristique au chargement du programme.\n"
+    },
+    {
+        8,
+        0,
+        "SECTION 8 : MOTEURS DE RESTITUTION UNIVERSELS (src/report/)",
+    "=== SECTION 8 : MOTEURS DE RESTITUTION UNIVERSELS (src/report/) ===\n"
+    "\n"
+    "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formattée\n"
+    "  • Signature C : void raptor_report_cli_print(const RaptorReportContext* ctx);\n"
+    "  • Utilité     : Rendu textuel intégral du rapport dans le terminal avec codes\n"
+    "                  ANSI pour les couleurs de sévérité et colonnage structuré.\n"
+    "\n"
+    "Fonction 49 : report_html.c -- raptor_report_html_generate -- Export de rapport web\n"
+    "  • Signature C : bool raptor_report_html_generate(const RaptorReportContext* ctx, const char* filepath);\n"
+    "  • Utilité     : Génère un rapport d'audit au format HTML souverain autonome avec\n"
+    "                  thème sombre, visualisations interactives et tableaux filtrables.\n"
+    },
+    {
+        8,
+        48,
+        "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formattée",
+    "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formattée\n"
+    "  • Signature C : void raptor_report_cli_print(const RaptorReportContext* ctx);\n"
+    "  • Utilité     : Rendu textuel intégral du rapport dans le terminal avec codes\n"
+    "                  ANSI pour les couleurs de sévérité et colonnage structuré.\n"
+    },
+    {
+        8,
+        49,
+        "Fonction 49 : report_html.c -- raptor_report_html_generate -- Export de rapport web",
+    "Fonction 49 : report_html.c -- raptor_report_html_generate -- Export de rapport web\n"
+    "  • Signature C : bool raptor_report_html_generate(const RaptorReportContext* ctx, const char* filepath);\n"
+    "  • Utilité     : Génère un rapport d'audit au format HTML souverain autonome avec\n"
+    "                  thème sombre, visualisations interactives et tableaux filtrables.\n"
+    },
+    {
+        9,
+        0,
+        "SECTION 9 : MOTEUR GRAPHIQUE ET CONTRÔLEURS DE VUES (src/ui/)",
+    "=== SECTION 9 : MOTEUR GRAPHIQUE ET CONTRÔLEURS DE VUES (src/ui/) ===\n"
+    "\n"
+    "Fonction 50 : ui_engine.c -- raptor_ui_init -- Initialisation graphique Raylib\n"
+    "  • Signature C : bool raptor_ui_init(int width, int height, const char* title);\n"
+    "  • Utilité     : Configure la fenêtre Raylib, applique les dimensions, le titre,\n"
+    "                  la synchronisation verticale (VSync) et la cible de 60 FPS.\n"
+    "\n"
+    "Fonction 51 : ui_engine.c -- raptor_ui_run -- Boucle de surveillance active\n"
+    "  • Signature C : void raptor_ui_run(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Pilote la boucle de rendu principale, orchestre l'affichage des onglets\n"
+    "                  et intègre le timer cyclique de 3s pour le rafraîchissement continu.\n"
+    "\n"
+    "Fonction 52 : ui_engine.c -- raptor_ui_shutdown -- Libération graphique\n"
+    "  • Signature C : void raptor_ui_shutdown(void);\n"
+    "  • Utilité     : Décharge les textures vectorielles (icônes) et détruit proprement\n"
+    "                  la fenêtre graphique Raylib à la fermeture.\n"
+    "\n"
+    "Fonction 53 : view_ai.c -- view_ai_detect_os -- Identification du système hôte\n"
+    "  • Signature C : static void view_ai_detect_os(char* out_name, size_t max_len);\n"
+    "  • Utilité     : Interroge `/etc/os-release` pour afficher le nom exact de la distribution\n"
+    "                  (ex: Linux Mint Debian Edition) dans le bandeau du rapport IA.\n"
+    "\n"
+    "Fonction 54 : view_ai.c -- view_ai_draw_pid_badge -- Affichage badges d'alerte PID\n"
+    "  • Signature C : static float view_ai_draw_pid_badge(const char* role_title, const char* pid_val, float posX, float posY);\n"
+    "  • Utilité     : Dessine un conteneur visuel haute visibilité (bordure jaune vif 2 px,\n"
+    "                  fond sombre, texte blanc) mettant en évidence les identifiants cibles et parents.\n"
+    "\n"
+    "Fonction 55 : view_ai.c -- ui_view_ai_draw -- Contrôleur du rapport IA [ 05 ]\n"
+    "  • Signature C : void ui_view_ai_draw(const RaptorReportContext* ctx);\n"
+    "  • Utilité     : Consolide l'audit explicatif souverain, affiche le modèle Z-Score, trace\n"
+    "                  la lignée du spawn et intègre le garde-fou strict interdisant le kill du PID 1.\n"
+    "\n"
+    "Fonction 56 : view_processes.c -- ui_view_processes_draw -- Contrôleur Processus & RAM [ 02 ]\n"
+    "  • Signature C : void ui_view_processes_draw(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Affiche la table filtrable des processus, gère la sélection interactive,\n"
+    "                  exécute la capture forensique, ordonne le signal de kill et consigne l'événement.\n"
+    },
+    {
+        9,
+        50,
+        "Fonction 50 : ui_engine.c -- raptor_ui_init -- Initialisation graphique Raylib",
+    "Fonction 50 : ui_engine.c -- raptor_ui_init -- Initialisation graphique Raylib\n"
+    "  • Signature C : bool raptor_ui_init(int width, int height, const char* title);\n"
+    "  • Utilité     : Configure la fenêtre Raylib, applique les dimensions, le titre,\n"
+    "                  la synchronisation verticale (VSync) et la cible de 60 FPS.\n"
+    },
+    {
+        9,
+        51,
+        "Fonction 51 : ui_engine.c -- raptor_ui_run -- Boucle de surveillance active",
+    "Fonction 51 : ui_engine.c -- raptor_ui_run -- Boucle de surveillance active\n"
+    "  • Signature C : void raptor_ui_run(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Pilote la boucle de rendu principale, orchestre l'affichage des onglets\n"
+    "                  et intègre le timer cyclique de 3s pour le rafraîchissement continu.\n"
+    },
+    {
+        9,
+        52,
+        "Fonction 52 : ui_engine.c -- raptor_ui_shutdown -- Libération graphique",
+    "Fonction 52 : ui_engine.c -- raptor_ui_shutdown -- Libération graphique\n"
+    "  • Signature C : void raptor_ui_shutdown(void);\n"
+    "  • Utilité     : Décharge les textures vectorielles (icônes) et détruit proprement\n"
+    "                  la fenêtre graphique Raylib à la fermeture.\n"
+    },
+    {
+        9,
+        53,
+        "Fonction 53 : view_ai.c -- view_ai_detect_os -- Identification du système hôte",
+    "Fonction 53 : view_ai.c -- view_ai_detect_os -- Identification du système hôte\n"
+    "  • Signature C : static void view_ai_detect_os(char* out_name, size_t max_len);\n"
+    "  • Utilité     : Interroge `/etc/os-release` pour afficher le nom exact de la distribution\n"
+    "                  (ex: Linux Mint Debian Edition) dans le bandeau du rapport IA.\n"
+    },
+    {
+        9,
+        54,
+        "Fonction 54 : view_ai.c -- view_ai_draw_pid_badge -- Affichage badges d'alerte PID",
+    "Fonction 54 : view_ai.c -- view_ai_draw_pid_badge -- Affichage badges d'alerte PID\n"
+    "  • Signature C : static float view_ai_draw_pid_badge(const char* role_title, const char* pid_val, float posX, float posY);\n"
+    "  • Utilité     : Dessine un conteneur visuel haute visibilité (bordure jaune vif 2 px,\n"
+    "                  fond sombre, texte blanc) mettant en évidence les identifiants cibles et parents.\n"
+    },
+    {
+        9,
+        55,
+        "Fonction 55 : view_ai.c -- ui_view_ai_draw -- Contrôleur du rapport IA [ 05 ]",
+    "Fonction 55 : view_ai.c -- ui_view_ai_draw -- Contrôleur du rapport IA [ 05 ]\n"
+    "  • Signature C : void ui_view_ai_draw(const RaptorReportContext* ctx);\n"
+    "  • Utilité     : Consolide l'audit explicatif souverain, affiche le modèle Z-Score, trace\n"
+    "                  la lignée du spawn et intègre le garde-fou strict interdisant le kill du PID 1.\n"
+    },
+    {
+        9,
+        56,
+        "Fonction 56 : view_processes.c -- ui_view_processes_draw -- Contrôleur Processus & RAM [ 02 ]",
+    "Fonction 56 : view_processes.c -- ui_view_processes_draw -- Contrôleur Processus & RAM [ 02 ]\n"
+    "  • Signature C : void ui_view_processes_draw(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Affiche la table filtrable des processus, gère la sélection interactive,\n"
+    "                  exécute la capture forensique, ordonne le signal de kill et consigne l'événement.\n"
+    },
+    {
+        10,
+        0,
+        "SECTION 10 : POINT D'ENTRÉE DU SYSTÈME (src/main.c)",
+    "=== SECTION 10 : POINT D'ENTRÉE DU SYSTÈME (src/main.c) ===\n"
+    "\n"
+    "Fonction 57 : main.c -- main -- Orchestrateur d'amorçage\n"
+    "  • Signature C : int main(int argc, char** argv);\n"
+    "  • Utilité     : Parse les arguments de ligne de commande (`--cli` ou interface GUI),\n"
+    "                  initialise le registre, lance le premier audit et passe le relais à l'UI.\n"
+    },
+    {
+        10,
+        57,
+        "Fonction 57 : main.c -- main -- Orchestrateur d'amorçage",
+    "Fonction 57 : main.c -- main -- Orchestrateur d'amorçage\n"
+    "  • Signature C : int main(int argc, char** argv);\n"
+    "  • Utilité     : Parse les arguments de ligne de commande (`--cli` ou interface GUI),\n"
+    "                  initialise le registre, lance le premier audit et passe le relais à l'UI.\n"
+    },
+    {
+        11,
+        0,
+        "SECTION 11 : GREFFON RAPTOR NET-GUARD DÉFENSIF (src/plugins/plugin_net_guard.c)",
+    "=== SECTION 11 : GREFFON RAPTOR NET-GUARD DÉFENSIF (src/plugins/plugin_net_guard.c) ===\n"
+    "\n"
+    "Fonction 58 : plugin_net_guard.c -- net_guard_trim -- Assainissement de chaîne\n"
+    "  • Signature C : char* net_guard_trim(char* str);\n"
+    "  • Utilité     : Élimine les espaces blancs et sauts de ligne superflus en début\n"
+    "                  et fin de chaîne pour fiabiliser le parsing des fichiers de règles.\n"
+    "\n"
+    "Fonction 59 : plugin_net_guard.c -- net_guard_validate_ip -- Validation arithmétique IP & CIDR\n"
+    "  • Signature C : bool net_guard_validate_ip(const char* ip_str, uint32_t* out_ip, uint32_t* out_mask, uint16_t* out_port);\n"
+    "  • Utilité     : Contrôle rigoureusement les plages IPv4 (0-255), extrait le port\n"
+    "                  éventuel (1-65535) et calcule le masque binaire réseau à partir de la notation CIDR (/1 à /32).\n"
+    "\n"
+    "Fonction 60 : plugin_net_guard.c -- net_guard_load_file -- Parsing tolérant de registre .conf\n"
+    "  • Signature C : bool net_guard_load_file(const char* filepath, bool is_custom_source);\n"
+    "  • Utilité     : Lit ligne par ligne les fichiers de configuration, ignore les commentaires,\n"
+    "                  segmente les champs par séparateur pipe (|) et peuple les tables mémoires DOM et IP.\n"
+    "\n"
+    "Fonction 61 : plugin_net_guard.c -- net_guard_init -- Initialisation et fusion en RAM\n"
+    "  • Signature C : bool net_guard_init(void);\n"
+    "  • Utilité     : Réinitialise les tables du registre et charge successivement le socle\n"
+    "                  officiel (fw_officiel.conf) puis les ajouts locaux (fw_custom.conf) sans conflit.\n"
+    "\n"
+    "Fonction 62 : plugin_net_guard.c -- net_guard_add_custom_rule -- Sérialisation et persistance IHM\n"
+    "  • Signature C : bool net_guard_add_custom_rule(NetGuardRuleType type, const char* target, const char* param, const char* desc);\n"
+    "  • Utilité     : Formate avec espacements canoniques une nouvelle règle saisie dans l'IHM,\n"
+    "                  l'écrit en mode ajout permanent dans fw_custom.conf et actualise la table active.\n"
+    "\n"
+    "Fonction 63 : plugin_net_guard.c -- net_guard_remove_rule -- Suppression atomique de règle\n"
+    "  • Signature C : bool net_guard_remove_rule(NetGuardRuleType type, size_t index);\n"
+    "  • Utilité     : Supprime une règle personnalisée selon son index mémoire et réécrit\n"
+    "                  proprement l'intégralité du fichier fw_custom.conf sans toucher au registre officiel.\n"
+    "\n"
+    "Fonction 64 : plugin_net_guard.c -- net_guard_match_domain -- Détection anti-combosquatting\n"
+    "  • Signature C : NetGuardVerdict net_guard_match_domain(const char* hostname, char* out_reason, size_t reason_sz);\n"
+    "  • Utilité     : Analyse le nom de domaine demandé, vérifie la présence d'une marque protégée,\n"
+    "                  valide les domaines officiels autorisés et lève l'alerte CRITIQUE si un mot-clé suspect y est accolé.\n"
+    "\n"
+    "Fonction 65 : plugin_net_guard.c -- net_guard_match_ip -- Qualification binaire des endpoints IP\n"
+    "  • Signature C : NetGuardVerdict net_guard_match_ip(const char* remote_ip, uint16_t port, char* out_reason, size_t reason_sz);\n"
+    "  • Utilité     : Applique le masque de sous-réseau sur l'adresse distante pour déterminer\n"
+    "                  instantanément si le socket pointe vers une cible APPROUVÉ (vert) ou HOSTILE (rouge critique).\n"
+    "\n"
+    "Fonction 66 : plugin_net_guard.c -- net_guard_run_audit -- Moteur d'audit périodique réseau\n"
+    "  • Signature C : bool net_guard_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Orchestre la lecture de /proc/net/tcp et /proc/net/udp, confronte chaque\n"
+    "                  connexion active aux tables de règles et peuple la section générique du rapport de sécurité.\n"
+    "\n"
+    "Fonction 67 : plugin_net_guard.c -- net_guard_cleanup -- Déchargement et purge mémoire\n"
+    "  • Signature C : void net_guard_cleanup(void);\n"
+    "  • Utilité     : Remet à zéro l'ensemble des structures de données du registre Net-Guard\n"
+    "                  lors de la fermeture propre de l'application.\n"
+    "\n"
+    "Fonction 68 : plugin_net_guard.c -- net_guard_register -- Auto-enregistrement constructeur GCC\n"
+    "  • Signature C : __attribute__((constructor)) void net_guard_register(void);\n"
+    "  • Utilité     : Enregistre automatiquement la structure RaptorPlugin de Net-Guard auprès\n"
+    "                  du bus central raptor_registry dès le chargement du binaire en mémoire.\n"
+    "\n"
+    "Fonction 69 : plugin_net_guard.c -- net_guard_update_official_rules -- Rapatriement atomique GitHub\n"
+    "  • Signature C : bool net_guard_update_official_rules(void);\n"
+    "  • Utilité     : Télécharge la dernière mouture de fw_officiel.conf via curl vers un fichier\n"
+    "                  temporaire (.tmp), valide l'en-tête de conformité et applique un remplacement atomique POSIX (rename).\n"
+    },
+    {
+        11,
+        58,
+        "Fonction 58 : plugin_net_guard.c -- net_guard_trim -- Assainissement de chaîne",
+    "Fonction 58 : plugin_net_guard.c -- net_guard_trim -- Assainissement de chaîne\n"
+    "  • Signature C : char* net_guard_trim(char* str);\n"
+    "  • Utilité     : Élimine les espaces blancs et sauts de ligne superflus en début\n"
+    "                  et fin de chaîne pour fiabiliser le parsing des fichiers de règles.\n"
+    },
+    {
+        11,
+        59,
+        "Fonction 59 : plugin_net_guard.c -- net_guard_validate_ip -- Validation arithmétique IP & CIDR",
+    "Fonction 59 : plugin_net_guard.c -- net_guard_validate_ip -- Validation arithmétique IP & CIDR\n"
+    "  • Signature C : bool net_guard_validate_ip(const char* ip_str, uint32_t* out_ip, uint32_t* out_mask, uint16_t* out_port);\n"
+    "  • Utilité     : Contrôle rigoureusement les plages IPv4 (0-255), extrait le port\n"
+    "                  éventuel (1-65535) et calcule le masque binaire réseau à partir de la notation CIDR (/1 à /32).\n"
+    },
+    {
+        11,
+        60,
+        "Fonction 60 : plugin_net_guard.c -- net_guard_load_file -- Parsing tolérant de registre .conf",
+    "Fonction 60 : plugin_net_guard.c -- net_guard_load_file -- Parsing tolérant de registre .conf\n"
+    "  • Signature C : bool net_guard_load_file(const char* filepath, bool is_custom_source);\n"
+    "  • Utilité     : Lit ligne par ligne les fichiers de configuration, ignore les commentaires,\n"
+    "                  segmente les champs par séparateur pipe (|) et peuple les tables mémoires DOM et IP.\n"
+    },
+    {
+        11,
+        61,
+        "Fonction 61 : plugin_net_guard.c -- net_guard_init -- Initialisation et fusion en RAM",
+    "Fonction 61 : plugin_net_guard.c -- net_guard_init -- Initialisation et fusion en RAM\n"
+    "  • Signature C : bool net_guard_init(void);\n"
+    "  • Utilité     : Réinitialise les tables du registre et charge successivement le socle\n"
+    "                  officiel (fw_officiel.conf) puis les ajouts locaux (fw_custom.conf) sans conflit.\n"
+    },
+    {
+        11,
+        62,
+        "Fonction 62 : plugin_net_guard.c -- net_guard_add_custom_rule -- Sérialisation et persistance IHM",
+    "Fonction 62 : plugin_net_guard.c -- net_guard_add_custom_rule -- Sérialisation et persistance IHM\n"
+    "  • Signature C : bool net_guard_add_custom_rule(NetGuardRuleType type, const char* target, const char* param, const char* desc);\n"
+    "  • Utilité     : Formate avec espacements canoniques une nouvelle règle saisie dans l'IHM,\n"
+    "                  l'écrit en mode ajout permanent dans fw_custom.conf et actualise la table active.\n"
+    },
+    {
+        11,
+        63,
+        "Fonction 63 : plugin_net_guard.c -- net_guard_remove_rule -- Suppression atomique de règle",
+    "Fonction 63 : plugin_net_guard.c -- net_guard_remove_rule -- Suppression atomique de règle\n"
+    "  • Signature C : bool net_guard_remove_rule(NetGuardRuleType type, size_t index);\n"
+    "  • Utilité     : Supprime une règle personnalisée selon son index mémoire et réécrit\n"
+    "                  proprement l'intégralité du fichier fw_custom.conf sans toucher au registre officiel.\n"
+    },
+    {
+        11,
+        64,
+        "Fonction 64 : plugin_net_guard.c -- net_guard_match_domain -- Détection anti-combosquatting",
+    "Fonction 64 : plugin_net_guard.c -- net_guard_match_domain -- Détection anti-combosquatting\n"
+    "  • Signature C : NetGuardVerdict net_guard_match_domain(const char* hostname, char* out_reason, size_t reason_sz);\n"
+    "  • Utilité     : Analyse le nom de domaine demandé, vérifie la présence d'une marque protégée,\n"
+    "                  valide les domaines officiels autorisés et lève l'alerte CRITIQUE si un mot-clé suspect y est accolé.\n"
+    },
+    {
+        11,
+        65,
+        "Fonction 65 : plugin_net_guard.c -- net_guard_match_ip -- Qualification binaire des endpoints IP",
+    "Fonction 65 : plugin_net_guard.c -- net_guard_match_ip -- Qualification binaire des endpoints IP\n"
+    "  • Signature C : NetGuardVerdict net_guard_match_ip(const char* remote_ip, uint16_t port, char* out_reason, size_t reason_sz);\n"
+    "  • Utilité     : Applique le masque de sous-réseau sur l'adresse distante pour déterminer\n"
+    "                  instantanément si le socket pointe vers une cible APPROUVÉ (vert) ou HOSTILE (rouge critique).\n"
+    },
+    {
+        11,
+        66,
+        "Fonction 66 : plugin_net_guard.c -- net_guard_run_audit -- Moteur d'audit périodique réseau",
+    "Fonction 66 : plugin_net_guard.c -- net_guard_run_audit -- Moteur d'audit périodique réseau\n"
+    "  • Signature C : bool net_guard_run_audit(RaptorReportContext* ctx);\n"
+    "  • Utilité     : Orchestre la lecture de /proc/net/tcp et /proc/net/udp, confronte chaque\n"
+    "                  connexion active aux tables de règles et peuple la section générique du rapport de sécurité.\n"
+    },
+    {
+        11,
+        67,
+        "Fonction 67 : plugin_net_guard.c -- net_guard_cleanup -- Déchargement et purge mémoire",
+    "Fonction 67 : plugin_net_guard.c -- net_guard_cleanup -- Déchargement et purge mémoire\n"
+    "  • Signature C : void net_guard_cleanup(void);\n"
+    "  • Utilité     : Remet à zéro l'ensemble des structures de données du registre Net-Guard\n"
+    "                  lors de la fermeture propre de l'application.\n"
+    },
+    {
+        11,
+        68,
+        "Fonction 68 : plugin_net_guard.c -- net_guard_register -- Auto-enregistrement constructeur GCC",
+    "Fonction 68 : plugin_net_guard.c -- net_guard_register -- Auto-enregistrement constructeur GCC\n"
+    "  • Signature C : __attribute__((constructor)) void net_guard_register(void);\n"
+    "  • Utilité     : Enregistre automatiquement la structure RaptorPlugin de Net-Guard auprès\n"
+    "                  du bus central raptor_registry dès le chargement du binaire en mémoire.\n"
+    },
+    {
+        11,
+        69,
+        "Fonction 69 : plugin_net_guard.c -- net_guard_update_official_rules -- Rapatriement atomique GitHub",
+    "Fonction 69 : plugin_net_guard.c -- net_guard_update_official_rules -- Rapatriement atomique GitHub\n"
+    "  • Signature C : bool net_guard_update_official_rules(void);\n"
+    "  • Utilité     : Télécharge la dernière mouture de fw_officiel.conf via curl vers un fichier\n"
+    "                  temporaire (.tmp), valide l'en-tête de conformité et applique un remplacement atomique POSIX (rename).\n"
+    },
+    {
+        12,
+        0,
+        "SECTION 12 : RENSEIGNEMENT RÉSEAU, BGP & CDN INTEL (src/plugins/plugin_asn_intel.c)",
+    "=== SECTION 12 : RENSEIGNEMENT RÉSEAU, BGP & CDN INTEL (src/plugins/plugin_asn_intel.c) ===\n"
+    "\n"
+    "Fonction 71 : plugin_asn_intel.c -- asn_intel_trim -- Nettoyage canonique\n"
+    "  • Signature C : static char* asn_intel_trim(char* str);\n"
+    "  • Utilité     : Nettoyage canonique des espaces blancs en tête et queue de chaîne.\n"
+    "\n"
+    "Fonction 72 : plugin_asn_intel.c -- asn_intel_parse_cidr -- Décomposition CIDR\n"
+    "  • Signature C : static bool asn_intel_parse_cidr(const char* cidr, uint32_t* out_net, uint32_t* out_mask);\n"
+    "  • Utilité     : Décomposition arithmétique d'une notation CIDR (X.X.X.X/YY), extraction de\n"
+    "                  l'adresse réseau hôte et génération du masque binaire 32 bits.\n"
+    "\n"
+    "Fonction 73 : plugin_asn_intel.c -- asn_intel_load_file -- Parsing à chaud table_static.conf\n"
+    "  • Signature C : static bool asn_intel_load_file(const char* filepath);\n"
+    "  • Utilité     : Chargement dynamique de `assets/rules/table_static.conf` pour peupler la table\n"
+    "                  des plages IP de confiance sans recompilation du binaire.\n"
+    "\n"
+    "Fonction 74 : plugin_asn_intel.c -- asn_intel_match_static -- Évaluation arithmétique locale\n"
+    "  • Signature C : static bool asn_intel_match_static(uint32_t ip, char* out_name, size_t max_len);\n"
+    "  • Utilité     : Évaluation instantanée (0 ms) contre les infrastructures répertoriées via\n"
+    "                  l'opération binaire `(ip & mask) == (net & mask)`.\n"
+    "\n"
+    "Fonction 75 : plugin_asn_intel.c -- asn_intel_query_bgp -- Sonde DNS TXT BGP\n"
+    "  • Signature C : static bool asn_intel_query_bgp(const char* ip_str, uint32_t* out_asn, char* out_cc, size_t cc_sz);\n"
+    "  • Utilité     : Résolution DNS de secours vers le registre Team Cymru (`origin.asn.cymru.com`)\n"
+    "                  pour identifier le numéro d'ASN et le code pays ISO des adresses inconnues.\n"
+    "\n"
+    "Fonction 76 : plugin_asn_intel.c -- asn_intel_lookup -- Moteur central en cascade\n"
+    "  • Signature C : bool raptor_asn_intel_lookup(const char* ip_str, char* out_name, size_t max_len);\n"
+    "  • Utilité     : Cascade d'investigation : 1. Cache dynamique -> 2. `table_static.conf` (0 ms) -> 3. Sonde DNS BGP.\n"
+    "\n"
+    "Fonction 77 : plugin_asn_intel.c -- asn_intel_init -- Initialisation greffon ASN\n"
+    "  • Signature C : static bool asn_intel_init(void);\n"
+    "  • Utilité     : Prépare le mutex d'exclusion mutuelle, configure les caches et charge les règles réseau.\n"
+    "\n"
+    "Fonction 78 : plugin_asn_intel.c -- asn_intel_cleanup -- Vidange et arrêt\n"
+    "  • Signature C : static void asn_intel_cleanup(void);\n"
+    "  • Utilité     : Purge l'intégralité des structures mémoires et détruit le verrou d'exclusion mutuelle.\n"
+    "\n"
+    "Fonction 79 : plugin_asn_intel.c -- asn_intel_register -- Auto-enregistrement\n"
+    "  • Signature C : __attribute__((constructor)) static void asn_intel_register(void);\n"
+    "  • Utilité     : Enregistrement constructeur GCC du greffon sur le bus RaptorPlugin.\n"
+    },
+    {
+        12,
+        71,
+        "Fonction 71 : plugin_asn_intel.c -- asn_intel_trim -- Nettoyage canonique",
+    "Fonction 71 : plugin_asn_intel.c -- asn_intel_trim -- Nettoyage canonique\n"
+    "  • Signature C : static char* asn_intel_trim(char* str);\n"
+    "  • Utilité     : Nettoyage canonique des espaces blancs en tête et queue de chaîne.\n"
+    },
+    {
+        12,
+        72,
+        "Fonction 72 : plugin_asn_intel.c -- asn_intel_parse_cidr -- Décomposition CIDR",
+    "Fonction 72 : plugin_asn_intel.c -- asn_intel_parse_cidr -- Décomposition CIDR\n"
+    "  • Signature C : static bool asn_intel_parse_cidr(const char* cidr, uint32_t* out_net, uint32_t* out_mask);\n"
+    "  • Utilité     : Décomposition arithmétique d'une notation CIDR (X.X.X.X/YY), extraction de\n"
+    "                  l'adresse réseau hôte et génération du masque binaire 32 bits.\n"
+    },
+    {
+        12,
+        73,
+        "Fonction 73 : plugin_asn_intel.c -- asn_intel_load_file -- Parsing à chaud table_static.conf",
+    "Fonction 73 : plugin_asn_intel.c -- asn_intel_load_file -- Parsing à chaud table_static.conf\n"
+    "  • Signature C : static bool asn_intel_load_file(const char* filepath);\n"
+    "  • Utilité     : Chargement dynamique de `assets/rules/table_static.conf` pour peupler la table\n"
+    "                  des plages IP de confiance sans recompilation du binaire.\n"
+    },
+    {
+        12,
+        74,
+        "Fonction 74 : plugin_asn_intel.c -- asn_intel_match_static -- Évaluation arithmétique locale",
+    "Fonction 74 : plugin_asn_intel.c -- asn_intel_match_static -- Évaluation arithmétique locale\n"
+    "  • Signature C : static bool asn_intel_match_static(uint32_t ip, char* out_name, size_t max_len);\n"
+    "  • Utilité     : Évaluation instantanée (0 ms) contre les infrastructures répertoriées via\n"
+    "                  l'opération binaire `(ip & mask) == (net & mask)`.\n"
+    },
+    {
+        12,
+        75,
+        "Fonction 75 : plugin_asn_intel.c -- asn_intel_query_bgp -- Sonde DNS TXT BGP",
+    "Fonction 75 : plugin_asn_intel.c -- asn_intel_query_bgp -- Sonde DNS TXT BGP\n"
+    "  • Signature C : static bool asn_intel_query_bgp(const char* ip_str, uint32_t* out_asn, char* out_cc, size_t cc_sz);\n"
+    "  • Utilité     : Résolution DNS de secours vers le registre Team Cymru (`origin.asn.cymru.com`)\n"
+    "                  pour identifier le numéro d'ASN et le code pays ISO des adresses inconnues.\n"
+    },
+    {
+        12,
+        76,
+        "Fonction 76 : plugin_asn_intel.c -- asn_intel_lookup -- Moteur central en cascade",
+    "Fonction 76 : plugin_asn_intel.c -- asn_intel_lookup -- Moteur central en cascade\n"
+    "  • Signature C : bool raptor_asn_intel_lookup(const char* ip_str, char* out_name, size_t max_len);\n"
+    "  • Utilité     : Cascade d'investigation : 1. Cache dynamique -> 2. `table_static.conf` (0 ms) -> 3. Sonde DNS BGP.\n"
+    },
+    {
+        12,
+        77,
+        "Fonction 77 : plugin_asn_intel.c -- asn_intel_init -- Initialisation greffon ASN",
+    "Fonction 77 : plugin_asn_intel.c -- asn_intel_init -- Initialisation greffon ASN\n"
+    "  • Signature C : static bool asn_intel_init(void);\n"
+    "  • Utilité     : Prépare le mutex d'exclusion mutuelle, configure les caches et charge les règles réseau.\n"
+    },
+    {
+        12,
+        78,
+        "Fonction 78 : plugin_asn_intel.c -- asn_intel_cleanup -- Vidange et arrêt",
+    "Fonction 78 : plugin_asn_intel.c -- asn_intel_cleanup -- Vidange et arrêt\n"
+    "  • Signature C : static void asn_intel_cleanup(void);\n"
+    "  • Utilité     : Purge l'intégralité des structures mémoires et détruit le verrou d'exclusion mutuelle.\n"
+    },
+    {
+        12,
+        79,
+        "Fonction 79 : plugin_asn_intel.c -- asn_intel_register -- Auto-enregistrement",
+    "Fonction 79 : plugin_asn_intel.c -- asn_intel_register -- Auto-enregistrement\n"
+    "  • Signature C : __attribute__((constructor)) static void asn_intel_register(void);\n"
+    "  • Utilité     : Enregistrement constructeur GCC du greffon sur le bus RaptorPlugin.\n"
+    },
+    {
+        13,
+        0,
+        "SECTION 13 : TRAQUE MÉMOIRE ANONYME & MUTATIONS R-X (src/core/mem_stealth.c)",
+    "=== SECTION 13 : TRAQUE MÉMOIRE ANONYME & MUTATIONS R-X (src/core/mem_stealth.c) ===\n"
+    "\n"
+    "Fonction 80 : mem_stealth.c -- mem_stealth_whitelist_load -- Chargement liste blanche\n"
+    "  • Signature C : bool mem_stealth_whitelist_load(const char* filepath);\n"
+    "  • Utilité     : Charge et analyse `assets/rules/mem_whitelist.conf` (format `TYPE | MOTIF | DESC`),\n"
+    "                  éliminant les faux positifs structurels sur le code dynamique.\n"
+    "\n"
+    "Fonction 81 : mem_stealth.c -- mem_stealth_is_whitelisted -- Filtrage exceptions légitimes\n"
+    "  • Signature C : bool mem_stealth_is_whitelisted(const char* comm, const char* exe);\n"
+    "  • Utilité     : Vérifie si un processus correspond à une signature autorisée (navigateurs,\n"
+    "                  Flatpak, environnements de bureau Cinnamon/GNOME/KDE).\n"
+    "\n"
+    "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0\n"
+    "  • Signature C : bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe, StealthEvent* ev_out);\n"
+    "  • Utilité     : Analyse `/proc/[PID]/maps` pour isoler les allocations anonymes rendues\n"
+    "                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque.\n"
+    "\n"
+    "Fonction 83 : mem_stealth.c -- mem_stealth_dispatch_diff_event -- Propagation différentielle\n"
+    "  • Signature C : void mem_stealth_dispatch_diff_event(const StealthEvent* ev);\n"
+    "  • Utilité     : Injecte les alertes forensiques d'injection dans le tampon circulaire du\n"
+    "                  Cahier Différentiel (Onglet 4).\n"
+    },
+    {
+        13,
+        80,
+        "Fonction 80 : mem_stealth.c -- mem_stealth_whitelist_load -- Chargement liste blanche",
+    "Fonction 80 : mem_stealth.c -- mem_stealth_whitelist_load -- Chargement liste blanche\n"
+    "  • Signature C : bool mem_stealth_whitelist_load(const char* filepath);\n"
+    "  • Utilité     : Charge et analyse `assets/rules/mem_whitelist.conf` (format `TYPE | MOTIF | DESC`),\n"
+    "                  éliminant les faux positifs structurels sur le code dynamique.\n"
+    },
+    {
+        13,
+        81,
+        "Fonction 81 : mem_stealth.c -- mem_stealth_is_whitelisted -- Filtrage exceptions légitimes",
+    "Fonction 81 : mem_stealth.c -- mem_stealth_is_whitelisted -- Filtrage exceptions légitimes\n"
+    "  • Signature C : bool mem_stealth_is_whitelisted(const char* comm, const char* exe);\n"
+    "  • Utilité     : Vérifie si un processus correspond à une signature autorisée (navigateurs,\n"
+    "                  Flatpak, environnements de bureau Cinnamon/GNOME/KDE).\n"
+    },
+    {
+        13,
+        82,
+        "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0",
+    "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0\n"
+    "  • Signature C : bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe, StealthEvent* ev_out);\n"
+    "  • Utilité     : Analyse `/proc/[PID]/maps` pour isoler les allocations anonymes rendues\n"
+    "                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque.\n"
+    },
+    {
+        13,
+        83,
+        "Fonction 83 : mem_stealth.c -- mem_stealth_dispatch_diff_event -- Propagation différentielle",
+    "Fonction 83 : mem_stealth.c -- mem_stealth_dispatch_diff_event -- Propagation différentielle\n"
+    "  • Signature C : void mem_stealth_dispatch_diff_event(const StealthEvent* ev);\n"
+    "  • Utilité     : Injecte les alertes forensiques d'injection dans le tampon circulaire du\n"
+    "                  Cahier Différentiel (Onglet 4).\n"
+    },
+    {
+        14,
+        0,
+        "SECTION 14 : DÉTECTION DES DÉTOURNEMENTS LD_PRELOAD (src/core/preload_hunter.c)",
+    "=== SECTION 14 : DÉTECTION DES DÉTOURNEMENTS LD_PRELOAD (src/core/preload_hunter.c) ===\n"
+    "\n"
+    "Fonction 84 : preload_hunter.c -- preload_hunter_check_global -- Audit intégrité globale\n"
+    "  • Signature C : bool preload_hunter_check_global(char* out_path, size_t out_len);\n"
+    "  • Utilité     : Détecte la persistance d'un rootkit utilisateur en vérifiant l'accès\n"
+    "                  et le contenu de `/etc/ld.so.preload`.\n"
+    "\n"
+    "Fonction 85 : preload_hunter.c -- preload_hunter_scan_process_env -- Audit variables d'environnement\n"
+    "  • Signature C : bool preload_hunter_scan_process_env(pid_t pid, char* out_preload_lib, size_t out_len);\n"
+    "  • Utilité     : Scanne `/proc/[PID]/environ` (délimiteurs `\\0`) pour intercepter\n"
+    "                  toute injection ciblée via la variable `LD_PRELOAD=`.\n"
+    },
+    {
+        14,
+        84,
+        "Fonction 84 : preload_hunter.c -- preload_hunter_check_global -- Audit intégrité globale",
+    "Fonction 84 : preload_hunter.c -- preload_hunter_check_global -- Audit intégrité globale\n"
+    "  • Signature C : bool preload_hunter_check_global(char* out_path, size_t out_len);\n"
+    "  • Utilité     : Détecte la persistance d'un rootkit utilisateur en vérifiant l'accès\n"
+    "                  et le contenu de `/etc/ld.so.preload`.\n"
+    },
+    {
+        14,
+        85,
+        "Fonction 85 : preload_hunter.c -- preload_hunter_scan_process_env -- Audit variables d'environnement",
+    "Fonction 85 : preload_hunter.c -- preload_hunter_scan_process_env -- Audit variables d'environnement\n"
+    "  • Signature C : bool preload_hunter_scan_process_env(pid_t pid, char* out_preload_lib, size_t out_len);\n"
+    "  • Utilité     : Scanne `/proc/[PID]/environ` (délimiteurs `\\0`) pour intercepter\n"
+    "                  toute injection ciblée via la variable `LD_PRELOAD=`.\n"
+    },
+    {
+        15,
+        0,
+        "SECTION 15 : NOTIFICATIONS BUREAU ASYNCHRONES (src/core/raptor_notify.c)",
+    "=== SECTION 15 : NOTIFICATIONS BUREAU ASYNCHRONES (src/core/raptor_notify.c) ===\n"
+    "\n"
+    "Fonction 86 : raptor_notify.c -- raptor_notify_send_desktop -- Émission asynchrone FreeDesktop\n"
+    "  • Signature C : void raptor_notify_send_desktop(const char* title, const char* body, bool is_critical);\n"
+    "  • Utilité     : Envoie une notification via `notify-send` avec double fork (`fork()` / `_exit(0)`)\n"
+    "                  garantissant zéro saccade graphique sur la boucle Raylib (60 FPS).\n"
+    "\n"
+    "Fonction 87 : raptor_notify.c -- raptor_notify_evaluate_threats -- Arbitrage d'alertes\n"
+    "  • Signature C : void raptor_notify_evaluate_threats(int current_threats, const char* primary_threat_name);\n"
+    "  • Utilité     : Filtre anti-rebond temporel (30 secondes) déclenchant l'alerte sur\n"
+    "                  transition critique et signalant le retour au calme.\n"
+    },
+    {
+        15,
+        86,
+        "Fonction 86 : raptor_notify.c -- raptor_notify_send_desktop -- Émission asynchrone FreeDesktop",
+    "Fonction 86 : raptor_notify.c -- raptor_notify_send_desktop -- Émission asynchrone FreeDesktop\n"
+    "  • Signature C : void raptor_notify_send_desktop(const char* title, const char* body, bool is_critical);\n"
+    "  • Utilité     : Envoie une notification via `notify-send` avec double fork (`fork()` / `_exit(0)`)\n"
+    "                  garantissant zéro saccade graphique sur la boucle Raylib (60 FPS).\n"
+    },
+    {
+        15,
+        87,
+        "Fonction 87 : raptor_notify.c -- raptor_notify_evaluate_threats -- Arbitrage d'alertes",
+    "Fonction 87 : raptor_notify.c -- raptor_notify_evaluate_threats -- Arbitrage d'alertes\n"
+    "  • Signature C : void raptor_notify_evaluate_threats(int current_threats, const char* primary_threat_name);\n"
+    "  • Utilité     : Filtre anti-rebond temporel (30 secondes) déclenchant l'alerte sur\n"
+    "                  transition critique et signalant le retour au calme.\n"
+    },
+    {
+        16,
+        0,
+        "SECTION 16 : MODE CLI DE SECOURS & OUTILS CHIRURGICAUX (src/cli/)",
+    "=== SECTION 16 : MODE CLI DE SECOURS & OUTILS CHIRURGICAUX (src/cli/) ===\n"
+    "\n"
+    "Fonction 88 : rap_main.c -- rap_dispatch_command -- Micro-routeur déclaratif\n"
+    "  • Signature C : int rap_dispatch_command(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Achemine les requêtes CLI vers les gestionnaires spécialisés via la\n"
+    "                  table déclarative `g_commands`.\n"
+    "\n"
+    "Fonction 89 : cmd_status.c -- rap_cmd_status -- Bilan vital instantané\n"
+    "  • Signature C : int rap_cmd_status(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Diagnostic vital en moins de 15 ms (RAM totale, processus actifs,\n"
+    "                  intégrité de `/etc/ld.so.preload`).\n"
+    "\n"
+    "Fonction 90 : cmd_top.c -- rap_cmd_top -- Top consommateurs VmRSS\n"
+    "  • Signature C : int rap_cmd_top(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Trie les processus par mémoire résidente physique réelle sans\n"
+    "                  allocation sur le tas (tri d'insertion statique sur la pile).\n"
+    "\n"
+    "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné\n"
+    "  • Signature C : int rap_cmd_hunt(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Enchaîne séquentiellement la traque Inode 0 (`rx`), les détournements\n"
+    "                  dynamiques (`preload`) et l'analyse heuristique (`heur`).\n"
+    "\n"
+    "Fonction 92 : cmd_rx.c -- rap_cmd_rx -- Traque mutations exécutables Inode 0\n"
+    "  • Signature C : int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Repère les allocations mémoires anonymes exécutables (`r-xp`)\n"
+    "                  dans `/proc/[PID]/maps` avec filtrage de liste blanche (`-v` pour mode étendu).\n"
+    "\n"
+    "Fonction 93 : cmd_preload.c -- rap_cmd_preload -- Chasseur LD_PRELOAD\n"
+    "  • Signature C : int rap_cmd_preload(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Détecte les rootkits userland via le contrôle double palier\n"
+    "                  (`/etc/ld.so.preload` et `/proc/[PID]/environ`).\n"
+    "\n"
+    "Fonction 94 : cmd_net.c -- rap_cmd_net -- Audit réseau Net-Guard\n"
+    "  • Signature C : int rap_cmd_net(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Analyse `/proc/net/tcp` et qualifie instantanément les connexions\n"
+    "                  actives (APPROUVÉ, EXTERNE, SUSPECT, HOSTILE).\n"
+    "\n"
+    "Fonction 95 : cmd_kill.c -- rap_cmd_kill -- Neutralisation cinétique chirurgicale\n"
+    "  • Signature C : int rap_cmd_kill(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Émet le signal non rattrapable `SIGKILL` avec validation préalable\n"
+    "                  par `rap_check_safety_pid` et confirmation interactive (`-f` pour forcer).\n"
+    "\n"
+    "Fonction 96 : cmd_kill.c -- rap_cmd_freeze -- Suspension conservatoire forensique\n"
+    "  • Signature C : int rap_cmd_freeze(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Gèle un processus suspect via `SIGSTOP` (état `T`) pour figer son\n"
+    "                  activité tout en préservant sa mémoire vive pour analyse forensique.\n"
+    "\n"
+    "Fonction 97 : cmd_man.c -- rap_cmd_man -- Manuel de référence unifié embarqué\n"
+    "  • Signature C : int rap_cmd_man(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Restitue le manuel complet stocké en mémoire morte (`.rodata`),\n"
+    "                  avec bascule automatique vers le téléscripteur `rapless` sur terminal interactif.\n"
+    "\n"
+    "Fonction 98 : rap_common.c -- rap_output_formatter -- Formatage d'affichage universel\n"
+    "  • Signature C : void rap_output_formatter(const RapConfig *cfg, const char *c1, const char *c2, const char *c3, const char *c4);\n"
+    "  • Utilité     : Formate les flux d'audit sur 4 colonnes régulières en mode interactif\n"
+    "                  ou en flux brut délimité par tabulations (`\\t`) en mode `--raw`.\n"
+    "\n"
+    "Fonction 99 : rap_common.c -- rap_check_safety_pid -- Barrière de sécurité cinétique\n"
+    "  • Signature C : int rap_check_safety_pid(const RapConfig *cfg, pid_t pid);\n"
+    "  • Utilité     : Empêche les arrêts accidentels en rejetant le tir sur PID 1,\n"
+    "                  sur soi-même, sur le shell parent et sur les threads internes du noyau.\n"
+    "\n"
+    "Fonction 100 : rap_main.c -- rap_parse_flags -- Parseur d'arguments et drapeaux\n"
+    "  • Signature C : int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg);\n"
+    "  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-n`, `-h`),\n"
+    "                  détecte le mode TTY (`isatty`) et isole le verbe d'action dans `argv`.\n"
+    "\n"
+    "Fonction 107 : rap_common.c -- rap_is_mem_whitelisted -- Filtrage liste blanche mémoire\n"
+    "  • Signature C : int rap_is_mem_whitelisted(const char *comm);\n"
+    "  • Utilité     : Vérifie si un processus figure dans `mem_whitelist.conf` en gérant\n"
+    "                  la troncature noyau à 15 caractères sans allocation dynamique.\n"
+    "\n"
+    "Fonction 108 : rap_common.c -- rap_net_eval_ip -- Qualification CIDR d'endpoint IP\n"
+    "  • Signature C : int rap_net_eval_ip(uint32_t ip, uint16_t port, char *out_desc, size_t desc_size);\n"
+    "  • Utilité     : Évalue une adresse IP contre les registres `fw_officiel.conf` et `fw_custom.conf`\n"
+    "                  pour retourner son niveau de confiance (APPROUVÉ, STANDARD, SUSPECT, HOSTILE).\n"
+    "\n"
+    "Fonction 109 : cmd_heur.c -- rap_cmd_heur -- Traque des anomalies d'exécution\n"
+    "  • Signature C : int rap_cmd_heur(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Parcourt `/proc`, résout `/proc/[PID]/exe` et projette les anomalies\n"
+    "                  comportementales identifiées sur la console de secours.\n"
+    "\n"
+    "Fonction 110 : cmd_heur.c -- rap_heur_check_process -- Évaluation unitaire heuristique\n"
+    "  • Signature C : int rap_heur_check_process(pid_t pid, const char *comm, const char *exe_path, char *out_anomaly, size_t out_sz);\n"
+    "  • Utilité     : Évalue un processus selon trois axes sans allocation dynamique :\n"
+    "                  1. Binaires supprimés du disque en cours d'exécution (`(deleted)`).\n"
+    "                  2. Exécutions depuis des zones volatiles suspectes (`/tmp`, `/dev/shm`).\n"
+    "                  3. Usurpation d'identité de démons systèmes (*Masquerading*).\n"
+    },
+    {
+        16,
+        88,
+        "Fonction 88 : rap_main.c -- rap_dispatch_command -- Micro-routeur déclaratif",
+    "Fonction 88 : rap_main.c -- rap_dispatch_command -- Micro-routeur déclaratif\n"
+    "  • Signature C : int rap_dispatch_command(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Achemine les requêtes CLI vers les gestionnaires spécialisés via la\n"
+    "                  table déclarative `g_commands`.\n"
+    },
+    {
+        16,
+        89,
+        "Fonction 89 : cmd_status.c -- rap_cmd_status -- Bilan vital instantané",
+    "Fonction 89 : cmd_status.c -- rap_cmd_status -- Bilan vital instantané\n"
+    "  • Signature C : int rap_cmd_status(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Diagnostic vital en moins de 15 ms (RAM totale, processus actifs,\n"
+    "                  intégrité de `/etc/ld.so.preload`).\n"
+    },
+    {
+        16,
+        90,
+        "Fonction 90 : cmd_top.c -- rap_cmd_top -- Top consommateurs VmRSS",
+    "Fonction 90 : cmd_top.c -- rap_cmd_top -- Top consommateurs VmRSS\n"
+    "  • Signature C : int rap_cmd_top(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Trie les processus par mémoire résidente physique réelle sans\n"
+    "                  allocation sur le tas (tri d'insertion statique sur la pile).\n"
+    },
+    {
+        16,
+        91,
+        "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné",
+    "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné\n"
+    "  • Signature C : int rap_cmd_hunt(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Enchaîne séquentiellement la traque Inode 0 (`rx`), les détournements\n"
+    "                  dynamiques (`preload`) et l'analyse heuristique (`heur`).\n"
+    },
+    {
+        16,
+        92,
+        "Fonction 92 : cmd_rx.c -- rap_cmd_rx -- Traque mutations exécutables Inode 0",
+    "Fonction 92 : cmd_rx.c -- rap_cmd_rx -- Traque mutations exécutables Inode 0\n"
+    "  • Signature C : int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Repère les allocations mémoires anonymes exécutables (`r-xp`)\n"
+    "                  dans `/proc/[PID]/maps` avec filtrage de liste blanche (`-v` pour mode étendu).\n"
+    },
+    {
+        16,
+        93,
+        "Fonction 93 : cmd_preload.c -- rap_cmd_preload -- Chasseur LD_PRELOAD",
+    "Fonction 93 : cmd_preload.c -- rap_cmd_preload -- Chasseur LD_PRELOAD\n"
+    "  • Signature C : int rap_cmd_preload(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Détecte les rootkits userland via le contrôle double palier\n"
+    "                  (`/etc/ld.so.preload` et `/proc/[PID]/environ`).\n"
+    },
+    {
+        16,
+        94,
+        "Fonction 94 : cmd_net.c -- rap_cmd_net -- Audit réseau Net-Guard",
+    "Fonction 94 : cmd_net.c -- rap_cmd_net -- Audit réseau Net-Guard\n"
+    "  • Signature C : int rap_cmd_net(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Analyse `/proc/net/tcp` et qualifie instantanément les connexions\n"
+    "                  actives (APPROUVÉ, EXTERNE, SUSPECT, HOSTILE).\n"
+    },
+    {
+        16,
+        95,
+        "Fonction 95 : cmd_kill.c -- rap_cmd_kill -- Neutralisation cinétique chirurgicale",
+    "Fonction 95 : cmd_kill.c -- rap_cmd_kill -- Neutralisation cinétique chirurgicale\n"
+    "  • Signature C : int rap_cmd_kill(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Émet le signal non rattrapable `SIGKILL` avec validation préalable\n"
+    "                  par `rap_check_safety_pid` et confirmation interactive (`-f` pour forcer).\n"
+    },
+    {
+        16,
+        96,
+        "Fonction 96 : cmd_kill.c -- rap_cmd_freeze -- Suspension conservatoire forensique",
+    "Fonction 96 : cmd_kill.c -- rap_cmd_freeze -- Suspension conservatoire forensique\n"
+    "  • Signature C : int rap_cmd_freeze(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Gèle un processus suspect via `SIGSTOP` (état `T`) pour figer son\n"
+    "                  activité tout en préservant sa mémoire vive pour analyse forensique.\n"
+    },
+    {
+        16,
+        97,
+        "Fonction 97 : cmd_man.c -- rap_cmd_man -- Manuel de référence unifié embarqué",
+    "Fonction 97 : cmd_man.c -- rap_cmd_man -- Manuel de référence unifié embarqué\n"
+    "  • Signature C : int rap_cmd_man(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Restitue le manuel complet stocké en mémoire morte (`.rodata`),\n"
+    "                  avec bascule automatique vers le téléscripteur `rapless` sur terminal interactif.\n"
+    },
+    {
+        16,
+        98,
+        "Fonction 98 : rap_common.c -- rap_output_formatter -- Formatage d'affichage universel",
+    "Fonction 98 : rap_common.c -- rap_output_formatter -- Formatage d'affichage universel\n"
+    "  • Signature C : void rap_output_formatter(const RapConfig *cfg, const char *c1, const char *c2, const char *c3, const char *c4);\n"
+    "  • Utilité     : Formate les flux d'audit sur 4 colonnes régulières en mode interactif\n"
+    "                  ou en flux brut délimité par tabulations (`\\t`) en mode `--raw`.\n"
+    },
+    {
+        16,
+        99,
+        "Fonction 99 : rap_common.c -- rap_check_safety_pid -- Barrière de sécurité cinétique",
+    "Fonction 99 : rap_common.c -- rap_check_safety_pid -- Barrière de sécurité cinétique\n"
+    "  • Signature C : int rap_check_safety_pid(const RapConfig *cfg, pid_t pid);\n"
+    "  • Utilité     : Empêche les arrêts accidentels en rejetant le tir sur PID 1,\n"
+    "                  sur soi-même, sur le shell parent et sur les threads internes du noyau.\n"
+    },
+    {
+        16,
+        100,
+        "Fonction 100 : rap_main.c -- rap_parse_flags -- Parseur d'arguments et drapeaux",
+    "Fonction 100 : rap_main.c -- rap_parse_flags -- Parseur d'arguments et drapeaux\n"
+    "  • Signature C : int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg);\n"
+    "  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-n`, `-h`),\n"
+    "                  détecte le mode TTY (`isatty`) et isole le verbe d'action dans `argv`.\n"
+    },
+    {
+        16,
+        107,
+        "Fonction 107 : rap_common.c -- rap_is_mem_whitelisted -- Filtrage liste blanche mémoire",
+    "Fonction 107 : rap_common.c -- rap_is_mem_whitelisted -- Filtrage liste blanche mémoire\n"
+    "  • Signature C : int rap_is_mem_whitelisted(const char *comm);\n"
+    "  • Utilité     : Vérifie si un processus figure dans `mem_whitelist.conf` en gérant\n"
+    "                  la troncature noyau à 15 caractères sans allocation dynamique.\n"
+    },
+    {
+        16,
+        108,
+        "Fonction 108 : rap_common.c -- rap_net_eval_ip -- Qualification CIDR d'endpoint IP",
+    "Fonction 108 : rap_common.c -- rap_net_eval_ip -- Qualification CIDR d'endpoint IP\n"
+    "  • Signature C : int rap_net_eval_ip(uint32_t ip, uint16_t port, char *out_desc, size_t desc_size);\n"
+    "  • Utilité     : Évalue une adresse IP contre les registres `fw_officiel.conf` et `fw_custom.conf`\n"
+    "                  pour retourner son niveau de confiance (APPROUVÉ, STANDARD, SUSPECT, HOSTILE).\n"
+    },
+    {
+        16,
+        109,
+        "Fonction 109 : cmd_heur.c -- rap_cmd_heur -- Traque des anomalies d'exécution",
+    "Fonction 109 : cmd_heur.c -- rap_cmd_heur -- Traque des anomalies d'exécution\n"
+    "  • Signature C : int rap_cmd_heur(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Parcourt `/proc`, résout `/proc/[PID]/exe` et projette les anomalies\n"
+    "                  comportementales identifiées sur la console de secours.\n"
+    },
+    {
+        16,
+        110,
+        "Fonction 110 : cmd_heur.c -- rap_heur_check_process -- Évaluation unitaire heuristique",
+    "Fonction 110 : cmd_heur.c -- rap_heur_check_process -- Évaluation unitaire heuristique\n"
+    "  • Signature C : int rap_heur_check_process(pid_t pid, const char *comm, const char *exe_path, char *out_anomaly, size_t out_sz);\n"
+    "  • Utilité     : Évalue un processus selon trois axes sans allocation dynamique :\n"
+    "                  1. Binaires supprimés du disque en cours d'exécution (`(deleted)`).\n"
+    "                  2. Exécutions depuis des zones volatiles suspectes (`/tmp`, `/dev/shm`).\n"
+    "                  3. Usurpation d'identité de démons systèmes (*Masquerading*).\n"
+    },
+    {
+        17,
+        0,
+        "SECTION 17 : SENTINELLE PASSIVE ANTI-RANÇONGICIEL (FANOTIFY & LEURRES DENSES)",
+    "=== SECTION 17 : SENTINELLE PASSIVE ANTI-RANÇONGICIEL (FANOTIFY & LEURRES DENSES) ===\n"
+    "\n"
+    "Fonction 111 : sentry_engine.c -- sentry_deploy_canary -- Déploiement d'appât dense\n"
+    "  • Signature C : int sentry_deploy_canary(const char *dir_path);\n"
+    "  • Utilité     : Génère un fichier binaire dense de 32 Ko (`!00_raptor_vault.kdbx`)\n"
+    "                  doté de l'en-tête officiel KeePass KDBX4 (Magic Numbers authentiques)\n"
+    "                  et d'un corps à haute entropie généré par LCG. Applique les permissions\n"
+    "                  `0666` via `fchmod` afin de piéger tout compte utilisateur.\n"
+    "  • Retour      : `0` en cas de synchronisation physique (`fdatasync`) réussie, `-1` en cas d'échec.\n"
+    "\n"
+    "Fonction 112 : sentry_engine.c -- sentry_init_fanotify -- Initialisation de la surveillance noyau\n"
+    "  • Signature C : int sentry_init_fanotify(const SentryConfig *config);\n"
+    "  • Utilité     : Configure le sous-système de notification noyau en mode permissionnel\n"
+    "                  synchrone (`FAN_CLASS_CONTENT | FAN_NONBLOCK | FAN_CLOEXEC`). Déploie le\n"
+    "                  leurre si nécessaire et pose une marque de verrouillage d'ouverture\n"
+    "                  synchrone (`FAN_MARK_ADD`, `FAN_OPEN_PERM`) sur chaque cible configurée.\n"
+    "  • Retour      : Descripteur de fichier `fan_fd` valide, ou `-1` en cas d'erreur de privilèges.\n"
+    "\n"
+    "Fonction 113 : sentry_engine.c -- sentry_listen_loop -- Boucle de veille passive bloquante\n"
+    "  • Signature C : int sentry_listen_loop(int fanotify_fd, const SentryConfig *config);\n"
+    "  • Utilité     : Assure le guet passif bloquant sur `poll()` (consommation de 0% CPU au repos).\n"
+    "                  Dépouille les événements noyau dans un tampon statique de 4 Ko aligné\n"
+    "                  sur 8 octets (`__attribute__((aligned(8)))`) sans allocation sur le tas (`0 heap`).\n"
+    "  • Retour      : `0` lors d'un arrêt nominal par signal, `-1` en cas d'erreur de lecture.\n"
+    "\n"
+    "Fonction 114 : sentry_engine.c -- sentry_trigger_reflex -- Riposte cinétique synchrone\n"
+    "  • Signature C : int sentry_trigger_reflex(int fanotify_fd, int fd_event, pid_t pid);\n"
+    "  • Utilité     : Vérifie le garde-fou autonome `sentry_is_protected_pid` (PID <= 1, self, parent).\n"
+    "                  Applique instantanément le gel conservatoire de l'agresseur via `SIGSTOP`\n"
+    "                  (état noyau `T`), ordonne le rejet de l'appel d'ouverture auprès du noyau via\n"
+    "                  `FAN_DENY`, referme le descripteur d'inspection et émet l'alerte console.\n"
+    "  • Retour      : `0` si la neutralisation a réussi, `-1` si le PID était protégé.\n"
+    "\n"
+    "Fonction 115 : sentry_engine.c -- sentry_enter_stealth -- Blindage et invisibilité mémoire\n"
+    "  • Signature C : int sentry_enter_stealth(const char *fake_name);\n"
+    "  • Utilité     : Masque le nom du processus dans la table noyau via `prctl(PR_SET_NAME, \"[kworker/u16:3]\")`,\n"
+    "                  s'attribue l'immunité OOM maximale (`/proc/self/oom_score_adj = -1000`) et\n"
+    "                  verrouille l'intégralité des pages physiques en RAM via `mlockall(MCL_CURRENT | MCL_FUTURE)`.\n"
+    "  • Retour      : `0` en cas de succès opérationnel, `-1` si les limites système restreignent le verrouillage.\n"
+    "\n"
+    "Fonction 116 : cmd_sentry.c -- cmd_sentry_arm -- Armement des leurres sur disque\n"
+    "  • Signature C : static int cmd_sentry_arm(int argc, char **argv);\n"
+    "  • Utilité     : Déploie les fichiers canaris dans les cibles spécifiées en ligne de\n"
+    "                  commande ou applique les répertoires sensibles par défaut (`/home`, `/var/www`, `/var/lib`, `/etc`).\n"
+    "  • Retour      : `0` (succès) si au moins un appât est opérationnel, `2` en cas d'échec global.\n"
+    "\n"
+    "Fonction 117 : cmd_sentry.c -- cmd_sentry_disarm -- Purge et désarmement préventif\n"
+    "  • Signature C : static int cmd_sentry_disarm(int argc, char **argv);\n"
+    "  • Utilité     : Supprime proprement par déliaison physique (`unlink`) les fichiers\n"
+    "                  leurres pour autoriser les opérations de maintenance sans fausse alerte.\n"
+    "  • Retour      : Toujours `0` après affichage du bilan de neutralisation.\n"
+    "\n"
+    "Fonction 118 : cmd_sentry.c -- cmd_sentry_status -- Audit d'intégrité physique des appâts\n"
+    "  • Signature C : static int cmd_sentry_status(int argc, char **argv);\n"
+    "  • Utilité     : Vérifie l'existence et la stricte conformité de taille (32768 octets)\n"
+    "                  des canaris sur l'ensemble des répertoires surveillés (`[ACTIF]`, `[ALTERE]`, `[NON ARME]`).\n"
+    "  • Retour      : Toujours `0`.\n"
+    "\n"
+    "Fonction 119 : cmd_sentry.c -- cmd_sentry_run -- Démarrage du guet passif fanotify\n"
+    "  • Signature C : static int cmd_sentry_run(int argc, char **argv);\n"
+    "  • Utilité     : Initialise `fanotify`, prend en charge le détachement en démon d'arrière-plan\n"
+    "                  (`-d` / `--daemon`) via `fork()` et `setsid()`, active l'invisibilité furtive\n"
+    "                  (`sentry_enter_stealth`), redirige les flux vers `/dev/null` et lance la veille.\n"
+    "  • Retour      : `0` en cas d'arrêt propre, `2` en cas de droits administrateur insuffisants.\n"
+    "\n"
+    "Fonction 120 : cmd_sentry.c -- cmd_sentry -- Aiguilleur CLI sentry\n"
+    "  • Signature C : int cmd_sentry(int argc, char **argv);\n"
+    "  • Utilité     : Point d'entrée principal de la sous-commande `rap sentry`. Parse les\n"
+    "                  arguments et route vers `arm`, `disarm`, `status` ou `run`.\n"
+    "  • Retour      : Code de retour de la sous-commande, ou `2` si la commande est inconnue.\n"
+    "\n"
+    "Fonction 121 : rap_main.c -- rap_cmd_sentry -- Pont déclaratif sentinelle\n"
+    "  • Signature C : int rap_cmd_sentry(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Relie la table déclarative universelle `g_commands` de RAPTOR au point\n"
+    "                  d'entrée de la sentinelle anti-rançongiciel (`cmd_sentry`).\n"
+    "  • Retour      : Code de retour POSIX transmis par `cmd_sentry`.\n"
+    },
+    {
+        17,
+        111,
+        "Fonction 111 : sentry_engine.c -- sentry_deploy_canary -- Déploiement d'appât dense",
+    "Fonction 111 : sentry_engine.c -- sentry_deploy_canary -- Déploiement d'appât dense\n"
+    "  • Signature C : int sentry_deploy_canary(const char *dir_path);\n"
+    "  • Utilité     : Génère un fichier binaire dense de 32 Ko (`!00_raptor_vault.kdbx`)\n"
+    "                  doté de l'en-tête officiel KeePass KDBX4 (Magic Numbers authentiques)\n"
+    "                  et d'un corps à haute entropie généré par LCG. Applique les permissions\n"
+    "                  `0666` via `fchmod` afin de piéger tout compte utilisateur.\n"
+    "  • Retour      : `0` en cas de synchronisation physique (`fdatasync`) réussie, `-1` en cas d'échec.\n"
+    },
+    {
+        17,
+        112,
+        "Fonction 112 : sentry_engine.c -- sentry_init_fanotify -- Initialisation de la surveillance noyau",
+    "Fonction 112 : sentry_engine.c -- sentry_init_fanotify -- Initialisation de la surveillance noyau\n"
+    "  • Signature C : int sentry_init_fanotify(const SentryConfig *config);\n"
+    "  • Utilité     : Configure le sous-système de notification noyau en mode permissionnel\n"
+    "                  synchrone (`FAN_CLASS_CONTENT | FAN_NONBLOCK | FAN_CLOEXEC`). Déploie le\n"
+    "                  leurre si nécessaire et pose une marque de verrouillage d'ouverture\n"
+    "                  synchrone (`FAN_MARK_ADD`, `FAN_OPEN_PERM`) sur chaque cible configurée.\n"
+    "  • Retour      : Descripteur de fichier `fan_fd` valide, ou `-1` en cas d'erreur de privilèges.\n"
+    },
+    {
+        17,
+        113,
+        "Fonction 113 : sentry_engine.c -- sentry_listen_loop -- Boucle de veille passive bloquante",
+    "Fonction 113 : sentry_engine.c -- sentry_listen_loop -- Boucle de veille passive bloquante\n"
+    "  • Signature C : int sentry_listen_loop(int fanotify_fd, const SentryConfig *config);\n"
+    "  • Utilité     : Assure le guet passif bloquant sur `poll()` (consommation de 0% CPU au repos).\n"
+    "                  Dépouille les événements noyau dans un tampon statique de 4 Ko aligné\n"
+    "                  sur 8 octets (`__attribute__((aligned(8)))`) sans allocation sur le tas (`0 heap`).\n"
+    "  • Retour      : `0` lors d'un arrêt nominal par signal, `-1` en cas d'erreur de lecture.\n"
+    },
+    {
+        17,
+        114,
+        "Fonction 114 : sentry_engine.c -- sentry_trigger_reflex -- Riposte cinétique synchrone",
+    "Fonction 114 : sentry_engine.c -- sentry_trigger_reflex -- Riposte cinétique synchrone\n"
+    "  • Signature C : int sentry_trigger_reflex(int fanotify_fd, int fd_event, pid_t pid);\n"
+    "  • Utilité     : Vérifie le garde-fou autonome `sentry_is_protected_pid` (PID <= 1, self, parent).\n"
+    "                  Applique instantanément le gel conservatoire de l'agresseur via `SIGSTOP`\n"
+    "                  (état noyau `T`), ordonne le rejet de l'appel d'ouverture auprès du noyau via\n"
+    "                  `FAN_DENY`, referme le descripteur d'inspection et émet l'alerte console.\n"
+    "  • Retour      : `0` si la neutralisation a réussi, `-1` si le PID était protégé.\n"
+    },
+    {
+        17,
+        115,
+        "Fonction 115 : sentry_engine.c -- sentry_enter_stealth -- Blindage et invisibilité mémoire",
+    "Fonction 115 : sentry_engine.c -- sentry_enter_stealth -- Blindage et invisibilité mémoire\n"
+    "  • Signature C : int sentry_enter_stealth(const char *fake_name);\n"
+    "  • Utilité     : Masque le nom du processus dans la table noyau via `prctl(PR_SET_NAME, \"[kworker/u16:3]\")`,\n"
+    "                  s'attribue l'immunité OOM maximale (`/proc/self/oom_score_adj = -1000`) et\n"
+    "                  verrouille l'intégralité des pages physiques en RAM via `mlockall(MCL_CURRENT | MCL_FUTURE)`.\n"
+    "  • Retour      : `0` en cas de succès opérationnel, `-1` si les limites système restreignent le verrouillage.\n"
+    },
+    {
+        17,
+        116,
+        "Fonction 116 : cmd_sentry.c -- cmd_sentry_arm -- Armement des leurres sur disque",
+    "Fonction 116 : cmd_sentry.c -- cmd_sentry_arm -- Armement des leurres sur disque\n"
+    "  • Signature C : static int cmd_sentry_arm(int argc, char **argv);\n"
+    "  • Utilité     : Déploie les fichiers canaris dans les cibles spécifiées en ligne de\n"
+    "                  commande ou applique les répertoires sensibles par défaut (`/home`, `/var/www`, `/var/lib`, `/etc`).\n"
+    "  • Retour      : `0` (succès) si au moins un appât est opérationnel, `2` en cas d'échec global.\n"
+    },
+    {
+        17,
+        117,
+        "Fonction 117 : cmd_sentry.c -- cmd_sentry_disarm -- Purge et désarmement préventif",
+    "Fonction 117 : cmd_sentry.c -- cmd_sentry_disarm -- Purge et désarmement préventif\n"
+    "  • Signature C : static int cmd_sentry_disarm(int argc, char **argv);\n"
+    "  • Utilité     : Supprime proprement par déliaison physique (`unlink`) les fichiers\n"
+    "                  leurres pour autoriser les opérations de maintenance sans fausse alerte.\n"
+    "  • Retour      : Toujours `0` après affichage du bilan de neutralisation.\n"
+    },
+    {
+        17,
+        118,
+        "Fonction 118 : cmd_sentry.c -- cmd_sentry_status -- Audit d'intégrité physique des appâts",
+    "Fonction 118 : cmd_sentry.c -- cmd_sentry_status -- Audit d'intégrité physique des appâts\n"
+    "  • Signature C : static int cmd_sentry_status(int argc, char **argv);\n"
+    "  • Utilité     : Vérifie l'existence et la stricte conformité de taille (32768 octets)\n"
+    "                  des canaris sur l'ensemble des répertoires surveillés (`[ACTIF]`, `[ALTERE]`, `[NON ARME]`).\n"
+    "  • Retour      : Toujours `0`.\n"
+    },
+    {
+        17,
+        119,
+        "Fonction 119 : cmd_sentry.c -- cmd_sentry_run -- Démarrage du guet passif fanotify",
+    "Fonction 119 : cmd_sentry.c -- cmd_sentry_run -- Démarrage du guet passif fanotify\n"
+    "  • Signature C : static int cmd_sentry_run(int argc, char **argv);\n"
+    "  • Utilité     : Initialise `fanotify`, prend en charge le détachement en démon d'arrière-plan\n"
+    "                  (`-d` / `--daemon`) via `fork()` et `setsid()`, active l'invisibilité furtive\n"
+    "                  (`sentry_enter_stealth`), redirige les flux vers `/dev/null` et lance la veille.\n"
+    "  • Retour      : `0` en cas d'arrêt propre, `2` en cas de droits administrateur insuffisants.\n"
+    },
+    {
+        17,
+        120,
+        "Fonction 120 : cmd_sentry.c -- cmd_sentry -- Aiguilleur CLI sentry",
+    "Fonction 120 : cmd_sentry.c -- cmd_sentry -- Aiguilleur CLI sentry\n"
+    "  • Signature C : int cmd_sentry(int argc, char **argv);\n"
+    "  • Utilité     : Point d'entrée principal de la sous-commande `rap sentry`. Parse les\n"
+    "                  arguments et route vers `arm`, `disarm`, `status` ou `run`.\n"
+    "  • Retour      : Code de retour de la sous-commande, ou `2` si la commande est inconnue.\n"
+    },
+    {
+        17,
+        121,
+        "Fonction 121 : rap_main.c -- rap_cmd_sentry -- Pont déclaratif sentinelle",
+    "Fonction 121 : rap_main.c -- rap_cmd_sentry -- Pont déclaratif sentinelle\n"
+    "  • Signature C : int rap_cmd_sentry(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Relie la table déclarative universelle `g_commands` de RAPTOR au point\n"
+    "                  d'entrée de la sentinelle anti-rançongiciel (`cmd_sentry`).\n"
+    "  • Retour      : Code de retour POSIX transmis par `cmd_sentry`.\n"
+    },
+    {
+        18,
+        0,
+        "SECTION 18 : OUTILLAGE DE COMPILATION & SOURCE UNIQUE SSOT (tools/)",
+    "=== SECTION 18 : OUTILLAGE DE COMPILATION & SOURCE UNIQUE SSOT (tools/) ===\n"
+    "\n"
+    "Outil 01 : gen_man.py -- parse_ssot_markdown -- Découpage multi-pages\n"
+    "  • Signature Python : def parse_ssot_markdown(md_raw) -> dict\n"
+    "  • Utilité          : Parse le fichier maître `docs/man/rap.1.md` et segmente chaque\n"
+    "                       page de manuel délimitée par les balises `<!-- MAN: key | sec | titre -->`.\n"
+    "\n"
+    "Outil 02 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix\n"
+    "  • Signature Python : def format_unix_header(key, sec) -> str\n"
+    "  • Utilité          : Calibre et génère la bannière d'en-tête troff/groff centrée\n"
+    "                       sur 70 colonnes (ex: `RAP(1)   RAPTOR DEFENSE   RAP(1)`).\n"
+    "\n"
+    "Outil 03 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99\n"
+    "  • Signature Python : def generate_cli_header(pages) -> str\n"
+    "  • Utilité          : Encode l'ensemble des pages de manuel dans le tableau constant\n"
+    "                       `g_rap_man_data[]` de `src/cli/rap_man_data.h` pour inclusion\n"
+    "                       autonome en mémoire morte dans l'exécutable `rap` (zéro heap).\n"
+    "\n"
+    "Outil 04 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS\n"
+    "  • Signature Python : def generate_js_database(pages) -> str\n"
+    "  • Utilité          : Construit la base de données JavaScript `docs/js/man_data.js`\n"
+    "                       alimentant la visionneuse interactive de `docs/man.html`.\n"
+    "\n"
+    "================================================================================\n"
+    "FIN DU RÉFÉRENTIEL TECHNIQUE OFFICIEL // RAPTOR DEFENSE v2.0\n"
+    "================================================================================\n"
+    },
+    {
+        18,
+        1,
+        "Outil 1 : gen_man.py -- parse_ssot_markdown -- Découpage multi-pages",
+    "Outil 01 : gen_man.py -- parse_ssot_markdown -- Découpage multi-pages\n"
+    "  • Signature Python : def parse_ssot_markdown(md_raw) -> dict\n"
+    "  • Utilité          : Parse le fichier maître `docs/man/rap.1.md` et segmente chaque\n"
+    "                       page de manuel délimitée par les balises `<!-- MAN: key | sec | titre -->`.\n"
+    },
+    {
+        18,
+        2,
+        "Outil 2 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix",
+    "Outil 02 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix\n"
+    "  • Signature Python : def format_unix_header(key, sec) -> str\n"
+    "  • Utilité          : Calibre et génère la bannière d'en-tête troff/groff centrée\n"
+    "                       sur 70 colonnes (ex: `RAP(1)   RAPTOR DEFENSE   RAP(1)`).\n"
+    },
+    {
+        18,
+        3,
+        "Outil 3 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99",
+    "Outil 03 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99\n"
+    "  • Signature Python : def generate_cli_header(pages) -> str\n"
+    "  • Utilité          : Encode l'ensemble des pages de manuel dans le tableau constant\n"
+    "                       `g_rap_man_data[]` de `src/cli/rap_man_data.h` pour inclusion\n"
+    "                       autonome en mémoire morte dans l'exécutable `rap` (zéro heap).\n"
+    },
+    {
+        18,
+        4,
+        "Outil 4 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS",
+    "Outil 04 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS\n"
+    "  • Signature Python : def generate_js_database(pages) -> str\n"
+    "  • Utilité          : Construit la base de données JavaScript `docs/js/man_data.js`\n"
+    "                       alimentant la visionneuse interactive de `docs/man.html`.\n"
+    "\n"
+    "================================================================================\n"
+    "FIN DU RÉFÉRENTIEL TECHNIQUE OFFICIEL // RAPTOR DEFENSE v2.0\n"
+    "================================================================================\n"
+    },
+};
+
+static const size_t g_rap_fn_entries_count = sizeof(g_rap_fn_entries) / sizeof(g_rap_fn_entries[0]);
 
 #endif /* RAP_MAN_DATA_H */
