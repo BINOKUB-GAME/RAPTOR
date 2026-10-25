@@ -1,12 +1,12 @@
 // ==============================================================================
 // NOM DU SCRIPT   : docs/js/threat_data.js
 // GÉNÉRATION      : AUTOMATIQUE VIA tools/gen_threats.py (SSOT)
-// DATE PRODUCTION : 2026-10-25 16:10:07 UTC
+// DATE PRODUCTION : 2026-10-25 17:29:16 UTC
 // RESPONSABILITÉ  : Dictionnaire de réputation IP O(1) pour l'investigation web.
 //                   Exécution 100% côté client, aucune donnée transmise à un tiers.
 // ==============================================================================
 
-const RAPTOR_THREAT_TIMESTAMP = "2026-10-25 16:10:07 UTC";
+const RAPTOR_THREAT_TIMESTAMP = "2026-10-25 17:29:16 UTC";
 const RAPTOR_THREAT_COUNT = 19927;
 
 // Format de stockage : "IP" : [Catégorie, Score, Tag]

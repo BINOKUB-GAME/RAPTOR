@@ -1,7 +1,7 @@
 /* ==============================================================================
  * NOM DU SCRIPT   : src/cli/rap_threat_data.h
  * GÉNÉRATION      : AUTOMATIQUE VIA tools/gen_threats.py (SSOT)
- * DATE PRODUCTION : 2026-10-25 16:10:07 UTC
+ * DATE PRODUCTION : 2026-10-25 17:29:16 UTC
  * RESPONSABILITÉ  : Base locale C99 de renseignement sur les menaces (.rodata).
  *                   Table triée par entier IPv4 pour recherche binaire en O(log N).
  *                   Zéro allocation dynamique (0 heap), silence radio absolu.
@@ -24,7 +24,7 @@ typedef struct {
     uint8_t  score;    /* Score de réputation (1 à 100) */
 } RapThreatRecord;
 
-static const char *RAP_THREAT_DB_BUILD = "2026-10-25 16:10:07 UTC";
+static const char *RAP_THREAT_DB_BUILD = "2026-10-25 17:29:16 UTC";
 static const size_t RAP_THREAT_COUNT = 19927;
 
 static const RapThreatRecord g_rap_threat_db[] = {
