@@ -1,6 +1,6 @@
 # ==============================================================================
 # NOM DU SCRIPT   : CMakeLists.txt
-# RÉVISION        : Rev 1.7
+# RÉVISION        : Rev 1.9
 # PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
 # RESPONSABILITÉ  : Configuration générale du système de construction CMake.
 #                   - Cible C99 avec extensions GNU (Linux/POSIX) et standard Windows.
@@ -12,6 +12,13 @@
 #                   - Assemblage de l'exécutable unifié 'raptor'.
 #                   - Intégration modulaire du mode CLI de secours (Sections 16 & 17) :
 #                     binaire d'urgence 'rap' et téléscripteur autonome 'rapless'.
+#                   - Chaîne de compilation automatisée de la documentation SSOT.
+#
+# BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.9) :
+#   - Intégration du générateur de documentation unifiée SSOT (tools/gen_man.py).
+#   - Création de la cible personnalisée 'gen_man' dépendante de 'docs/man/rap.1.md'.
+#   - Établissement de la dépendance de compilation : 'rap' dépend de 'gen_man'.
+#   - Génération synchrone de 'src/cli/rap_man_data.h' et 'docs/manual_content.html'.
 # ==============================================================================
 
 cmake_minimum_required(VERSION 3.16...3.30)
@@ -173,7 +180,23 @@ if(UNIX)
     )
     target_compile_options(rapless PRIVATE -Wall -Wextra -Wformat=2)
 
-    # 8.2. Dispatcher chirurgical modulaire en ligne de commande
+    # 8.2. Génération automatique de la documentation unique (SSOT)
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/cli/rap_man_data.h
+        COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/tools/gen_man.py
+        DEPENDS 
+            ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/rap.1.md 
+            ${CMAKE_CURRENT_SOURCE_DIR}/tools/gen_man.py
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "[SSOT] Generation automatique de rap_man_data.h et manual_content.html"
+        VERBATIM
+    )
+
+    add_custom_target(gen_man
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/cli/rap_man_data.h
+    )
+
+    # 8.3. Dispatcher chirurgical modulaire en ligne de commande
     set(RAP_CLI_SOURCES
         src/cli/rap_main.c
         src/cli/rap_common.c
@@ -184,20 +207,27 @@ if(UNIX)
         src/cli/cmd_preload.c
         src/cli/cmd_heur.c
         src/cli/cmd_net.c
+        src/cli/cmd_sentry.c
         src/cli/cmd_kill.c
         src/cli/cmd_man.c
+        src/engine/sentry_engine.c
     )
 
     add_executable(rap
         ${RAP_CLI_SOURCES}
     )
+
+    # Dépendance stricte : le binaire 'rap' exige la production de rap_man_data.h
+    add_dependencies(rap gen_man)
+
     target_include_directories(rap PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cli
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/engine
     )
     target_compile_options(rap PRIVATE -Wall -Wextra -Wformat=2)
 
-    # 8.3. Règles d'installation standardisées (/usr/local/bin)
+    # 8.4. Règles d'installation standardisées (/usr/local/bin)
     install(TARGETS raptor rap rapless
         RUNTIME DESTINATION bin
         OPTIONAL

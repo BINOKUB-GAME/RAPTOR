@@ -1,5 +1,5 @@
 # DICTIONNAIRE OFFICIEL DES STRUCTURES ET FONCTIONS // RAPTOR v2.0
-## RÉFÉRENTIEL TECHNIQUE D'INGÉNIERIE ET D'API (CONSOLIDÉ)
+## RÉFÉRENTIEL TECHNIQUE D'INGÉNIERIE ET D'API (CONSOLIDÉ AU 24-10-2026)
 
 ================================================================================
 SECTION 1 : MODÈLE DE DONNÉES UNIVERSEL (src/core/raptor_data.c)
@@ -387,210 +387,296 @@ Fonction 69 : plugin_net_guard.c -- net_guard_update_official_rules -- Rapatriem
                   temporaire (.tmp), valide l'en-tête de conformité et applique un remplacement atomique POSIX (rename).
 
 ================================================================================
-SECTION 12 : RENSEIGNEMENT RÉSEAU, BGP & CDN INTEL (Fonctions 71 à 79)
-Module source : src/plugins/plugin_asn_intel.c
-En-tête       : include/raptor/raptor_asn_intel.h
-Configuration : assets/rules/table_static.conf
+SECTION 12 : RENSEIGNEMENT RÉSEAU, BGP & CDN INTEL (src/plugins/plugin_asn_intel.c)
 ================================================================================
 
-71. asn_intel_trim
-    - Rôle : Nettoyage canonique des espaces blancs en tête et queue de chaîne.
-    - Entrée : char* str
-    - Sortie : char* (pointeur sur la chaîne assainie).
+Fonction 71 : plugin_asn_intel.c -- asn_intel_trim -- Nettoyage canonique
+  • Signature C : static char* asn_intel_trim(char* str);
+  • Utilité     : Nettoyage canonique des espaces blancs en tête et queue de chaîne.
 
-72. asn_intel_parse_cidr
-    - Rôle : Décomposition arithmétique d'une notation CIDR (X.X.X.X/YY).
-    - Calcul : Extraction de l'adresse réseau hôte et génération du masque binaire 32 bits.
-    - Sortie : bool (validation syntaxique et mathématique).
+Fonction 72 : plugin_asn_intel.c -- asn_intel_parse_cidr -- Décomposition CIDR
+  • Signature C : static bool asn_intel_parse_cidr(const char* cidr, uint32_t* out_net, uint32_t* out_mask);
+  • Utilité     : Décomposition arithmétique d'une notation CIDR (X.X.X.X/YY), extraction de
+                  l'adresse réseau hôte et génération du masque binaire 32 bits.
 
-73. asn_intel_load_file
-    - Rôle : Parsing à chaud du fichier assets/rules/table_static.conf.
-    - Fonctionnement : Peuplement dynamique de la table g_static_ranges sans recompilation.
-    - Sortie : bool (succès du chargement).
+Fonction 73 : plugin_asn_intel.c -- asn_intel_load_file -- Parsing à chaud table_static.conf
+  • Signature C : static bool asn_intel_load_file(const char* filepath);
+  • Utilité     : Chargement dynamique de `assets/rules/table_static.conf` pour peupler la table
+                  des plages IP de confiance sans recompilation du binaire.
 
-74. asn_intel_match_static
-    - Rôle : Évaluation arithmétique instantanée (0 ms) contre les infrastructures répertoriées.
-    - Logique : (ip_host & r->netmask) == (r->network_ip & r->netmask).
-    - Sortie : bool (vrai si correspondance CDN/Cloud trouvée).
+Fonction 74 : plugin_asn_intel.c -- asn_intel_match_static -- Évaluation arithmétique locale
+  • Signature C : static bool asn_intel_match_static(uint32_t ip, char* out_name, size_t max_len);
+  • Utilité     : Évaluation instantanée (0 ms) contre les infrastructures répertoriées via
+                  l'opération binaire `(ip & mask) == (net & mask)`.
 
-75. asn_intel_query_bgp
-    - Rôle : Sonde DNS TXT de secours vers le registre Team Cymru (origin.asn.cymru.com).
-    - Extraction : Numéro ASN public et code pays ISO pour les adresses non répertoriées.
-    - Sortie : bool (succès de la résolution distante).
+Fonction 75 : plugin_asn_intel.c -- asn_intel_query_bgp -- Sonde DNS TXT BGP
+  • Signature C : static bool asn_intel_query_bgp(const char* ip_str, uint32_t* out_asn, char* out_cc, size_t cc_sz);
+  • Utilité     : Résolution DNS de secours vers le registre Team Cymru (`origin.asn.cymru.com`)
+                  pour identifier le numéro d'ASN et le code pays ISO des adresses inconnues.
 
-76. asn_intel_lookup
-    - Rôle : Moteur central d'investigation en cascade.
-    - Cascade : 1. Cache dynamique -> 2. table_static.conf (0 ms) -> 3. Sonde DNS BGP.
-    - Sortie : bool (identification formelle de l'opérateur).
+Fonction 76 : plugin_asn_intel.c -- asn_intel_lookup -- Moteur central en cascade
+  • Signature C : bool raptor_asn_intel_lookup(const char* ip_str, char* out_name, size_t max_len);
+  • Utilité     : Cascade d'investigation : 1. Cache dynamique -> 2. `table_static.conf` (0 ms) -> 3. Sonde DNS BGP.
 
-77. asn_intel_init
-    - Rôle : Initialisation du greffon, allocation du verrou d'exclusion mutuelle et chargement des règles.
-    - Sortie : bool (état opérationnel).
+Fonction 77 : plugin_asn_intel.c -- asn_intel_init -- Initialisation greffon ASN
+  • Signature C : static bool asn_intel_init(void);
+  • Utilité     : Prépare le mutex d'exclusion mutuelle, configure les caches et charge les règles réseau.
 
-78. asn_intel_cleanup
-    - Rôle : Vidange complète des structures et remise à zéro du cache en mémoire vive.
-    - Sortie : void.
+Fonction 78 : plugin_asn_intel.c -- asn_intel_cleanup -- Vidange et arrêt
+  • Signature C : static void asn_intel_cleanup(void);
+  • Utilité     : Purge l'intégralité des structures mémoires et détruit le verrou d'exclusion mutuelle.
 
-79. asn_intel_register
-    - Rôle : Enregistrement constructeur GCC du greffon autonome sur le bus RaptorPlugin.
-    - Sortie : void.
+Fonction 79 : plugin_asn_intel.c -- asn_intel_register -- Auto-enregistrement
+  • Signature C : __attribute__((constructor)) static void asn_intel_register(void);
+  • Utilité     : Enregistrement constructeur GCC du greffon sur le bus RaptorPlugin.
 
-### SECTION 13 : FORENSIC & TRAQUE DE MUTATIONS MÉMOIRE ANONYMES (R-X)
+================================================================================
+SECTION 13 : TRAQUE MÉMOIRE ANONYME & MUTATIONS R-X (src/core/mem_stealth.c)
+================================================================================
 
-| N° | Nom de la fonction | Fichier source | Signature | Rôle & Responsabilité technique |
-| :--- | :--- | :--- | :--- | :--- |
-| **80** | `mem_stealth_is_jit_whitelisted` | `src/core/mem_stealth.c` | `bool mem_stealth_is_jit_whitelisted(const char* comm)` | Isole les moteurs à compilation JIT légitimes (Chromium, Firefox, Electron, Node, JVM) pour éliminer les faux positifs structurels sur le code exécutable dynamique. |
-| **81** | `mem_stealth_scan_maps_anon_rx` | `src/core/mem_stealth.c` | `bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, StealthEvent* ev_out)` | Scanne chirurgicalement `/proc/[PID]/maps` à la recherche de plages mémoires possédant le droit d'exécution (`x`) avec un Inode à `0` (aucun fichier adossé sur disque), excluant `[vdso]` et `[vsyscall]`. Renseigne la structure d'incident `StealthEvent`. |
-| **82** | `mem_stealth_dispatch_diff_event` | `src/core/mem_stealth.c` | `void mem_stealth_dispatch_diff_event(const StealthEvent* ev)` | Formate l'anomalie forensique identifiée et l'injecte dans le pipeline temporel du Cahier Différentiel (Onglet 4) pour marquage critique lors de la bascule d'état entre T-1 et T0. |
+Fonction 80 : mem_stealth.c -- mem_stealth_whitelist_load -- Chargement liste blanche
+  • Signature C : bool mem_stealth_whitelist_load(const char* filepath);
+  • Utilité     : Charge et analyse `assets/rules/mem_whitelist.conf` (format `TYPE | MOTIF | DESC`),
+                  éliminant les faux positifs structurels sur le code dynamique.
 
-#### Structure forensique associée (src/core/mem_stealth.h) :
+Fonction 81 : mem_stealth.c -- mem_stealth_is_whitelisted -- Filtrage exceptions légitimes
+  • Signature C : bool mem_stealth_is_whitelisted(const char* comm, const char* exe);
+  • Utilité     : Vérifie si un processus correspond à une signature autorisée (navigateurs,
+                  Flatpak, environnements de bureau Cinnamon/GNOME/KDE).
 
-typedef struct {
-    pid_t pid;
-    char comm[64];
-    unsigned long start_addr;
-    unsigned long end_addr;
-    size_t size_kb;
-    char detail[128];
-} StealthEvent;
+Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0
+  • Signature C : bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe, StealthEvent* ev_out);
+  • Utilité     : Analyse `/proc/[PID]/maps` pour isoler les allocations anonymes rendues
+                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque.
 
+Fonction 83 : mem_stealth.c -- mem_stealth_dispatch_diff_event -- Propagation différentielle
+  • Signature C : void mem_stealth_dispatch_diff_event(const StealthEvent* ev);
+  • Utilité     : Injecte les alertes forensiques d'injection dans le tampon circulaire du
+                  Cahier Différentiel (Onglet 4).
 
-### SECTION 13 — TRAQUE MÉMOIRE ANONYME & MUTATIONS R-X (`src/core/mem_stealth.c`)
+================================================================================
+SECTION 14 : DÉTECTION DES DÉTOURNEMENTS LD_PRELOAD (src/core/preload_hunter.c)
+================================================================================
 
-* **80. `mem_stealth_whitelist_load`**
-  * **Prototype :** `bool mem_stealth_whitelist_load(const char* filepath)`
-  * **Rôle :** Charge et analyse le fichier souverain externe (`assets/rules/mem_whitelist.conf`). Parse les directives `JIT` et `FFI`, nettoie les délimiteurs verticaux (`|`) et peuple le registre d'exception en mémoire vive (capacité portée à 256 motifs).
-  * **Retour :** `true` si au moins une règle est chargée avec succès, sinon `false`.
+Fonction 84 : preload_hunter.c -- preload_hunter_check_global -- Audit intégrité globale
+  • Signature C : bool preload_hunter_check_global(char* out_path, size_t out_len);
+  • Utilité     : Détecte la persistance d'un rootkit utilisateur en vérifiant l'accès
+                  et le contenu de `/etc/ld.so.preload`.
 
-* **81. `mem_stealth_is_whitelisted`**
-  * **Prototype :** `bool mem_stealth_is_whitelisted(const char* comm, const char* exe)`
-  * **Rôle :** Vérifie si un processus correspond à une signature autorisée dans la liste blanche externe. Effectue une comparaison insensible à la casse sur le nom court (`comm`) et le chemin absolu (`exe`) pour neutraliser les faux positifs (navigateurs, Flatpak, environnements de bureau Cinnamon/GNOME/KDE).
-  * **Retour :** `true` si le binaire est légitime, sinon `false`.
+Fonction 85 : preload_hunter.c -- preload_hunter_scan_process_env -- Audit variables d'environnement
+  • Signature C : bool preload_hunter_scan_process_env(pid_t pid, char* out_preload_lib, size_t out_len);
+  • Utilité     : Scanne `/proc/[PID]/environ` (délimiteurs `\0`) pour intercepter
+                  toute injection ciblée via la variable `LD_PRELOAD=`.
 
-* **82. `mem_stealth_scan_maps_anon_rx`**
-  * **Prototype :** `bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe, StealthEvent* ev_out)`
-  * **Rôle :** Analyse chirurgicale de `/proc/[PID]/maps` pour isoler les allocations anonymes rendues exécutables (`r-xp`) après bascule dynamique `mprotect()`. Isole les segments orphelins (Inode 0 sans fichier disque associé) hors vecteurs système protégés (`[vdso]`, `[vsyscall]`).
-  * **Retour :** `true` si une mutation mémoire clandestine est constatée, sinon `false`.
+================================================================================
+SECTION 15 : NOTIFICATIONS BUREAU ASYNCHRONES (src/core/raptor_notify.c)
+================================================================================
 
-* **83. `mem_stealth_dispatch_diff_event`**
-  * **Prototype :** `void mem_stealth_dispatch_diff_event(const StealthEvent* ev)`
-  * **Rôle :** Enregistre et déduplique les alertes forensiques dans le tampon circulaire de RAPTOR. Propulse les événements en temps réel vers le registre LIFO du Cahier Différentiel (Onglet 4).
+Fonction 86 : raptor_notify.c -- raptor_notify_send_desktop -- Émission asynchrone FreeDesktop
+  • Signature C : void raptor_notify_send_desktop(const char* title, const char* body, bool is_critical);
+  • Utilité     : Envoie une notification via `notify-send` avec double fork (`fork()` / `_exit(0)`)
+                  garantissant zéro saccade graphique sur la boucle Raylib (60 FPS).
 
----
+Fonction 87 : raptor_notify.c -- raptor_notify_evaluate_threats -- Arbitrage d'alertes
+  • Signature C : void raptor_notify_evaluate_threats(int current_threats, const char* primary_threat_name);
+  • Utilité     : Filtre anti-rebond temporel (30 secondes) déclenchant l'alerte sur
+                  transition critique et signalant le retour au calme.
 
-### SECTION 14 — DÉTECTION DES DÉTOURNEMENTS DU CHARGEUR DYNAMIQUE (`src/core/preload_hunter.c`)
+================================================================================
+SECTION 16 : MODE CLI DE SECOURS & OUTILS CHIRURGICAUX (src/cli/)
+================================================================================
 
-* **84. `preload_hunter_check_global`**
-  * **Prototype :** `bool preload_hunter_check_global(char* out_path, size_t out_len)`
-  * **Rôle :** Audit d'intégrité passif de l'hôte via le contrôle d'accès direct à `/etc/ld.so.preload`. Identifie la persistance globale d'un rootkit en espace utilisateur forçant l'injection d'une bibliothèque partagée (`.so`) dans l'ensemble des exécutables de la machine.
-  * **Retour :** `true` si le fichier existe et référence une bibliothèque active, sinon `false`.
+Fonction 88 : rap_main.c -- rap_dispatch_command -- Micro-routeur déclaratif
+  • Signature C : int rap_dispatch_command(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Achemine les requêtes CLI vers les gestionnaires spécialisés via la
+                  table déclarative `g_commands`.
 
-* **85. `preload_hunter_scan_process_env`**
-  * **Prototype :** `bool preload_hunter_scan_process_env(pid_t pid, char* out_preload_lib, size_t out_len)`
-  * **Rôle :** Inspection unitaire et sécurisée du pseudo-fichier `/proc/[PID]/environ`. Parcourt les variables délimitées par des octets nuls (`\0`) pour intercepter la variable hostile `LD_PRELOAD=` ciblant un processus spécifique.
-  * **Retour :** `true` en cas d'injection ciblée détectée avec extraction du chemin de la bibliothèque, sinon `false`.
+Fonction 89 : cmd_status.c -- rap_cmd_status -- Bilan vital instantané
+  • Signature C : int rap_cmd_status(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Diagnostic vital en moins de 15 ms (RAM totale, processus actifs,
+                  intégrité de `/etc/ld.so.preload`).
 
----
+Fonction 90 : cmd_top.c -- rap_cmd_top -- Top consommateurs VmRSS
+  • Signature C : int rap_cmd_top(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Trie les processus par mémoire résidente physique réelle sans
+                  allocation sur le tas (tri d'insertion statique sur la pile).
 
-### SECTION 15 — NOTIFICATIONS BUREAU ASYNCHRONES FREEDESKTOP (`src/core/raptor_notify.c`)
+Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné
+  • Signature C : int rap_cmd_hunt(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Enchaîne séquentiellement la traque Inode 0 (`rx`), les détournements
+                  dynamiques (`preload`) et l'analyse heuristique (`heur`).
 
-* **86. `raptor_notify_send_desktop`**
-  * **Prototype :** `void raptor_notify_send_desktop(const char* title, const char* body, bool is_critical)`
-  * **Rôle :** Émet une bulle d'avertissement native vers le démon de notification du bureau via `notify-send`. Utilise un double découplage de processus (`fork()` / `_exit(0)`) garantissant 0 ms de blocage sur la boucle de rendu Raylib (60 FPS constants) et 0 processus zombie.
+Fonction 92 : cmd_rx.c -- rap_cmd_rx -- Traque mutations exécutables Inode 0
+  • Signature C : int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Repère les allocations mémoires anonymes exécutables (`r-xp`)
+                  dans `/proc/[PID]/maps` avec filtrage de liste blanche (`-v` pour mode étendu).
 
-* **87. `raptor_notify_evaluate_threats`**
-  * **Prototype :** `void raptor_notify_evaluate_threats(int current_threats, const char* primary_threat_name)`
-  * **Rôle :** Moteur d'arbitrage d'alertes avec filtre anti-rebond temporel (délai de garde de 30 secondes). Déclenche instantanément la notification lors d'une transition critique (passage de 0 à N menaces) et notifie le retour au statut nominal lors de la résolution de l'incident.
+Fonction 93 : cmd_preload.c -- rap_cmd_preload -- Chasseur LD_PRELOAD
+  • Signature C : int rap_cmd_preload(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Détecte les rootkits userland via le contrôle double palier
+                  (`/etc/ld.so.preload` et `/proc/[PID]/environ`).
 
----
+Fonction 94 : cmd_net.c -- rap_cmd_net -- Audit réseau Net-Guard
+  • Signature C : int rap_cmd_net(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Analyse `/proc/net/tcp` et qualifie instantanément les connexions
+                  actives (APPROUVÉ, EXTERNE, SUSPECT, HOSTILE).
 
-### SECTION 16 — MODE CLI DE SECOURS & OUTILS CHIRURGICAUX (`src/cli/`)
+Fonction 95 : cmd_kill.c -- rap_cmd_kill -- Neutralisation cinétique chirurgicale
+  • Signature C : int rap_cmd_kill(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Émet le signal non rattrapable `SIGKILL` avec validation préalable
+                  par `rap_check_safety_pid` et confirmation interactive (`-f` pour forcer).
 
-* **88. `rap_dispatch_command`** (`src/cli/rap_main.c`)
-  * **Prototype :** `int rap_dispatch_command(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Micro-routeur central du binaire `rap`. Parcourt la table déclarative des greffons (`g_commands`) pour acheminer l'exécution vers la fonction dédiée (`status`, `top`, `hunt`, `rx`, `preload`, `net`, `kill`, `freeze`, `man`). Sans argument, bascule automatiquement vers l'affichage du manuel.
-  * **Retour :** Code de sortie POSIX normalisé (`RAP_EXIT_OK`, `RAP_EXIT_THREAT` ou `RAP_EXIT_ERROR`).
+Fonction 96 : cmd_kill.c -- rap_cmd_freeze -- Suspension conservatoire forensique
+  • Signature C : int rap_cmd_freeze(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Gèle un processus suspect via `SIGSTOP` (état `T`) pour figer son
+                  activité tout en préservant sa mémoire vive pour analyse forensique.
 
-* **89. `rap_cmd_status`** (`src/cli/cmd_status.c`)
-  * **Prototype :** `int rap_cmd_status(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Diagnostic vital instantané de l'hôte en moins de 15 ms sans allocation dynamique. Lit `/proc/meminfo` (RAM totale et disponible), dénombre les processus actifs sous `/proc` et audite l'existence de l'altération globale `/etc/ld.so.preload`.
-  * **Retour :** `RAP_EXIT_OK` (0) si le système est intègre, `RAP_EXIT_THREAT` (1) si `/etc/ld.so.preload` est présent.
+Fonction 97 : cmd_man.c -- rap_cmd_man -- Manuel de référence unifié embarqué
+  • Signature C : int rap_cmd_man(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Restitue le manuel complet stocké en mémoire morte (`.rodata`),
+                  avec bascule automatique vers le téléscripteur `rapless` sur terminal interactif.
 
-* **90. `rap_cmd_top`** (`src/cli/cmd_top.c`)
-  * **Prototype :** `int rap_cmd_top(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Analyse et ordonne les processus consommant le plus de mémoire vive résidente réelle (`VmRSS` dans `/proc/[PID]/status`). Élimine strictement les threads noyau (`rss == 0`) et applique un tri d'insertion statique borné dans la pile (0 octet sur le tas).
-  * **Retour :** `RAP_EXIT_OK` (0) après affichage, `RAP_EXIT_ERROR` (2) si `/proc` est inaccessible.
+Fonction 98 : rap_common.c -- rap_output_formatter -- Formatage d'affichage universel
+  • Signature C : void rap_output_formatter(const RapConfig *cfg, const char *c1, const char *c2, const char *c3, const char *c4);
+  • Utilité     : Formate les flux d'audit sur 4 colonnes régulières en mode interactif
+                  ou en flux brut délimité par tabulations (`\t`) en mode `--raw`.
 
-* **91. `rap_cmd_hunt`** (`src/cli/cmd_hunt.c`)
-  * **Prototype :** `int rap_cmd_hunt(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Moteur d'audit universel combiné. Coordonne séquentiellement la traque des mutations mémoires anonymes (`rap_cmd_rx`) et des détournements du chargeur dynamique (`rap_cmd_preload`) en une passe unique d'investigation.
-  * **Retour :** `RAP_EXIT_THREAT` (1) si au moins une menace est identifiée par l'une des sondes, sinon `RAP_EXIT_OK` (0).
+Fonction 99 : rap_common.c -- rap_check_safety_pid -- Barrière de sécurité cinétique
+  • Signature C : int rap_check_safety_pid(const RapConfig *cfg, pid_t pid);
+  • Utilité     : Empêche les arrêts accidentels en rejetant le tir sur PID 1,
+                  sur soi-même, sur le shell parent et sur les threads internes du noyau.
 
-* **92. `rap_cmd_rx`** (`src/cli/cmd_rx.c`)
-  * **Prototype :** `int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Traque chirurgicale dans `/proc/[PID]/maps` des segments mémoires virtuels anonymes convertis en exécutable (`r-xp`) avec un Inode à `0` sans ancrage fichier. Filtre automatiquement les faux positifs légitimes via `rap_is_mem_whitelisted` sauf si le drapeau `-v` (verbose) est activé.
-  * **Retour :** `RAP_EXIT_THREAT` (1) en cas de mutation clandestine non autorisée, `RAP_EXIT_OK` (0) si le système est intègre.
+Fonction 100 : rap_main.c -- rap_parse_flags -- Parseur d'arguments et drapeaux
+  • Signature C : int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg);
+  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-n`, `-h`),
+                  détecte le mode TTY (`isatty`) et isole le verbe d'action dans `argv`.
 
-* **93. `rap_cmd_preload`** (`src/cli/cmd_preload.c`)
-  * **Prototype :** `int rap_cmd_preload(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Détection des rootkits userland via un audit à double palier : contrôle d'accès direct au fichier de persistance `/etc/ld.so.preload` et extraction sécurisée des variables d'environnement délimitées par des zéros binaires (`/proc/[PID]/environ`) pour intercepter `LD_PRELOAD=`.
-  * **Retour :** `RAP_EXIT_THREAT` (1) en cas de détournement détecté, sinon `RAP_EXIT_OK` (0).
+Fonction 107 : rap_common.c -- rap_is_mem_whitelisted -- Filtrage liste blanche mémoire
+  • Signature C : int rap_is_mem_whitelisted(const char *comm);
+  • Utilité     : Vérifie si un processus figure dans `mem_whitelist.conf` en gérant
+                  la troncature noyau à 15 caractères sans allocation dynamique.
 
-* **94. `rap_cmd_net`** (`src/cli/cmd_net.c`)
-  * **Prototype :** `int rap_cmd_net(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Inspection passive directe de `/proc/net/tcp` sans dépendance externe (`netstat`/`ss`). Décode les adresses binaires IPv4 (little-endian), isole les sockets en communication active (`TCP_ESTABLISHED`) et qualifie chaque flux en temps réel via l'intelligence Net-Guard (`rap_net_eval_ip`).
-  * **Retour :** `RAP_EXIT_THREAT` (1) si une connexion pointe vers une adresse IP hostile, sinon `RAP_EXIT_OK` (0).
+Fonction 108 : rap_common.c -- rap_net_eval_ip -- Qualification CIDR d'endpoint IP
+  • Signature C : int rap_net_eval_ip(uint32_t ip, uint16_t port, char *out_desc, size_t desc_size);
+  • Utilité     : Évalue une adresse IP contre les registres `fw_officiel.conf` et `fw_custom.conf`
+                  pour retourner son niveau de confiance (APPROUVÉ, STANDARD, SUSPECT, HOSTILE).
 
-* **95. `rap_cmd_kill`** (`src/cli/cmd_kill.c`)
-  * **Prototype :** `int rap_cmd_kill(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Neutralisation cinétique chirurgicale d'un processus hostile par émission du signal non rattrapable `SIGKILL`. Valide préalablement la cible via `rap_check_safety_pid` et applique une demande de confirmation interactive sauf présence du drapeau `-f` (`--force`).
-  * **Retour :** `RAP_EXIT_OK` (0) en cas de succès, `RAP_EXIT_ERROR` (2) en cas de refus de sécurité ou d'échec système.
+Fonction 109 : cmd_heur.c -- rap_cmd_heur -- Traque des anomalies d'exécution
+  • Signature C : int rap_cmd_heur(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Parcourt `/proc`, résout `/proc/[PID]/exe` et projette les anomalies
+                  comportementales identifiées sur la console de secours.
 
-* **96. `rap_cmd_freeze`** (`src/cli/cmd_kill.c`)
-  * **Prototype :** `int rap_cmd_freeze(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Suspension conservatoire immédiate d'une menace via le signal `SIGSTOP`. Fige l'exécution de la cible en la plaçant dans l'état noyau `T` (*Stopped*) tout en préservant intacte sa mémoire virtuelle pour copie ou analyse forensique ultérieure.
-  * **Retour :** `RAP_EXIT_OK` (0) si la cible est figée avec succès, `RAP_EXIT_ERROR` (2) en cas de refus de sécurité ou d'échec.
+Fonction 110 : cmd_heur.c -- rap_heur_check_process -- Évaluation unitaire heuristique
+  • Signature C : int rap_heur_check_process(pid_t pid, const char *comm, const char *exe_path, char *out_anomaly, size_t out_sz);
+  • Utilité     : Évalue un processus selon trois axes sans allocation dynamique :
+                  1. Binaires supprimés du disque en cours d'exécution (`(deleted)`).
+                  2. Exécutions depuis des zones volatiles suspectes (`/tmp`, `/dev/shm`).
+                  3. Usurpation d'identité de démons systèmes (*Masquerading*).
 
-* **97. `rap_cmd_man`** (`src/cli/cmd_man.c`)
-  * **Prototype :** `int rap_cmd_man(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Manuel de référence autonome embarqué intégralement en mémoire morte (`.rodata`). Restitue la documentation technique complète (syntaxe, commandes, codes de sortie POSIX, pipelines) et l'aide unitaire par sous-commande sans dépendre du disque, de `man` ou de `groff`.
-  * **Retour :** Toujours `RAP_EXIT_OK` (0).
+================================================================================
+SECTION 17 : SENTINELLE PASSIVE ANTI-RANÇONGICIEL (FANOTIFY & LEURRES DENSES)
+================================================================================
 
-* **98. `rap_output_formatter`** (`src/cli/rap_common.c`)
-  * **Prototype :** `void rap_output_formatter(const RapConfig *cfg, const char *c1, const char *c2, const char *c3, const char *c4)`
-  * **Rôle :** Moteur transversal de formatage d'affichage sur 4 colonnes. Aligne proprement les colonnes avec espacement calibré en mode TTY interactif, ou génère un flux brut délimité par tabulations (`\t`) sans fioritures en mode redirection ou extraction machine (`-r` / `--raw`).
-  * **Retour :** Aucun (`void`).
+Fonction 111 : sentry_engine.c -- sentry_deploy_canary -- Déploiement d'appât dense
+  • Signature C : int sentry_deploy_canary(const char *dir_path);
+  • Utilité     : Génère un fichier binaire dense de 32 Ko (`!00_raptor_vault.kdbx`)
+                  doté de l'en-tête officiel KeePass KDBX4 (Magic Numbers authentiques)
+                  et d'un corps à haute entropie généré par LCG. Applique les permissions
+                  `0666` via `fchmod` afin de piéger tout compte utilisateur.
+  • Retour      : `0` en cas de synchronisation physique (`fdatasync`) réussie, `-1` en cas d'échec.
 
-* **99. `rap_check_safety_pid`** (`src/cli/rap_common.c`)
-  * **Prototype :** `int rap_check_safety_pid(const RapConfig *cfg, pid_t pid)`
-  * **Rôle :** Barrière de sécurité inviolable prévenant les tirs fratricides et les arrêts critiques accidentels. Rejette catégoriquement le ciblage du PID 1 (`init`/`systemd`), du PID courant de l'utilitaire, du PPID (shell parent de l'opérateur) et des threads internes du noyau Linux (`maps` vide).
-  * **Retour :** `0` si le PID est valide et autorisé, `-1` en cas d'interdiction de tir formelle.
+Fonction 112 : sentry_engine.c -- sentry_init_fanotify -- Initialisation de la surveillance noyau
+  • Signature C : int sentry_init_fanotify(const SentryConfig *config);
+  • Utilité     : Configure le sous-système de notification noyau en mode permissionnel
+                  synchrone (`FAN_CLASS_CONTENT | FAN_NONBLOCK | FAN_CLOEXEC`). Déploie le
+                  leurre si nécessaire et pose une marque de verrouillage d'ouverture
+                  synchrone (`FAN_MARK_ADD`, `FAN_OPEN_PERM`) sur chaque cible configurée.
+  • Retour      : Descripteur de fichier `fan_fd` valide, ou `-1` en cas d'erreur de privilèges.
 
-* **100. `rap_parse_flags`** (`src/cli/rap_main.c`)
-  * **Prototype :** `int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg)`
-  * **Rôle :** Analyseur d'arguments universels en ligne de commande. Extrait les drapeaux de combat (`-q`, `-r`, `-f`, `-v`, `-n`, `-h`), détecte si la sortie standard est connectée à un terminal (`isatty`) et réaligne le tableau `argv` pour isoler le verbe d'action à exécuter.
-  * **Retour :** Toujours `0`.
+Fonction 113 : sentry_engine.c -- sentry_listen_loop -- Boucle de veille passive bloquante
+  • Signature C : int sentry_listen_loop(int fanotify_fd, const SentryConfig *config);
+  • Utilité     : Assure le guet passif bloquant sur `poll()` (consommation de 0% CPU au repos).
+                  Dépouille les événements noyau dans un tampon statique de 4 Ko aligné
+                  sur 8 octets (`__attribute__((aligned(8)))`) sans allocation sur le tas (`0 heap`).
+  • Retour      : `0` lors d'un arrêt nominal par signal, `-1` en cas d'erreur de lecture.
 
-* **107. `rap_is_mem_whitelisted`** (`src/cli/rap_common.c`)
-  * **Prototype :** `int rap_is_mem_whitelisted(const char *comm)`
-  * **Rôle :** Moteur d'assainissement passif des allocations dynamiques. Charge sans allocation dynamique (`0 heap`) les règles de `assets/rules/mem_whitelist.conf` (format `TYPE | MOTIF | DESC`), prend en compte la troncature `TASK_COMM_LEN` (15 octets) du noyau et écarte le bruit des moteurs JIT (Chromium) et des trampolines FFI (Cinnamon/GTK).
-  * **Retour :** `1` si le processus figure dans la liste blanche légitime, sinon `0`.
+Fonction 114 : sentry_engine.c -- sentry_trigger_reflex -- Riposte cinétique synchrone
+  • Signature C : int sentry_trigger_reflex(int fanotify_fd, int fd_event, pid_t pid);
+  • Utilité     : Vérifie le garde-fou autonome `sentry_is_protected_pid` (PID <= 1, self, parent).
+                  Applique instantanément le gel conservatoire de l'agresseur via `SIGSTOP`
+                  (état noyau `T`), ordonne le rejet de l'appel d'ouverture auprès du noyau via
+                  `FAN_DENY`, referme le descripteur d'inspection et émet l'alerte console.
+  • Retour      : `0` si la neutralisation a réussi, `-1` si le PID était protégé.
 
-* **108. `rap_net_eval_ip`** (`src/cli/rap_common.c`)
-  * **Prototype :** `int rap_net_eval_ip(uint32_t ip, uint16_t port, char *out_desc, size_t desc_size)`
-  * **Rôle :** Évaluateur CIDR autonome adossé aux registres souverains Net-Guard (`fw_officiel.conf` et `fw_custom.conf`). Intercepte instantanément les adresses IP répertoriées hostiles (relais C2/Tor), approuve les flux privés locaux (RFC 1918) et qualifie les communications sortantes standards (HTTPS:443, HTTP:80, DNS:53, SSH:22).
-  * **Retour :** Constante entière de qualification (`RAP_NET_APPROVED`, `RAP_NET_STANDARD`, `RAP_NET_SUSPECT`, `RAP_NET_HOSTILE`).
+Fonction 115 : sentry_engine.c -- sentry_enter_stealth -- Blindage et invisibilité mémoire
+  • Signature C : int sentry_enter_stealth(const char *fake_name);
+  • Utilité     : Masque le nom du processus dans la table noyau via `prctl(PR_SET_NAME, "[kworker/u16:3]")`,
+                  s'attribue l'immunité OOM maximale (`/proc/self/oom_score_adj = -1000`) et
+                  verrouille l'intégralité des pages physiques en RAM via `mlockall(MCL_CURRENT | MCL_FUTURE)`.
+  • Retour      : `0` en cas de succès opérationnel, `-1` si les limites système restreignent le verrouillage.
 
-* **109. `rap_cmd_heur`** (`src/cli/cmd_heur.c`)
-  * **Prototype :** `int rap_cmd_heur(int argc, char **argv, const RapConfig *cfg)`
-  * **Rôle :** Parcourt l'arborescence `/proc` pour traquer l'ensemble des anomalies comportementales et d'exécution clandestine. Résout le lien symbolique `/proc/[PID]/exe` de chaque tâche active, applique les filtres heuristiques experts (`rap_heur_check_process`) et projette les alertes formatées en console.
-  * **Retour :** `RAP_EXIT_THREAT` (1) en cas d'anomalie détectée (binaire fantôme, zone volatile, usurpation), `RAP_EXIT_OK` (0) si le système est intègre, ou `RAP_EXIT_ERROR` (2) si `/proc` est inaccessible.
+Fonction 116 : cmd_sentry.c -- cmd_sentry_arm -- Armement des leurres sur disque
+  • Signature C : static int cmd_sentry_arm(int argc, char **argv);
+  • Utilité     : Déploie les fichiers canaris dans les cibles spécifiées en ligne de
+                  commande ou applique les répertoires sensibles par défaut (`/home`, `/var/www`, `/var/lib`, `/etc`).
+  • Retour      : `0` (succès) si au moins un appât est opérationnel, `2` en cas d'échec global.
 
-* **110. `rap_heur_check_process`** (`src/cli/cmd_heur.c`)
-  * **Prototype :** `int rap_heur_check_process(pid_t pid, const char *comm, const char *exe_path, char *out_anomaly, size_t out_sz)`
-  * **Rôle :** Évalue unitairement la posture de sécurité d'un processus via trois filtres défensifs sans allocation dynamique :
-    1. Détection des binaires fantômes exécutés en mémoire vive après suppression sur le disque (`(deleted)`).
-    2. Détection d'exécutions clandestines depuis des répertoires temporaires ou volatils suspects (`/tmp`, `/var/tmp`, `/dev/shm`, `/run/user/`).
-    3. Détection d'usurpation d'identité système (*Masquerading*) sur les démons officiels (`systemd`, `sshd`, `cron`, `rsyslogd`) et faux threads `kworker`.
-    Neutralise automatiquement les faux positifs lorsque `/proc/[PID]/exe` est inaccessible sans privilèges root.
-  * **Retour :** `1` si une anomalie heuristique est avérée avec qualification dans `out_anomaly`, sinon `0`.
+Fonction 117 : cmd_sentry.c -- cmd_sentry_disarm -- Purge et désarmement préventif
+  • Signature C : static int cmd_sentry_disarm(int argc, char **argv);
+  • Utilité     : Supprime proprement par déliaison physique (`unlink`) les fichiers
+                  leurres pour autoriser les opérations de maintenance sans fausse alerte.
+  • Retour      : Toujours `0` après affichage du bilan de neutralisation.
+
+Fonction 118 : cmd_sentry.c -- cmd_sentry_status -- Audit d'intégrité physique des appâts
+  • Signature C : static int cmd_sentry_status(int argc, char **argv);
+  • Utilité     : Vérifie l'existence et la stricte conformité de taille (32768 octets)
+                  des canaris sur l'ensemble des répertoires surveillés (`[ACTIF]`, `[ALTERE]`, `[NON ARME]`).
+  • Retour      : Toujours `0`.
+
+Fonction 119 : cmd_sentry.c -- cmd_sentry_run -- Démarrage du guet passif fanotify
+  • Signature C : static int cmd_sentry_run(int argc, char **argv);
+  • Utilité     : Initialise `fanotify`, prend en charge le détachement en démon d'arrière-plan
+                  (`-d` / `--daemon`) via `fork()` et `setsid()`, active l'invisibilité furtive
+                  (`sentry_enter_stealth`), redirige les flux vers `/dev/null` et lance la veille.
+  • Retour      : `0` en cas d'arrêt propre, `2` en cas de droits administrateur insuffisants.
+
+Fonction 120 : cmd_sentry.c -- cmd_sentry -- Aiguilleur CLI sentry
+  • Signature C : int cmd_sentry(int argc, char **argv);
+  • Utilité     : Point d'entrée principal de la sous-commande `rap sentry`. Parse les
+                  arguments et route vers `arm`, `disarm`, `status` ou `run`.
+  • Retour      : Code de retour de la sous-commande, ou `2` si la commande est inconnue.
+
+Fonction 121 : rap_main.c -- rap_cmd_sentry -- Pont déclaratif sentinelle
+  • Signature C : int rap_cmd_sentry(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Relie la table déclarative universelle `g_commands` de RAPTOR au point
+                  d'entrée de la sentinelle anti-rançongiciel (`cmd_sentry`).
+  • Retour      : Code de retour POSIX transmis par `cmd_sentry`.
+
+================================================================================
+SECTION 18 : OUTILLAGE DE COMPILATION & SOURCE UNIQUE SSOT (tools/)
+================================================================================
+
+Outil 01 : gen_man.py -- parse_ssot_markdown -- Découpage multi-pages
+  • Signature Python : def parse_ssot_markdown(md_raw) -> dict
+  • Utilité          : Parse le fichier maître `docs/man/rap.1.md` et segmente chaque
+                       page de manuel délimitée par les balises `<!-- MAN: key | sec | titre -->`.
+
+Outil 02 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix
+  • Signature Python : def format_unix_header(key, sec) -> str
+  • Utilité          : Calibre et génère la bannière d'en-tête troff/groff centrée
+                       sur 70 colonnes (ex: `RAP(1)   RAPTOR DEFENSE   RAP(1)`).
+
+Outil 03 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99
+  • Signature Python : def generate_cli_header(pages) -> str
+  • Utilité          : Encode l'ensemble des pages de manuel dans le tableau constant
+                       `g_rap_man_data[]` de `src/cli/rap_man_data.h` pour inclusion
+                       autonome en mémoire morte dans l'exécutable `rap` (zéro heap).
+
+Outil 04 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS
+  • Signature Python : def generate_js_database(pages) -> str
+  • Utilité          : Construit la base de données JavaScript `docs/js/man_data.js`
+                       alimentant la visionneuse interactive de `docs/man.html`.
+
+================================================================================
+FIN DU RÉFÉRENTIEL TECHNIQUE OFFICIEL // RAPTOR DEFENSE v2.0
+================================================================================

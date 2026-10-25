@@ -1,21 +1,40 @@
 /* ============================================================================
  * NOM DU SCRIPT   : src/cli/rap_main.c
- * RÉVISION        : Rev 1.1
+ * RÉVISION        : Rev 1.2
  * PROJET          : RAPTOR DEFENSE v2.0 (Mode CLI & Outils de Secours)
  * RESPONSABILITÉ  : Point d'entrée principal et micro-dispatcher déclaratif.
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.1) :
- *   - Enregistrement de la commande 'heur' (alias 'he') dans g_commands.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
+ *   - Enregistrement de la commande 'sentry' (alias 'se') dans la table déclarative g_commands.
+ *   - Intégration du pont d'aiguillage rap_cmd_sentry vers le gestionnaire cmd_sentry.
  *
- * SECTION DU CAHIER DES CHARGES : SECTION 16 (Fonctions 88 & 100)
+ * SECTION DU CAHIER DES CHARGES : SECTION 16 (Fonctions 88 & 100, Liaison Sentinelle)
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
- *    88. rap_dispatch_command
- *   100. rap_parse_flags
+ *    88. rap_dispatch_command : Aiguillage déclaratif vers le gestionnaire de commande.
+ *   100. rap_parse_flags      : Analyse et épuration des drapeaux de la ligne de commande.
+ *   121. rap_cmd_sentry       : Pont d'aiguillage vers la sentinelle anti-rançongiciel.
  * ============================================================================
  */
 
 #include "rap_cli.h"
+
+/* Déclaration externe du point d'entrée sentinelle (src/cli/cmd_sentry.c) */
+extern int cmd_sentry(int argc, char **argv);
+
+/* ============================================================================
+ * FONCTION 121 : rap_cmd_sentry
+ * Pont d'adaptation entre le dispatcher déclaratif et le gestionnaire de sous-commandes.
+ * ============================================================================
+ */
+int rap_cmd_sentry(int argc, char **argv, const RapConfig *cfg)
+{
+    (void)cfg;
+    if (argc < 2) {
+        return cmd_sentry(1, argv);
+    }
+    return cmd_sentry(argc - 1, &argv[1]);
+}
 
 static const RapCliCommand g_commands[] = {
     {"status",  "st", "Bilan vital instantané de la machine hôte", rap_cmd_status},
@@ -25,6 +44,7 @@ static const RapCliCommand g_commands[] = {
     {"preload", NULL, "Traque des détournements LD_PRELOAD", rap_cmd_preload},
     {"heur",    "he", "Analyse heuristique (chemins volatils, binaires supprimés, usurpations)", rap_cmd_heur},
     {"net",     NULL, "Audit des communications réseau TCP établies", rap_cmd_net},
+    {"sentry",  "se", "Sentinelle passive anti-rançongiciel (canaris & fanotify)", rap_cmd_sentry},
     {"kill",    NULL, "Neutralisation chirurgicale immédiate par signal SIGKILL", rap_cmd_kill},
     {"freeze",  NULL, "Gel d'un processus hostile via SIGSTOP pour analyse", rap_cmd_freeze},
     {"man",     NULL, "Manuel de référence autonome embarqué (.rodata)", rap_cmd_man},

@@ -1,14 +1,14 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/man.html
- * RÉVISION        : Rev 1.2
+ * RÉVISION        : Rev 1.3
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Interface interactive de consultation des pages de manuel
  *                   UNIX en ligne (Section 1 Commandes, Section 5 Formats).
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
- *   - Nettoyage des styles inline rigides (width: 260px, margin-left: auto).
- *   - Regroupement des actions de recherche dans des conteneurs responsives.
- *   - Adaptation fluide de la grille des sélecteurs pour les écrans mobiles.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.3) :
+ *   - Intégration du script de données unifié 'js/man_data.js' (généré via SSOT).
+ *   - Ajout du raccourci rapide pour la sentinelle anti-rançongiciel (#rap-sentry).
+ *   - Découplage strict : le fichier HTML consomme la base sans redondance.
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -65,7 +65,7 @@
             <!-- Barre d'outils responsive -->
             <div class="man-selector-bar">
                 <div class="man-search-group">
-                    <input type="text" id="manSearchInput" placeholder="Rechercher une commande (ex: rx, kill, net)...">
+                    <input type="text" id="manSearchInput" placeholder="Rechercher une commande (ex: rx, sentry, kill)...">
                     <div class="man-btn-group">
                         <button type="button" id="btnManExec" class="btn-primary">man</button>
                         <button type="button" id="btnAproposExec" class="btn-secondary">apropos</button>
@@ -85,7 +85,7 @@
                     <div class="man-select-field">
                         <label for="manCommandSelect">Page :</label>
                         <select id="manCommandSelect" class="man-select">
-                            <!-- Rempli dynamiquement par man-engine.js -->
+                            <!-- Rempli dynamiquement depuis js/man_data.js -->
                         </select>
                     </div>
                 </div>
@@ -114,6 +114,7 @@
                     <a href="#rap-preload">rap-preload(1)</a> &bull; 
                     <a href="#rap-heur">rap-heur(1)</a> &bull; 
                     <a href="#rap-net">rap-net(1)</a> &bull; 
+                    <a href="#rap-sentry">rap-sentry(1)</a> &bull; 
                     <a href="#rap-kill">rap-kill(1)</a> &bull; 
                     <a href="#rap-freeze">rap-freeze(1)</a> &bull; 
                     <a href="#rapless">rapless(1)</a> &bull; 
@@ -136,6 +137,8 @@
         </div>
     </footer>
 
+    <!-- Chargement de la base de données unifiée SSOT puis du moteur d'affichage -->
+    <script src="js/man_data.js"></script>
     <script src="js/man-engine.js"></script>
 </body>
 </html>

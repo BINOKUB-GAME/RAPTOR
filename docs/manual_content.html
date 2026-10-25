@@ -1,0 +1,93 @@
+<h1>RAPTOR DEFENSE v2.0 // Manuel de Référence (Mode CLI)</h1>
+<br>
+<h2>NOM</h2>
+<p>rap - Arsenal souverain d'audit défensif, traque mémoire et neutralisation d'urgence.</p>
+<br>
+<h2>SYNOPSIS</h2>
+<p><code>rap <commande> [options] [arguments]</code>  </p>
+<p><code>rap [drapeaux_globaux] <commande></code></p>
+<br>
+<h2>DESCRIPTION</h2>
+<p>RAPTOR DEFENSE v2.0 est un bouclier d'investigation système et d'intervention en espace utilisateur C99 strict. Conçu selon les principes de l'ingénierie critique (zéro allocation dynamique sur le tas, exécution bornée sur la pile, zéro dépendance externe), il opère directement sur les structures natives du noyau Linux (<code>/proc</code>, <code>fanotify</code>, <code>netlink</code>).</p>
+<br>
+<p>---</p>
+<br>
+<h2>COMMANDES DISPONIBLES</h2>
+<br>
+<h3>status (alias: st)</h3>
+<p>Bilan vital instantané de la machine hôte.</p>
+<p>* <strong>Syntaxe</strong> : <code>rap status</code></p>
+<p>* <strong>Description</strong> : Scanne l'état global du système, la charge mémoire vive, l'intégrité de la table des processus et signale tout indice de compromission immédiat.</p>
+<br>
+<h3>top</h3>
+<p>Top des consommateurs de mémoire vive résidente.</p>
+<p>* <strong>Syntaxe</strong> : <code>rap top [-n limite]</code></p>
+<p>* <strong>Description</strong> : Analyse <code>/proc/[pid]/status</code> et trie les processus par empreinte <code>VmRSS</code> décroissante sans recourir à des forks externes.</p>
+<br>
+<h3>hunt</h3>
+<p>Audit combiné complet multi-vecteurs.</p>
+<p>* <strong>Syntaxe</strong> : <code>rap hunt</code></p>
+<p>* <strong>Description</strong> : Exécute en une seule passe séquentielle la traque des pages mutées (<code>rx</code>), les détournements d'environnement (<code>preload</code>) et les anomalies d'exécution (<code>heur</code>).</p>
+<br>
+<h3>rx</h3>
+<p>Traque des mutations de pages exécutables anonymes (Inode 0).</p>
+<p>* <strong>Syntaxe</strong> : <code>rap rx</code></p>
+<p>* <strong>Description</strong> : Inspecte <code>/proc/[pid]/maps</code> pour détecter les injections de code dynamique, coquilles de décompression (*packers*) ou segments <code>rwx</code> / <code>r-x</code> sans ancrage fichier sur le disque.</p>
+<br>
+<h3>preload</h3>
+<p>Traque des détournements d'édition de liens dynamique.</p>
+<p>* <strong>Syntaxe</strong> : <code>rap preload</code></p>
+<p>* <strong>Description</strong> : Audit <code>/etc/ld.so.preload</code> et les environnements mémoire <code>/proc/[pid]/environ</code> pour repérer toute usurpation de symboles partagés (rootkits en espace utilisateur).</p>
+<br>
+<h3>heur (alias: he)</h3>
+<p>Analyse heuristique des comportements furtifs.</p>
+<p>* <strong>Syntaxe</strong> : <code>rap heur</code></p>
+<p>* <strong>Description</strong> : Détecte les binaires supprimés toujours actifs (<code>(deleted)</code>), les exécutions depuis des répertoires temporaires volatils (<code>/tmp</code>, <code>/dev/shm</code>) et les usurpations d'identité noyau.</p>
+<br>
+<h3>net</h3>
+<p>Audit des communications réseau TCP établies.</p>
+<p>* <strong>Syntaxe</strong> : <code>rap net</code></p>
+<p>* <strong>Description</strong> : Analyse <code>/proc/net/tcp</code> et <code>/proc/net/tcp6</code> pour corréler chaque socket active avec son PID réel et sa ligne de commande associée.</p>
+<br>
+<h3>sentry (alias: se)</h3>
+<p>Sentinelle passive anti-rançongiciel (canaris & fanotify).</p>
+<p>* <strong>Syntaxe</strong> : <code>rap sentry <arm | disarm | status | run [-d]> [chemins...]</code></p>
+<p>* <strong>Sous-commandes</strong> :</p>
+<p>  * <code>arm [chemins...]</code> : Déploie des fichiers leurres denses (<code>!00_raptor_vault.kdbx</code>, 32 Ko, signature KeePass KDBX4 authentique). Cibles par défaut : <code>/home</code>, <code>/var/www</code>, <code>/var/lib</code>, <code>/etc</code>.</p>
+<p>  * <code>disarm [chemins...]</code> : Supprime proprement les leurres lors des opérations de maintenance.</p>
+<p>  * <code>status</code> : Contrôle la présence et la taille exacte des canaris armés.</p>
+<p>  * <code>run [-d] [chemins...]</code> : Active la veille passive noyau <code>FAN_OPEN_PERM</code> (0% CPU au repos). Le drapeau <code>-d</code> active le détachement en arrière-plan, le masquage <code>prctl</code> (<code>[kworker/u16:3]</code>), le verrouillage <code>mlockall</code> et l'immunité mémoire <code>/proc/self/oom_score_adj = -1000</code>.</p>
+<p>* <strong>Réaction cinétique</strong> : Gel conservatoire immédiat (<code>SIGSTOP</code>, état <code>T</code>) et rejet synchrone de l'ouverture (<code>FAN_DENY</code>) dès qu'un processus tente d'accéder à un leurre.</p>
+<br>
+<h3>kill</h3>
+<p>Neutralisation chirurgicale immédiate par signal SIGKILL.</p>
+<p>* <strong>Syntaxe</strong> : <code>rap kill <PID></code></p>
+<p>* <strong>Description</strong> : Vérifie les gardes-fous anti-suicide système (<code>PID <= 1</code>, processus père) et applique un signal <code>SIGKILL</code> direct sans délai.</p>
+<br>
+<h3>freeze</h3>
+<p>Suspension conservatoire d'un processus suspect pour analyse.</p>
+<p>* <strong>Syntaxe</strong> : <code>rap freeze <PID></code></p>
+<p>* <strong>Description</strong> : Envoie le signal <code>SIGSTOP</code> pour figer l'état du suspect sans détruire sa mémoire vive (permet l'extraction forensique de clés de chiffrement en RAM).</p>
+<br>
+<h3>man</h3>
+<p>Affiche ce manuel de référence autonome embarqué.</p>
+<p>* <strong>Syntaxe</strong> : <code>rap man</code></p>
+<br>
+<p>---</p>
+<br>
+<h2>DRAPEAUX GLOBAUX</h2>
+<p>* <code>-q, --quiet</code>   : Mode silencieux (supprime bannières et en-têtes ANSI).</p>
+<p>* <code>-r, --raw</code>     : Sortie brute délimitée par tabulations pour scripts shell et pipelines.</p>
+<p>* <code>-f, --force</code>   : Ignore les invites de confirmation interactive.</p>
+<p>* <code>-v, --verbose</code> : Affiche les métriques détaillées d'audit.</p>
+<p>* <code>-h, --help</code>    : Affiche l'aide abrégée et quitte.</p>
+<p>* <code>-n <nombre></code>   : Limite le nombre de lignes retournées (ex: <code>rap top -n 5</code>).</p>
+<br>
+<h2>CODES DE RETOUR POSIX</h2>
+<p>* <code>0</code> : Exécution nominale, aucun élément hostile détecté.</p>
+<p>* <code>1</code> : Alerte sécurité levée (anomalie détectée ou processus intercepté).</p>
+<p>* <code>2</code> : Erreur d'exécution, argument invalide ou privilèges insuffisants (root requis).</p>
+<br>
+<h2>DROITS SYSTÈME REQUIS</h2>
+<p>L'interception au niveau du noyau (<code>sentry</code>) et l'envoi de signaux inter-processus (<code>kill</code>, <code>freeze</code>) exigent les privilèges administrateur (<code>root</code>) ou l'attribution des capacités POSIX suivantes :  </p>
+<p><code>setcap 'cap_sys_admin,cap_kill,cap_ipc_lock=+ep' /usr/local/bin/rap</code></p>
