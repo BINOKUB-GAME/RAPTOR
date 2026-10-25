@@ -38,7 +38,7 @@ COMMANDES
      rx           Traque des pages mémoires anonymes exécutables (Inode 0).
      preload      Audit d'intégrité du chargeur dynamique (/etc/ld.so.preload).
      heur, he     Analyse heuristique (binaires supprimés, chemins volatils).
-     net          Audit et qualification des sockets TCP (Net-Guard).
+     net          Audit TCP, corrélation PID et forensic IP (Net-Guard / OSINT).
      sentry, se   Sentinelle passive anti-rançongiciel (canaris & fanotify).
      kill <PID>   Neutralisation immédiate par émission du signal SIGKILL.
      freeze <PID> Gel conservatoire via signal SIGSTOP pour examen forensique.
@@ -147,25 +147,73 @@ DESCRIPTION
        2. Les processus exécutés depuis des répertoires temporaires (/tmp, /dev/shm).
        3. L'usurpation d'identité de démons officiels (systemd, sshd, kworker).
 
-<!-- MAN: rap-net | 1 | RAP-NET(1) — Sonde Réseau Net-Guard -->
+<!-- MAN: rap-net | 1 | RAP-NET(1) — Sonde Réseau & Forensic Net-Intel -->
 NAME
-     rap net — Audit des communications TCP actives et qualification Net-Guard
+     rap net — Surveillance réseau, corrélation PID et forensic IP souverain
 
 SYNOPSIS
      rap net [-q] [-r] [-n nombre]
+     rap net -i <ADRESSE_IPV4>
+     rap net <ADRESSE_IPV4>
+     rap net -l [c2 | tor | abuse | all]
 
 DESCRIPTION
-     Décode directement les sockets à l'état TCP_ESTABLISHED dans /proc/net/tcp.
-     Chaque flux distant est évalué mathématiquement par calcul de masque CIDR
-     contre les registres fw_officiel.conf et fw_custom.conf :
-       - APPROUVÉ : Segments privés RFC 1918 (192.168.0.0/16, etc.) ou loopback.
-       - EXTERNE  : Ports standards sécurisés (443 HTTPS, 80 HTTP, 53 DNS).
-       - SUSPECT  : Ports distants exotiques non homologués.
-       - [HOSTILE]: Adresses de relais C2 ou nœuds d'attaque répertoriés.
+     rap net est le module d'audit passif des communications réseau et de
+     renseignement tactique sur les menaces (Threat Intelligence).
+     
+     Il combine l'inspection locale des descripteurs de sockets du noyau Linux
+     (/proc/net/tcp et /proc/[PID]/fd/) à une base de réputation OSINT souveraine
+     embarquée directement en section .rodata (zéro allocation dynamique, 0 heap).
+     Toutes les vérifications s'exécutent en mémoire pure sans émettre le moindre
+     paquet sur le réseau extérieur (silence radio et furtivité absolue).
+
+MODES OPÉRATOIRES
+     1. Surveillance active des flux établis :
+        rap net [-q] [-r] [-n nombre]
+        Énumère en temps réel les connexions TCP à l'état ESTABLISHED.
+        Chaque flux est enrichi instantanément par :
+          - La corrélation du socket Inode avec le PID et le binaire local (/proc/[PID]/comm).
+          - La confrontation arithmétique O(log N) avec la table de menaces OSINT.
+          - La qualification Net-Guard (APPROUVÉ, EXTERNE, SUSPECT, DANGER C2, ALERTE TOR).
+
+     2. Enquête médico-légale unitaire :
+        rap net -i <ADRESSE_IPV4>
+        rap net <ADRESSE_IPV4>
+        Édite la fiche forensique complète de l'adresse cible sans contact externe :
+          - Reconnaissance immédiate des plages privées RFC 1918 et Loopback.
+          - Score de menace consolidé (0 à 100) et qualification de la source hostile.
+          - Détection de tout socket actif local connecté à cette IP avec chemin du binaire (/proc/[PID]/exe).
+          - Génération immédiate des règles de neutralisation iptables et nftables.
+
+     3. Inventaire et consultation de la base de signatures :
+        rap net -l [c2 | tor | abuse | all]
+        - Sans argument : Affiche le bilan vital de la base (date, volume, répartition).
+        - Avec argument : Déverse les adresses filtrées par catégorie pour pagination
+          dans le téléscripteur rapless ou exploitation dans des scripts d'administration.
+
+CATÉGORIES OSINT INTÉGRÉES
+     c2       Serveurs de commande et contrôle (C2), rançongiciels et botnets (abuse.ch Feodo).
+     tor      Relais de sortie officiels du réseau d'anonymisation Tor.
+     abuse    Adresses d'attaquants récurrents (scanners, brute-force SSH, fraudes IPsum).
+     all      Ensemble exhaustif des signatures consolidées.
+
+EXAMPLES
+     Surveiller les flux et isoler les alertes :
+     rap net
+
+     Auditer chirurgicalement une IP suspecte repérée dans les journaux :
+     rap net -i 194.26.29.112
+
+     Inspecter les serveurs C2 actifs dans le téléscripteur zéro-heap :
+     rap net -l c2 | rapless
+
+     Extraire les IP malveillantes pour alimentation d'un pare-feu local :
+     rap net -q -r -l c2 | awk '{print "iptables -A OUTPUT -d " $1 " -j DROP"}'
 
 EXIT STATUS
-     0    Trafic nominal ou absence de flux hostile.
-     1    Au moins une connexion vers un endpoint HOSTILE identifiée.
+     0 (RAP_EXIT_OK)      Trafic sain, IP non hostile ou bilan documentaire nominal.
+     1 (RAP_EXIT_THREAT)  Connexion active vers un hôte hostile ou IP au score >= 70.
+     2 (RAP_EXIT_ERROR)   Format IPv4 invalide, catégorie inconnue ou droits insuffisants.
 
 <!-- MAN: rap-sentry | 1 | RAP-SENTRY(1) — Sentinelle Anti-Rançongiciel -->
 NAME
@@ -260,50 +308,4 @@ SYNOPSIS
 DESCRIPTION
      rapless est un téléscripteur d'urgence écrit en C99 n'effectuant aucun
      appel à malloc/calloc (0 heap). Il indexe par pagination statique les flux
-     massifs (testé jusqu'à 25 000 lignes sous /proc/kallsyms).
-
-CONTRÔLES CLAVIER
-     Espace       Fait défiler d'une page complète vers l'avant.
-     Entrée       Fait défiler d'une ligne vers l'avant.
-     b            Revient d'une page vers l'arrière.
-     q            Quitte le téléscripteur et restaure le terminal.
-
-<!-- MAN: mem_whitelist | 5 | MEM_WHITELIST(5) — Format Registre Mémoire -->
-NAME
-     mem_whitelist.conf — Registre des processus autorisés aux pages anonymes R-X
-
-DESCRIPTION
-     Définit les exceptions légitimes pour le moteur d'audit mémoire (rap rx).
-     Élimine les faux positifs causés par les compilateurs JIT (Just-In-Time)
-     et les trampolines de fermeture libffi.
-
-SYNTAXE DU FICHIER
-     TYPE | MOTIF_RECHERCHE | DESCRIPTION CONTEXTUELLE
-
-     TYPE :
-       JIT   Moteurs d'exécution dynamique (navigateurs, JVM, Node.js).
-       FFI   Trampolines d'interfaces graphiques (Cinnamon, GTK, Python).
-
-EXEMPLES
-     JIT | chromium         | Navigateurs basés sur Chromium / V8
-     FFI | cinnamon         | Gestionnaire du bureau Cinnamon
-     FFI | csd-             | Préfixe des démons de configuration Cinnamon
-
-<!-- MAN: fw_officiel | 5 | FW_OFFICIEL(5) — Format Registre Net-Guard -->
-NAME
-     fw_officiel.conf — Registre officiel de souveraineté IP et Net-Guard
-
-DESCRIPTION
-     Fichier immuable de règles réseau distribué avec RAPTOR DEFENSE.
-     Parse les adresses unitaires, les blocs CIDR et les noms de domaines.
-
-SYNTAXE DES RÈGLES IP
-     IP | ADRESSE_OU_CIDR | STATUT | DESCRIPTION
-
-     STATUT :
-       APPROUVÉ   Plage privée locale (RFC 1918) ou service vital autorisé.
-       HOSTILE    Relais C2, scanner malveillant ou infrastructure d'attaque.
-
-EXEMPLES
-     IP | 192.168.0.0/16    | APPROUVÉ | Réseau local privé (RFC 1918)
-     IP | 45.33.32.156      | HOSTILE  | Relais C2 Cobalt Strike répertorié
+     massifs (testé jusqu'à 25 000 lignes sous /proc/kalls
