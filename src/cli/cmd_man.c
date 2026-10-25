@@ -1,15 +1,15 @@
 /* ============================================================================
  * NOM DU SCRIPT   : src/cli/cmd_man.c
- * RÉVISION        : Rev 1.6
+ * RÉVISION        : Rev 1.7
  * PROJET          : RAPTOR DEFENSE v2.0 // Arsenal Souverain C99
  * RESPONSABILITÉ  : Affichage paginé autonome du manuel de référence (.rodata)
  *                   et navigation hiérarchique dans le dictionnaire des fonctions.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.6) :
- *   - Recherche robuste de 'fn' / 'fonct' / 'functions' sur toute la ligne argv.
- *   - Immunité totale contre les décalages d'index (rap man fn vs ./build/rap man fn).
- *   - Restitution paginée intégrale du dictionnaire brut (rap man fn).
- *   - Filtrage chirurgical : Section complète (fn_id=0) ou Fonction unitaire.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.7) :
+ *   - Filtrage chirurgical par rubrique : 'rap man sentry', 'rap man rx', etc.
+ *   - Recherche tolérante avec ou sans le préfixe 'rap-' et support des alias ('st', 'se', 'he').
+ *   - Restitution intégrale du manuel si aucun argument n'est fourni.
+ *   - Maintien du routage dédié pour le dictionnaire des fonctions ('fn').
  * ============================================================================
  */
 
@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 
 /* ============================================================================
@@ -60,7 +61,7 @@ static int rap_man_handle_fn(int argc, char **argv, const RapConfig *cfg)
 
     int p1 = atoi(argv[1]);
 
-    /* Cas 2 : 'rap man fn <sec> <fn>' (ex: rap man fn 17 114 ou rap man fn 2 16) */
+    /* Cas 2 : 'rap man fn <sec> <fn>' (ex: rap man fn 17 114) */
     if (argc >= 3) {
         int p2 = atoi(argv[2]);
         for (size_t i = 0; i < g_rap_fn_entries_count; ++i) {
@@ -97,6 +98,78 @@ static int rap_man_handle_fn(int argc, char **argv, const RapConfig *cfg)
 }
 
 /* ============================================================================
+ * FONCTION AUXILIAIRE : Extraction du mot-clé recherché
+ * ============================================================================
+ */
+static const char *rap_man_extract_topic(int argc, char **argv)
+{
+    int man_idx = -1;
+    for (int i = 0; i < argc; ++i) {
+        if (strcmp(argv[i], "man") == 0 || strcmp(argv[i], "help") == 0) {
+            man_idx = i;
+            break;
+        }
+    }
+
+    if (man_idx >= 0) {
+        for (int i = man_idx + 1; i < argc; ++i) {
+            if (argv[i][0] != '-') {
+                return argv[i];
+            }
+        }
+        return NULL;
+    }
+
+    /* Si 'man' n'est pas dans argv */
+    for (int i = 0; i < argc; ++i) {
+        if (argv[i][0] != '-') {
+            const char *slash = strrchr(argv[i], '/');
+            const char *base = slash ? slash + 1 : argv[i];
+            if (strcmp(base, "rap") != 0 && strcmp(base, "raptor") != 0) {
+                return argv[i];
+            }
+        }
+    }
+
+    return NULL;
+}
+
+/* ============================================================================
+ * FONCTION AUXILIAIRE : Recherche dans la table g_rap_man_pages[]
+ * ============================================================================
+ */
+static const RapManPageEntry *rap_man_lookup_page(const char *topic)
+{
+    if (!topic || topic[0] == '\0') {
+        return NULL;
+    }
+
+    /* Normalisation des alias courts */
+    const char *norm = topic;
+    if (strcasecmp(topic, "st") == 0) norm = "status";
+    else if (strcasecmp(topic, "se") == 0) norm = "sentry";
+    else if (strcasecmp(topic, "he") == 0) norm = "heur";
+
+    /* 1. Correspondance exacte sur le nom de page (ex: "rap", "rap-sentry", "rapless") */
+    for (size_t i = 0; i < g_rap_man_pages_count; ++i) {
+        if (strcasecmp(g_rap_man_pages[i].name, norm) == 0) {
+            return &g_rap_man_pages[i];
+        }
+    }
+
+    /* 2. Correspondance sans le préfixe 'rap-' (ex: "sentry" -> "rap-sentry", "rx" -> "rap-rx") */
+    for (size_t i = 0; i < g_rap_man_pages_count; ++i) {
+        if (strncasecmp(g_rap_man_pages[i].name, "rap-", 4) == 0) {
+            if (strcasecmp(g_rap_man_pages[i].name + 4, norm) == 0) {
+                return &g_rap_man_pages[i];
+            }
+        }
+    }
+
+    return NULL;
+}
+
+/* ============================================================================
  * FONCTION 99 : rap_cmd_man
  * ============================================================================
  */
@@ -117,7 +190,26 @@ int rap_cmd_man(int argc, char **argv, const RapConfig *cfg)
         return rap_man_handle_fn(argc - fn_idx, argv + fn_idx, cfg);
     }
 
-    /* Affichage du manuel CLI standard */
-    rap_man_render(g_rap_man_data, sizeof(g_rap_man_data) - 1, cfg, false);
-    return RAP_EXIT_OK;
+    /* Extraction de la rubrique demandée */
+    const char *topic = rap_man_extract_topic(argc, argv);
+
+    /* Cas 1 : Aucun argument (ou 'all') -> Projection du manuel complet */
+    if (!topic || strcasecmp(topic, "all") == 0) {
+        rap_man_render(g_rap_man_data, sizeof(g_rap_man_data) - 1, cfg, false);
+        return RAP_EXIT_OK;
+    }
+
+    /* Cas 2 : Recherche de la rubrique unitaire */
+    const RapManPageEntry *page = rap_man_lookup_page(topic);
+    if (page) {
+        rap_man_render(page->content, strlen(page->content), cfg, false);
+        return RAP_EXIT_OK;
+    }
+
+    /* Cas 3 : Rubrique inconnue */
+    fprintf(stderr, "[ERREUR] Rubrique de manuel introuvable : '%s'\n\n", topic);
+    fprintf(stderr, "Rubriques disponibles :\n");
+    fprintf(stderr, "  status, top, hunt, rx, preload, heur, net, sentry, kill, freeze, rapless\n");
+    fprintf(stderr, "  (ou 'rap man fn' pour le dictionnaire technique des fonctions)\n");
+    return RAP_EXIT_ERROR;
 }

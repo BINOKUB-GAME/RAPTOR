@@ -1,25 +1,26 @@
 /* ============================================================================
  * NOM DU SCRIPT   : src/engine/sentry_engine.c
- * RÉVISION        : Rev 1.2
+ * RÉVISION        : Rev 1.3
  * PROJET          : RAPTOR DEFENSE v2.0 // Arsenal Souverain C99
  * RESPONSABILITÉ  : Cœur cinétique de surveillance passive et d'interception
  *                   permissionnelle synchrone anti-rançongiciel (fanotify).
  *                   Déploiement d'appâts denses (canaris), écoute bloquante
- *                   à 0% CPU, gel réflexe SIGSTOP et invisibilité mémoire.
+ *                   à 0% CPU, routage vers le moteur réflexe et survie mémoire.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
- *   - Élimination de la dépendance externe rap_check_safety_pid (cause du SIGSEGV).
- *   - Intégration autonome de sentry_is_protected_pid (PID <= 1, self, parent).
- *   - Alignement 8 octets garanti sur le buffer fanotify (__attribute__((aligned(8)))).
- *   - Permissions 0666 forcées via chmod sur les canaris pour piéger tout compte.
- *   - Dimensionnement sécurisé du tampon d'alerte (512 octets).
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.3) :
+ *   - Intégration directe du moteur réflexe chirurgical 'rap_reflex_dispatch'
+ *     avec motif TRIGGER_CANARY_BREACH (paralysie, coupure réseau, boîte noire, kill).
+ *   - Délégation de l'immunité OOM et du verrouillage mémoire physique à 'rap_oom'
+ *     (rap_oom_protect, rap_oom_lock_memory).
+ *   - Révocation immédiate FAN_DENY auprès du noyau avant le déclenchement de la riposte.
+ *   - Alerte enrichie informant du statut de la boîte noire en mémoire vive (/dev/shm).
  *
  * LISTE DES FONCTIONS NUMÉROTÉES :
  *   111. sentry_deploy_canary    : Génère et dépose un fichier leurre binaire dense.
  *   112. sentry_init_fanotify    : Initialise fanotify et marque les leurres cibles.
  *   113. sentry_listen_loop      : Guet passif bloquant sur poll() et lecture d'événements.
- *   114. sentry_trigger_reflex   : Riposte cinétique (SIGSTOP, FAN_DENY, levée d'alerte).
- *   115. sentry_enter_stealth    : Verrouillage mémoire physique, immunité OOM et prctl.
+ *   114. sentry_trigger_reflex   : Révocation FAN_DENY et déclenchement de rap_reflex_dispatch.
+ *   115. sentry_enter_stealth    : Camouflage prctl, immunité OOM (-1000) et mlockall.
  * ============================================================================
  */
 
@@ -37,12 +38,13 @@
 #include <signal.h>
 #include <poll.h>
 #include <sys/fanotify.h>
-#include <sys/mman.h>
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include "sentry_engine.h"
+#include "rap_reflex.h"
+#include "rap_oom.h"
 
 /* ============================================================================
  * GARDE-FOU INTERNE : Protection anti-suicide et anti-panique noyau
@@ -245,10 +247,7 @@ int sentry_trigger_reflex(int fanotify_fd, int fd_event, pid_t pid)
         return -1;
     }
 
-    /* 1. RIPOSTE CINÉTIQUE : Gel immédiat du processus pirate (SIGSTOP) */
-    int kill_ret = kill(pid, SIGSTOP);
-
-    /* 2. REJET SYSTÈME : Refus d'ouverture du fichier canari par le noyau */
+    /* 1. REJET SYSTÈME : Refus immédiat de l'accès au leurre par le noyau */
     resp.response = FAN_DENY;
     write(fanotify_fd, &resp, sizeof(resp));
 
@@ -256,21 +255,34 @@ int sentry_trigger_reflex(int fanotify_fd, int fd_event, pid_t pid)
         close(fd_event);
     }
 
-    /* Notification visuelle d'alerte */
+    /* 2. DÉCLENCHEMENT DU SOUS-SYSTÈME RÉFLEXE (SIGSTOP -> Sockets -> Forensique -> SIGKILL) */
+    int reflex_ret = rap_reflex_dispatch(pid, TRIGGER_CANARY_BREACH);
+
+    /* 3. Notification visuelle immédiate */
+    uint64_t neutralized = 0;
+    reflex_mode_t mode = rap_reflex_get_stats(&neutralized);
+
+    const char *mode_str = "PASSIF (ALERTE SEULE)";
+    if (mode == REFLEX_MODE_ARMED) {
+        mode_str = "ARME (SIGSTOP + SIGKILL APPLIQUE)";
+    } else if (mode == REFLEX_MODE_DRYRUN) {
+        mode_str = "SIMULATION (DRY-RUN)";
+    }
+
     char alert_msg[512];
     int msg_len = snprintf(alert_msg, sizeof(alert_msg),
-        "\n\033[1;31m[ALERTE SENTINELLE]\033[0m ATTEINTE AU CANARI DETECTEE !\n"
+        "\n\033[1;31m[ALERTE SENTINELLE]\033[0m ATTEINTE AU CANARI INTERCEPTÉE !\n"
         "  -> PID AGRESSEUR       : %d\n"
-        "  -> ETAT DU PROCESSUS   : SUSPENDU CONSERVATOIRE (SIGSTOP)\n"
-        "  -> ACCES FICHIER       : BLOQUE (FAN_DENY)\n"
-        "  -> ACTION REQUISE      : rap hunt OU rap kill %d\n\n",
-        (int)pid, (int)pid);
+        "  -> ACCÈS FICHIER       : BLOQUÉ (FAN_DENY)\n"
+        "  -> MODE RÉFLEXE        : %s\n"
+        "  -> JOURNALISATION      : BOÎTE NOIRE RAM (/dev/shm/raptor_blackbox)\n\n",
+        (int)pid, mode_str);
 
     if (msg_len > 0) {
         write(STDERR_FILENO, alert_msg, (size_t)msg_len);
     }
 
-    return (kill_ret == 0) ? 0 : -1;
+    return reflex_ret;
 }
 
 /* ============================================================================
@@ -285,14 +297,11 @@ int sentry_enter_stealth(const char *fake_name)
         prctl(PR_SET_NAME, (unsigned long)"[kworker/u16:3]", 0, 0, 0);
     }
 
-    int oom_fd = open("/proc/self/oom_score_adj", O_WRONLY | O_CLOEXEC);
-    if (oom_fd >= 0) {
-        const char oom_val[] = "-1000\n";
-        write(oom_fd, oom_val, sizeof(oom_val) - 1);
-        close(oom_fd);
-    }
+    /* Immunité OOM absolue via rap_oom (-1000) */
+    rap_oom_protect();
 
-    if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0) {
+    /* Verrouillage mémoire RAM intégrale (interdiction du swap) */
+    if (rap_oom_lock_memory() != 0) {
         return -1;
     }
 

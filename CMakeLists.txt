@@ -1,6 +1,6 @@
 # ==============================================================================
 # NOM DU SCRIPT   : CMakeLists.txt
-# RÉVISION        : Rev 1.12
+# RÉVISION        : Rev 1.13
 # PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
 # RESPONSABILITÉ  : Configuration générale du système de construction CMake.
 #                   - Cible C99 avec extensions GNU (Linux/POSIX) et standard Windows.
@@ -15,11 +15,14 @@
 #                     binaire d'urgence 'rap' et téléscripteur autonome 'rapless'.
 #                   - Chaîne de compilation automatisée de la documentation SSOT.
 #
-# BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.12) :
-#   - Neutralisation explicite de tous les avertissements du compilateur (-w / /w)
-#     sur les cibles tierces raylib et glfw issues de FetchContent.
-#   - Préservation stricte des règles et avertissements d'audit (-Wall -Wextra)
-#     sur les cibles natives RAPTOR (raptor, rap, rapless).
+# BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.13) :
+#   - Intégration du sous-système de remédiation active chirurgicale et survie
+#     (src/core/rap_oom.c, src/core/rap_blackbox.c, src/core/rap_reflex.c).
+#   - Ajout de ${CMAKE_CURRENT_SOURCE_DIR}/src/core aux chemins d'inclusion pour
+#     les cibles 'raptor' (GUI) et 'rap' (CLI).
+#   - Liaison explicite de la bibliothèque POSIX Realtime (rt) et pthread sur les
+#     deux cibles binaires pour supporter shm_open, mlockall et clock_gettime.
+#   - Inclusion des sources réflexes dans le socle universel et le dispatcher CLI.
 # ==============================================================================
 
 cmake_minimum_required(VERSION 3.16...3.30)
@@ -42,10 +45,11 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
 
 # ------------------------------------------------------------------------------
-# 2. RÉPERTOIRES D'INCLUSION
+# 2. RÉPERTOIRES D'INCLUSION GLOBAUX
 # ------------------------------------------------------------------------------
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core
 )
 
 # ------------------------------------------------------------------------------
@@ -92,6 +96,9 @@ set(RAPTOR_CORE_SOURCES
     src/core/mem_stealth.c
     src/core/preload_hunter.c
     src/core/raptor_notify.c
+    src/core/rap_oom.c
+    src/core/rap_blackbox.c
+    src/core/rap_reflex.c
 )
 
 set(RAPTOR_REPORT_SOURCES
@@ -138,7 +145,7 @@ elseif(WIN32)
 endif()
 
 # ------------------------------------------------------------------------------
-# 6. DÉCLARATION DU BINAIRE EXÉCUTABLE & OPTIONS DE COMPILATION
+# 6. DÉCLARATION DU BINAIRE EXÉCUTABLE & OPTIONS DE COMPILATION (RAPTOR GUI)
 # ------------------------------------------------------------------------------
 add_executable(raptor
     ${RAPTOR_MAIN_SOURCE}
@@ -152,6 +159,7 @@ target_include_directories(raptor PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/raptor
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core
 )
 
 if(UNIX)
@@ -174,6 +182,7 @@ if(UNIX)
         m
         pthread
         dl
+        rt
     )
 elseif(WIN32)
     target_link_libraries(raptor PRIVATE
@@ -230,6 +239,9 @@ if(UNIX)
         src/cli/cmd_kill.c
         src/cli/cmd_man.c
         src/engine/sentry_engine.c
+        src/core/rap_oom.c
+        src/core/rap_blackbox.c
+        src/core/rap_reflex.c
     )
 
     add_executable(rap
@@ -242,9 +254,17 @@ if(UNIX)
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cli
         ${CMAKE_CURRENT_SOURCE_DIR}/src/engine
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core
     )
     target_compile_definitions(rap PRIVATE _GNU_SOURCE=1)
     target_compile_options(rap PRIVATE -Wall -Wextra -Wformat=2)
+
+    target_link_libraries(rap PRIVATE
+        m
+        pthread
+        dl
+        rt
+    )
 
     # 8.4. Règles d'installation standardisées (/usr/local/bin)
     install(TARGETS raptor rap rapless

@@ -1,18 +1,17 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : src/core/mem_stealth.c
- * RÉVISION        : Rev 1.7
+ * RÉVISION        : Rev 1.8
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : Sonde d'inspection forensique mémoire et traque de mutations.
  *                   Repère l'exécution sans ancrage binaire (mémoire anonyme R-X)
- *                   consécutive à une bascule mprotect() clandestine et injecte
- *                   l'anomalie directement dans le registre de l'Onglet 4.
+ *                   consécutive à une bascule mprotect() clandestine, injecte
+ *                   l'anomalie dans le registre différentiel et arme la riposte réflexe.
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.7) :
- *   - Suppression définitive de l'avertissement GCC -Wstringop-truncation.
- *   - Remplacement de tous les appels strncpy par des copies bornées memcpy
- *     avec assignation explicite de l'octet nul terminal.
- *   - Sécurisation du parseur de assets/rules/mem_whitelist.conf.
+ * NOUVELLES INTÉGRATIONS (Rev 1.8) :
+ *   - Intégration de rap_reflex_dispatch(pid, TRIGGER_MEMORY_MUTATION) dès
+ *     l'identification formelle d'une plage mémoire Inode 0 R-X clandestine.
+ *   - Conservation du modèle 0-heap sans allocation dynamique.
  *   - Maintien strict des 4 fonctions numérotées (80 à 83).
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
@@ -24,6 +23,7 @@
  */
 
 #include "mem_stealth.h"
+#include "rap_reflex.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -153,7 +153,7 @@ bool mem_stealth_is_whitelisted(const char* comm, const char* exe) {
     }
 
     if (exe) {
-        for (size_t i = 0; i < sizeof(lower_exe) - 1 && exe[i]; ++i) {
+        for (size_t i = 0; sizeof(lower_exe) - 1 > i && exe[i]; ++i) {
             lower_exe[i] = (char)tolower((unsigned char)exe[i]);
         }
     }
@@ -238,6 +238,9 @@ bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe,
                          (unsigned long)ev_out->size_kb);
 
                 mem_stealth_dispatch_diff_event(ev_out);
+
+                /* Déclenchement de la riposte réflexe (SIGSTOP -> Coupure sockets -> Forensique -> SIGKILL) */
+                rap_reflex_dispatch(pid, TRIGGER_MEMORY_MUTATION);
 
                 anomaly_detected = true;
                 break;

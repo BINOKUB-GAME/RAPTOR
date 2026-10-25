@@ -1,26 +1,20 @@
 /**
  * ============================================================================
  * NOM DU SCRIPT   : src/plugins/plugin_memory_rwx.c
- * RÉVISION        : Rev 1.13
+ * RÉVISION        : Rev 1.14
  * PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
  * RESPONSABILITÉ  : Greffon d'audit mémoire et processus sous Linux (/proc).
  *                   Inspecte les cartographies mémoire des processus (/proc/[PID]/maps)
  *                   à la recherche de segments RWX (Read-Write-Execute), qualifie
- *                   la légitimité des moteurs JIT et des chemins d'exécution de
- *                   confiance, calcule dynamiquement l'usage CPU et RAM totale
- *                   du système, extrait et trie en temps réel le Top 10 des
- *                   consommateurs de mémoire et isole les réelles anomalies.
+ *                   la légitimité des moteurs JIT et des chemins de confiance,
+ *                   et achemine les menaces confirmées vers le moteur réflexe.
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.13) :
- *   - Structuration séquentielle et chronologique intégrale de la fonction 5
- *     en 6 sous-étapes strictement numérotées (5.1 à 5.6).
- *   - Intégration effective de la Section 15 (raptor_notify_evaluate_threats)
- *     avec extraction déterministe du processus attaquant dans la notification.
- *   - Alignement logique des dépendances architecturales :
- *       * Section 13 : Mem-Stealth (Mutations R-X Inode 0)
- *       * Section 14 : Preload-Hunter (Global et Ciblé)
- *       * Section 15 : Notification Système Asynchrone (Freedesktop)
- *   - Élimination des incohérences de libellés et des sauts de numérotation.
+ * NOUVELLES INTÉGRATIONS (Rev 1.14) :
+ *   - Intégration de rap_reflex_dispatch sur les menaces mémoires et binaires :
+ *       * Plages RWX hostiles non-JIT -> TRIGGER_MEMORY_MUTATION
+ *       * Binaires supprimés en exécution (deleted) non officiels -> TRIGGER_BINARY_SEVERED
+ *       * Détournements d'environnement LD_PRELOAD -> TRIGGER_MEMORY_MUTATION
+ *   - Évitement des doubles ripostes si l'anomalie R-X a déjà été interceptée par mem_stealth.
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
  *   1. proc_mem_is_trusted_path
@@ -38,6 +32,7 @@
 #include "../core/mem_stealth.h"
 #include "../core/preload_hunter.h"
 #include "../core/raptor_notify.h"
+#include "../core/rap_reflex.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -483,6 +478,9 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
                 snprintf(p_ev.detail, sizeof(p_ev.detail),
                          "Détournement LD_PRELOAD : %.75s", proc_preload);
                 mem_stealth_dispatch_diff_event(&p_ev);
+
+                /* Déclenchement de la riposte réflexe sur injection de bibliothèque clandestine */
+                rap_reflex_dispatch((pid_t)pid, TRIGGER_MEMORY_MUTATION);
             }
         }
 
@@ -490,12 +488,21 @@ static bool proc_mem_run_audit(RaptorReportContext* ctx) {
             trusted = true;
         }
 
+        /* 5.3.5. Routage Réflexe sur RWX malveillant ou Binaire Supprimé (hors Inode 0 déjà traité) */
+        if (!is_anon_rx) {
+            if (is_rwx_threat) {
+                rap_reflex_dispatch((pid_t)pid, TRIGGER_MEMORY_MUTATION);
+            } else if (is_deleted && !trusted) {
+                rap_reflex_dispatch((pid_t)pid, TRIGGER_BINARY_SEVERED);
+            }
+        }
+
         bool is_suspicious = (!trusted) || is_rwx_threat || is_deleted || is_anon_rx || is_preload_hijack;
         if (is_suspicious) {
             threats_count++;
         }
 
-        /* 5.3.5. Qualification et Enregistrement dans la Liste de Tri */
+        /* 5.3.6. Qualification et Enregistrement dans la Liste de Tri */
         if (sort_count >= sort_cap) {
             size_t new_cap = (sort_cap == 0) ? 64 : sort_cap * 2;
             ProcSortEntry* new_arr = (ProcSortEntry*)realloc(sort_list, new_cap * sizeof(ProcSortEntry));

@@ -1,15 +1,20 @@
 <!-- MAN: rap | 1 | RAP(1) — Outils Généraux -->
 NAME
-     rap — Console chirurgicale et trousse de survie défensive pour Linux
+     rap — Console chirurgicale, traque mémoire 0-heap et remédiation active réflexe
 
 SYNOPSIS
-     rap [-q] [-r] [-f] [-v] [-n nombre] commande [arguments...]
+     rap [-q] [-r] [-f] [-v] [-a|--arm] [--dry-run] [-n nombre] commande [arguments...]
 
 DESCRIPTION
      rap est l'utilitaire autonome en ligne de commande de RAPTOR v2.0.
      Conçu selon la norme C99 pour fonctionner sous famine mémoire extrême
      (< 2 Mo RAM) ou en cas d'effondrement du serveur d'affichage (X11/Wayland),
      il audite passivement les structures du noyau (/proc) et neutralise les menaces.
+
+     Dans sa révision réflexe, rap intègre un disjoncteur chirurgical de dernier
+     recours (Last-Resort Watchdog) capable d'opérer sous contrainte d'épuisement
+     mémoire (mlockall et score OOM -1000) pour paralyser et détruire les menaces
+     en moins d'une milliseconde sans dépendre du disque ni du réseau.
 
 OPTIONS UNIVERSELLES
      -q, --quiet
@@ -28,21 +33,31 @@ OPTIONS UNIVERSELLES
              Mode d'audit forensique étendu. Révèle notamment les segments mémoires
              autorisés par mem_whitelist.conf avec le tag [LISTE BLANCHE].
 
+     -a, --arm
+             Arme la riposte cinétique immédiate (SIGSTOP -> Révocation réseau ->
+             Extraction boîte noire -> SIGKILL). Active également l'immunité OOM
+             (/proc/self/oom_score_adj = -1000) et le verrouillage mémoire physique.
+
+     --dry-run
+             Mode simulation opérationnelle. Exécute l'intégralité du pipeline réflexe
+             et enregistre l'incident dans la boîte noire RAM (/dev/shm/raptor_blackbox)
+             sans émettre les signaux de destruction (SIGSTOP/SIGKILL).
+
      -n nombre
              Limite le nombre de lignes projetées (applicable à top et net).
 
 COMMANDES
-     status, st   Bilan vital instantané de la machine hôte.
+     status, st   Diagnostic vital instantané de la machine hôte.
      top          Top des processus consommateurs de mémoire vive résidente.
-     hunt         Audit combiné universel (Mémoire, Preload, Heuristiques).
-     rx           Traque des pages mémoires anonymes exécutables (Inode 0).
+     hunt         Audit combiné universel (Mémoire, Preload, Heuristiques) avec riposte réflexe.
+     rx           Traque des pages mémoires anonymes exécutables (Inode 0) et neutralisation.
      preload      Audit d'intégrité du chargeur dynamique (/etc/ld.so.preload).
      heur, he     Analyse heuristique (binaires supprimés, chemins volatils).
      net          Audit TCP, corrélation PID et forensic IP (Net-Guard / OSINT).
-     sentry, se   Sentinelle passive anti-rançongiciel (canaris & fanotify).
+     sentry, se   Sentinelle passive anti-rançongiciel (canaris, fanotify et boîte noire).
      kill <PID>   Neutralisation immédiate par émission du signal SIGKILL.
      freeze <PID> Gel conservatoire via signal SIGSTOP pour examen forensique.
-     man [cmd]    Manuel de référence autonome embarqué.
+     man [cmd]    Manuel de référence autonome embarqué (SSOT).
 
 EXIT STATUS
      0 (RAP_EXIT_OK)      Système nominal. Aucune anomalie non autorisée.
@@ -83,10 +98,10 @@ DESCRIPTION
 
 <!-- MAN: rap-hunt | 1 | RAP-HUNT(1) — Chasseur Universel -->
 NAME
-     rap hunt — Audit de sécurité universel combiné
+     rap hunt — Audit de sécurité universel combiné et riposte active
 
 SYNOPSIS
-     rap hunt [-q] [-r] [-v]
+     rap hunt [-q] [-r] [-v] [-a|--arm] [--dry-run]
 
 DESCRIPTION
      Coordonne séquentiellement les trois grandes sondes d'investigation :
@@ -94,8 +109,12 @@ DESCRIPTION
        2. Traque des détournements LD_PRELOAD (rap preload).
        3. Analyse heuristique d'exécution (rap heur).
 
-     Conçu pour être invoqué dans les scripts de surveillance cron ou par
-     le centre opérationnel de sécurité (SOC).
+     En mode armé (-a, --arm), toute mutation Inode 0 R-X non autorisée ou
+     détournement LD_PRELOAD déclenche immédiatement le moteur de remédiation
+     rap_reflex (paralysie, isolation des descripteurs de socket et purge SIGKILL).
+
+     L'option --dry-run permet de simuler la riposte et d'alimenter la boîte noire
+     médico-légale sans impacter les processus audités.
 
 EXIT STATUS
      0    Aucune anomalie détectée sur les trois vecteurs.
@@ -106,7 +125,7 @@ NAME
      rap rx — Traque des pages mémoires anonymes exécutables (Inode 0)
 
 SYNOPSIS
-     rap rx [-q] [-r] [-v]
+     rap rx [-q] [-r] [-v] [-a|--arm] [--dry-run]
 
 DESCRIPTION
      Parcourt /proc/[PID]/maps pour identifier les régions mémoires marquées r-xp
@@ -116,9 +135,16 @@ DESCRIPTION
      et des liaisons libffi (Cinnamon, GTK) selon assets/rules/mem_whitelist.conf.
      L'option -v permet de révéler les allocations légitimes approuvées.
 
+     OPTIONS DE RÉACTION :
+       -a, --arm    : Neutralise sur-le-champ tout processus non approuvé via SIGKILL.
+       --dry-run    : Simule la riposte et consigne l'incident dans /dev/shm/raptor_blackbox.
+
 EXAMPLES
-     Abattre automatiquement tout processus inconnu présentant une injection r-xp :
-     rap rx -q | awk '{print $1}' | xargs -r rap kill -f
+     Chasser les injections mémoires et abattre immédiatement les processus hostiles :
+     sudo rap rx --arm
+
+     Auditer les mutations sans altérer l'état du système :
+     sudo rap rx --dry-run
 
 <!-- MAN: rap-preload | 1 | RAP-PRELOAD(1) — Audit Chargeur Dynamique -->
 NAME
@@ -217,11 +243,11 @@ EXIT STATUS
 
 <!-- MAN: rap-sentry | 1 | RAP-SENTRY(1) — Sentinelle Anti-Rançongiciel -->
 NAME
-     rap sentry — Sentinelle passive anti-rançongiciel (canaris & fanotify)
+     rap sentry — Sentinelle passive anti-rançongiciel (canaris, fanotify et boîte noire)
 
 SYNOPSIS
-     rap sentry <arm | disarm | status | run [-d]> [chemins...]
-     rap se <arm | disarm | status | run [-d]> [chemins...]
+     rap sentry <arm | disarm | status | dump | run [-d] [--arm|--dry-run]> [chemins...]
+     rap se <arm | disarm | status | dump | run [-d] [--arm|--dry-run]> [chemins...]
 
 DESCRIPTION
      rap sentry est un bouclier cinétique passif d'interception synchrone
@@ -244,31 +270,40 @@ SOUS-COMMANDES
 
      status
              Vérifie la présence physique, la conformité de taille et l'état
-             d'armement des canaris sur les cibles configurées.
+             d'armement des canaris ainsi que les statistiques du moteur réflexe.
 
-     run [-d] [chemins...]
+     dump, blackbox
+             Restitue l'ensemble des enregistrements médico-légaux conservés dans
+             la boîte noire circulaire en mémoire vive (/dev/shm/raptor_blackbox).
+             Accessible sans privilèges root (permissions 0666).
+
+     run [-d] [--arm|--dry-run] [chemins...]
              Enclenche le guet passif noyau FAN_OPEN_PERM.
-             - Sans option : Mode console direct avec alertes en temps réel.
+             - Sans option : Mode passif direct (rejet FAN_DENY et alerte seule).
+             - Option -a, --arm : Remédiation active (gel SIGSTOP, coupure socket, SIGKILL).
+             - Option --dry-run : Simulation de neutralisation avec trace en boîte noire.
              - Option -d   : Détachement en démon d'arrière-plan autonome (fork/setsid),
                              camouflage prctl ([kworker/u16:3]), verrouillage mémoire
                              physique (mlockall) et immunité OOM (/proc/self/oom_score_adj = -1000).
 
-MÉCANISME DE RIPOSTE CINÉTIQUE
+MÉCANISME DE RIPOSTE RÉFLEXE
      1. Un processus hostile tente d'ouvrir le fichier leurre (!00_raptor_vault.kdbx).
      2. Le noyau Linux suspend immédiatement l'agresseur dans son appel open().
      3. Contrôle des gardes-fous autonomes (PID <= 1, sentinelle, shell parent).
-     4. Gel immédiat du processus pirate par émission du signal SIGSTOP (état T).
-     5. Rejet catégorique de l'ouverture auprès du noyau via FAN_DENY.
-     6. Alerte rouge générée avec PID pour analyse (rap hunt) ou destruction (rap kill).
+     4. Rejet catégorique de l'ouverture auprès du noyau via FAN_DENY.
+     5. En mode armé : paralysie immédiate du process group par SIGSTOP.
+     6. Révocation forcée des descripteurs de socket (/proc/[pid]/fd).
+     7. Élimination définitive de l'agresseur par émission de SIGKILL.
+     8. Enregistrement médico-légal atomique dans l'anneau circulaire en RAM (/dev/shm).
 
 EXIT STATUS
      0 (RAP_EXIT_OK)      Guet nominal interrompu proprement par signal.
-     1 (RAP_EXIT_THREAT)  Atteinte à un canari détectée et gel conservatoire appliqué.
+     1 (RAP_EXIT_THREAT)  Atteinte à un canari détectée et riposte réflexe appliquée.
      2 (RAP_EXIT_ERROR)   Droits insuffisants (CAP_SYS_ADMIN requis) ou cible invalide.
 
 DROITS SYSTÈME REQUIS
      Requiert les privilèges root ou les capacités :
-     setcap 'cap_sys_admin,cap_kill,cap_ipc_lock=+ep' /usr/local/bin/rap
+     setcap 'cap_sys_admin,cap_kill,cap_ipc_lock,cap_sys_ptrace=+ep' /usr/local/bin/rap
 
 <!-- MAN: rap-kill | 1 | RAP-KILL(1) — Riposte Cinétique -->
 NAME
@@ -308,4 +343,9 @@ SYNOPSIS
 DESCRIPTION
      rapless est un téléscripteur d'urgence écrit en C99 n'effectuant aucun
      appel à malloc/calloc (0 heap). Il indexe par pagination statique les flux
-     massifs (testé jusqu'à 25 000 lignes sous /proc/kalls
+     massifs (testé jusqu'à 25 000 lignes sous /proc/kallsyms) sans saturer la
+     mémoire résidente de la machine hôte.
+
+EXIT STATUS
+     0    Fermeture nominale du visualiseur (touche 'q').
+     1    Erreur d'accès au fichier source ou flux vide.
