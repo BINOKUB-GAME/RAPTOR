@@ -1,16 +1,16 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/index.html
- * RÉVISION        : Rev 1.1
+ * RÉVISION        : Rev 1.2
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Page d'accueil officielle, présentation de l'architecture
  *                   souveraine, appel aux contributeurs / développeurs C/Linux,
  *                   vitrine des sondes de combat et guide d'amorçage.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
- *   - Correction du type MIME du favicon (image/png).
- *   - Rétablissement du texte de l'en-tête (charte institutionnelle).
- *   - Alignement canonique de l'URL git clone (https://github.com/BINOKUB-GAME/RAPTOR.git).
- *   - Synchronisation du bouton de copie rapide du terminal d'amorçage.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
+ *   - Intégration du lien d'investigation 'Net-Intel' dans la barre de navigation.
+ *   - Ajout du bouton hamburger accessible (navToggle) pour écrans mobiles/cellulaires.
+ *   - Script léger de bascule du menu mobile (open class toggle).
+ *   - Conservation stricte des styles institutionnels et ancres canoniques.
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -25,7 +25,7 @@
 <body>
 
     <!-- ======================================================================
-         1. EN-TÊTE INSTITUTIONNEL (STYLE FREEBSD)
+         1. EN-TÊTE INSTITUTIONNEL (STYLE FREEBSD & NAVIGATION MOBILE)
          ====================================================================== -->
     <header class="raptor-header">
         <div class="container">
@@ -34,8 +34,9 @@
                 <span>RAPTOR<span class="version-badge">v2.0</span></span>
             </a>
 
-            <nav class="raptor-nav">
+            <nav class="raptor-nav" id="raptorNav">
                 <a href="index.html" class="active">Accueil</a>
+                <a href="intel.html">Net-Intel</a>
                 <a href="man.html">Manuel (Man)</a>
                 <a href="faq.html">FAQ Technique</a>
                 <a href="community.html">Communauté</a>
@@ -44,7 +45,7 @@
             <div class="raptor-header-actions">
                 <div class="raptor-search-box">
                     <svg viewBox="0 0 24 24">
-                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/>
                     </svg>
                     <input type="text" placeholder="Recherche rapide...">
                 </div>
@@ -54,6 +55,13 @@
                     </svg>
                     GitHub
                 </a>
+
+                <!-- Bouton Menu Mobile (Hamburger) -->
+                <button class="raptor-hamburger" id="navToggle" aria-label="Afficher le menu de navigation" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
     </header>
@@ -76,7 +84,6 @@
                 <a href="man.html" class="btn-secondary">Consulter le Manuel rap(1)</a>
             </div>
 
-            <!-- Encart d'appel à constitution d'équipe -->
             <div class="raptor-join-banner">
                 <div class="raptor-join-content">
                     <h3>Rejoignez l'équipe de développement RAPTOR</h3>
@@ -100,7 +107,6 @@
             </div>
 
             <div class="cards-grid">
-                <!-- Carte 1 -->
                 <div class="raptor-card">
                     <div class="card-icon">RX</div>
                     <h3>Traque Mémoire Inode 0</h3>
@@ -110,17 +116,15 @@
                     <div class="card-footer-tag">COMMANDE : rap rx [-v]</div>
                 </div>
 
-                <!-- Carte 2 -->
                 <div class="raptor-card">
                     <div class="card-icon">NET</div>
-                    <h3>Net-Guard Souverain</h3>
+                    <h3>Net-Guard & Net-Intel</h3>
                     <p>
-                        Analyse passive des sockets sous <code>/proc/net/tcp</code>. Évaluation mathématique CIDR (/8 à /32) confrontée aux registres souverains pour qualifier instantanément les flux LAN RFC 1918, les sorties HTTPS et neutraliser les nœuds C2 hostiles.
+                        Analyse passive des sockets sous <code>/proc/net/tcp</code>. Évaluation mathématique CIDR (/8 à /32) et confrontation instantanée aux flux OSINT souverains (C2, botnets, proxies) sans aucune fuite réseau externe.
                     </p>
-                    <div class="card-footer-tag">COMMANDE : rap net [-n &lt;N&gt;]</div>
+                    <div class="card-footer-tag">COMMANDES : rap net | rap net -i &lt;IP&gt;</div>
                 </div>
 
-                <!-- Carte 3 -->
                 <div class="raptor-card">
                     <div class="card-icon">PL</div>
                     <h3>Chasseur LD_PRELOAD</h3>
@@ -130,7 +134,6 @@
                     <div class="card-footer-tag">COMMANDE : rap preload</div>
                 </div>
 
-                <!-- Carte 4 -->
                 <div class="raptor-card">
                     <div class="card-icon">HR</div>
                     <h3>Analyseur Heuristique</h3>
@@ -140,7 +143,6 @@
                     <div class="card-footer-tag">COMMANDE : rap heur</div>
                 </div>
 
-                <!-- Carte 5 -->
                 <div class="raptor-card">
                     <div class="card-icon">0H</div>
                     <h3>Téléscripteur rapless</h3>
@@ -150,7 +152,6 @@
                     <div class="card-footer-tag">UTILITAIRE : rapless</div>
                 </div>
 
-                <!-- Carte 6 -->
                 <div class="raptor-card">
                     <div class="card-icon">PID</div>
                     <h3>Riposte Cinétique Protégée</h3>
@@ -215,10 +216,10 @@
                 <div class="footer-col">
                     <h5>Documentation</h5>
                     <ul>
+                        <li><a href="intel.html">Renseignement Net-Intel</a></li>
                         <li><a href="man.html">Manuel rap(1)</a></li>
                         <li><a href="man.html#rapless">Téléscripteur rapless(1)</a></li>
                         <li><a href="faq.html">FAQ Faux Positifs (JIT/FFI)</a></li>
-                        <li><a href="faq.html#netguard">Règles Net-Guard</a></li>
                     </ul>
                 </div>
 
@@ -253,5 +254,18 @@
         </div>
     </footer>
 
+    <!-- Script de gestion du menu hamburger mobile -->
+    <script>
+        (function() {
+            var toggle = document.getElementById('navToggle');
+            var nav = document.getElementById('raptorNav');
+            if (toggle && nav) {
+                toggle.addEventListener('click', function() {
+                    var isOpen = nav.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', isOpen);
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

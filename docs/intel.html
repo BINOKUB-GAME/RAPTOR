@@ -1,0 +1,418 @@
+<!-- ==========================================================================
+ * NOM DU SCRIPT   : docs/intel.html
+ * RÉVISION        : Rev 1.0
+ * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
+ * RESPONSABILITÉ  : Interface web souveraine d'investigation médico-légale IP.
+ *                   - Recherche instantanée O(1) sans intermédiaire serveur.
+ *                   - Exploitation directe de docs/js/threat_data.js (OSINT).
+ *                   - Zéro log, zéro traçage, étanchéité réseau absolue.
+ *                   - Générateur automatique de commandes de riposte (rap net -i,
+ *                     règles de neutralisation iptables et nftables).
+ *
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.0) :
+ *   - Intégration du composant de validation stricte IPv4 (RFC 791).
+ *   - Détection autonome des plages locales / privées (RFC 1918 / Loopback).
+ *   - Restitution typée terminal UNIX avec calcul de score et étiquetage.
+ *   - Comparatif de souveraineté face aux solutions d'abonnement propriétaires.
+ *   - Support complet du menu hamburger responsive pour téléphones cellulaires.
+ * ========================================================================== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPTOR DEFENSE // Net-Intel — Renseignement & Forensic IP Souverain</title>
+    <meta name="description" content="Audit immédiat et confidentiel de réputation IP contre 19 927 menaces cyber. 100% exécuté dans votre navigateur, aucun paquet externe émis.">
+    <link rel="stylesheet" href="css/raptor-core.css">
+    <link rel="icon" type="image/png" href="raptor-icon.png">
+</head>
+<body>
+
+    <!-- ======================================================================
+         1. EN-TÊTE INSTITUTIONNEL & NAVIGATION RESPONSIVE
+         ====================================================================== -->
+    <header class="raptor-header">
+        <div class="container">
+            <a href="index.html" class="raptor-brand">
+                <img src="raptor-icon.png" alt="Logo Officiel RAPTOR DEFENSE">
+                <span>RAPTOR<span class="version-badge">v2.0</span></span>
+            </a>
+
+            <nav class="raptor-nav" id="raptorNav">
+                <a href="index.html">Accueil</a>
+                <a href="intel.html" class="active">Net-Intel</a>
+                <a href="man.html">Manuel (Man)</a>
+                <a href="faq.html">FAQ Technique</a>
+                <a href="community.html">Communauté</a>
+            </nav>
+
+            <div class="raptor-header-actions">
+                <div class="raptor-search-box">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/>
+                    </svg>
+                    <input type="text" placeholder="Recherche rapide...">
+                </div>
+                <a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener" class="btn-github">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+                <button class="raptor-hamburger" id="navToggle" aria-label="Menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================================================================
+         2. BANNIÈRE HERO NET-INTEL
+         ====================================================================== -->
+    <section class="raptor-hero" style="padding-bottom: 56px;">
+        <div class="container">
+            <div class="raptor-hero-badge">
+                RENSEIGNEMENT SUR LES MENACES // 100% EXÉCUTÉ EN LOCAL
+            </div>
+            <h1>RAPTOR NET-INTEL</h1>
+            <p class="raptor-hero-subtitle">
+                Inspectez chirurgicalement la réputation d'une adresse IPv4 contre la base souveraine RAPTOR. Zéro paquet envoyé sur le réseau, aucune requête API externe, confidentialité défensive absolue.
+            </p>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         3. CONSOLE D'INVESTIGATION MÉDICO-LÉGALE
+         ====================================================================== -->
+    <section class="raptor-section" style="padding-top: 0;">
+        <div class="container">
+            
+            <!-- Carte de saisie chirurgicale -->
+            <div class="intel-search-card">
+                <form id="intelForm" onsubmit="event.preventDefault(); inspectIP();">
+                    <div class="intel-input-group">
+                        <input type="text" id="ipInput" placeholder="Saisir une adresse IPv4 (ex: 194.26.29.112)" autocomplete="off" spellcheck="false" autofocus>
+                        <button type="submit" class="btn-primary" style="font-weight: 700;">Auditer l'IP</button>
+                    </div>
+                </form>
+
+                <div class="intel-quick-samples">
+                    <span>Échantillons tactiques :</span>
+                    <button class="intel-quick-btn" onclick="setAndAudit('194.26.29.112')">194.26.29.112 (C2 Feodo)</button>
+                    <button class="intel-quick-btn" onclick="setAndAudit('185.220.101.5')">185.220.101.5 (Relais Tor)</button>
+                    <button class="intel-quick-btn" onclick="setAndAudit('1.1.1.1')">1.1.1.1 (Cloudflare / Sain)</button>
+                    <button class="intel-quick-btn" onclick="setAndAudit('192.168.1.10')">192.168.1.10 (LAN Privé)</button>
+                </div>
+            </div>
+
+            <!-- Fiche de résultat typée terminal UNIX -->
+            <div id="resultBox" class="man-viewer-box" style="max-width: 860px; margin: 0 auto; display: none;">
+                <div class="man-viewer-header">
+                    <span id="resultHeaderTitle" class="man-viewer-title">RAPTOR FORENSIC ENGINE // RAP NET -I</span>
+                    <button class="man-btn-copy" id="copyRuleBtn" onclick="copyDefensiveRule()">Copier la règle</button>
+                </div>
+                <div id="resultOutput" class="man-content"></div>
+            </div>
+
+            <!-- Message d'attente initial -->
+            <div id="placeholderBox" style="text-align: center; max-width: 680px; margin: 0 auto; color: var(--color-text-muted); padding: 20px;">
+                <p style="font-size: 0.95rem;">
+                    Saisissez une adresse IPv4 ci-dessus pour déclencher l'audit instantané. La recherche s'opère en mémoire locale pure sans aucun contact avec la cible inspectée.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         4. MÉTRIQUES ET STATUT DE LA BASE LOCALE
+         ====================================================================== -->
+    <section class="raptor-section" style="background-color: var(--color-bg-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
+        <div class="container">
+            <div class="section-header">
+                <h2>Renseignement Embarqué & Métriques</h2>
+                <p>Données issues des observatoires mondiaux de référence et consolidées par le pipeline SSOT.</p>
+            </div>
+
+            <div class="intel-stats-grid">
+                <div class="intel-stat-box">
+                    <div class="intel-stat-val" id="statIpCount">19 927</div>
+                    <div class="intel-stat-lbl">IP Malveillantes Indexées</div>
+                </div>
+                <div class="intel-stat-box">
+                    <div class="intel-stat-val">0 µs</div>
+                    <div class="intel-stat-lbl">Latence de Consultation</div>
+                </div>
+                <div class="intel-stat-box">
+                    <div class="intel-stat-val">0 Paquet</div>
+                    <div class="intel-stat-lbl">Trafic Réseau Émis</div>
+                </div>
+                <div class="intel-stat-box">
+                    <div class="intel-stat-val" id="statTimestamp" style="font-size: 1.1rem; line-height: 2rem;">2026-10-24</div>
+                    <div class="intel-stat-lbl">Dernière Synchronisation</div>
+                </div>
+            </div>
+
+            <!-- Comparatif Souveraineté vs Solutions Propriétaires -->
+            <div style="max-width: 860px; margin: 0 auto;">
+                <h3 style="text-align: center; margin-bottom: 16px;">Pourquoi RAPTOR Net-Intel est Supérieur aux Services Payants</h3>
+                <table class="intel-compare-table">
+                    <thead>
+                        <tr>
+                            <th>Critère Technique</th>
+                            <th>Services Commerciaux (Scamalytics, etc.)</th>
+                            <th>RAPTOR Net-Intel (Libre & Souverain)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Modèle Économique</strong></td>
+                            <td>Abonnements récurrents et facturation par requête API.</td>
+                            <td><strong>100% Gratuit & Open Source</strong> (Licence Libre C99).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Confidentialité (Stealth)</strong></td>
+                            <td>Votre recherche est envoyée et journalisée sur leurs serveurs.</td>
+                            <td><strong>Étanchéité totale</strong> : le test s'exécute dans votre RAM locale.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Furtivité en Réponse à Incident</strong></td>
+                            <td>Risque d'alerter l'attaquant ou le C2 via les serveurs tiers.</td>
+                            <td><strong>Silence radio absolu</strong> : 0 contact avec l'extérieur.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Intégration Console & Scripting</strong></td>
+                            <td>Dépendance à curl, à une clé API et à la connexion Internet.</td>
+                            <td><strong>Intégré en binaire natif</strong> via la commande <code>rap net -i</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         5. PIED DE PAGE INSTITUTIONNEL
+         ====================================================================== -->
+    <footer class="raptor-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                        <img src="raptor-icon.png" alt="RAPTOR Logo" style="height: 32px; width: 32px; border-radius: 50%;">
+                        <span style="color: #FFFFFF; font-weight: 700; font-size: 1.1rem;">RAPTOR DEFENSE</span>
+                    </div>
+                    <p style="font-size: 0.88rem; line-height: 1.6; color: #8C96A5;">
+                        Projet d'ingénierie forensique et d'audit défensif souverain pour systèmes d'exploitation Linux. Zéro compromis sur la mémoire, indépendance technologique totale.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Documentation</h5>
+                    <ul>
+                        <li><a href="intel.html">Renseignement Net-Intel</a></li>
+                        <li><a href="man.html">Manuel rap(1)</a></li>
+                        <li><a href="man.html#rapless">Téléscripteur rapless(1)</a></li>
+                        <li><a href="faq.html">FAQ Faux Positifs (JIT/FFI)</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Projet & Équipe</h5>
+                    <ul>
+                        <li><a href="community.html">Rejoindre l'équipe</a></li>
+                        <li><a href="community.html#bugs">Signaler un bogue</a></li>
+                        <li><a href="community.html#plugins">Développer un greffon</a></li>
+                        <li><a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener">Dépôt Git</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Gouvernance</h5>
+                    <ul>
+                        <li><a href="community.html#charte">Charte de contribution</a></li>
+                        <li><a href="community.html#securite">Divulgation sécurité</a></li>
+                        <li><a href="community.html#licence">Licence C99 Souveraine</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>
+                    &copy; 2026 RAPTOR DEFENSE Project. Développé pour la communauté des bâtisseurs et auditeurs de systèmes.
+                </div>
+                <div>
+                    Inspiré des fondations libres et souveraines UNIX.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Intégration de la base OSINT compilée -->
+    <script src="js/threat_data.js"></script>
+
+    <!-- Moteur d'évaluation forensique Net-Intel côté client -->
+    <script>
+        var currentRuleText = "";
+
+        // Initialisation des métriques depuis threat_data.js
+        window.addEventListener('DOMContentLoaded', function() {
+            if (typeof RAPTOR_THREAT_COUNT !== 'undefined') {
+                document.getElementById('statIpCount').textContent = RAPTOR_THREAT_COUNT.toLocaleString('fr-FR');
+            }
+            if (typeof RAPTOR_THREAT_TIMESTAMP !== 'undefined') {
+                document.getElementById('statTimestamp').textContent = RAPTOR_THREAT_TIMESTAMP.split(' ')[0];
+            }
+
+            // Gestion du menu hamburger
+            var toggle = document.getElementById('navToggle');
+            var nav = document.getElementById('raptorNav');
+            if (toggle && nav) {
+                toggle.addEventListener('click', function() {
+                    var isOpen = nav.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', isOpen);
+                });
+            }
+        });
+
+        function setAndAudit(ip) {
+            document.getElementById('ipInput').value = ip;
+            inspectIP();
+        }
+
+        function isPrivateIPv4(ip) {
+            var parts = ip.split('.').map(Number);
+            if (parts.length !== 4) return false;
+            // 10.0.0.0/8
+            if (parts[0] === 10) return true;
+            // 127.0.0.0/8
+            if (parts[0] === 127) return true;
+            // 172.16.0.0/12
+            if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
+            // 192.168.0.0/16
+            if (parts[0] === 192 && parts[1] === 168) return true;
+            // 169.254.0.0/16
+            if (parts[0] === 169 && parts[1] === 254) return true;
+            return false;
+        }
+
+        function isValidIPv4(ip) {
+            var parts = ip.split('.');
+            if (parts.length !== 4) return false;
+            for (var i = 0; i < 4; i++) {
+                var num = parseInt(parts[i], 10);
+                if (isNaN(num) || num < 0 || num > 255 || parts[i] !== num.toString()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function inspectIP() {
+            var input = document.getElementById('ipInput');
+            var ip = input.value.trim();
+            var resultBox = document.getElementById('resultBox');
+            var placeholder = document.getElementById('placeholderBox');
+            var output = document.getElementById('resultOutput');
+
+            if (!ip) return;
+
+            if (!isValidIPv4(ip)) {
+                alert("Format invalide. Veuillez saisir une adresse IPv4 standard (ex: 194.26.29.112).");
+                return;
+            }
+
+            placeholder.style.display = 'none';
+            resultBox.style.display = 'block';
+
+            var report = "";
+            var isThreat = false;
+            var threatData = (typeof RAPTOR_THREAT_DB !== 'undefined') ? RAPTOR_THREAT_DB[ip] : null;
+
+            if (isPrivateIPv4(ip)) {
+                // Cas IP privée / LAN
+                currentRuleText = "# Adresse interne : aucune neutralisation requise";
+                report = 
+'<span class="man-section-heading">QUALIFICATION FORENSIQUE : RÉSEAU LOCAL / PRIVÉ</span>\n' +
+'CIBLE AUDITÉE   : <strong style="color: #58A6FF;">' + ip + '</strong>\n' +
+'STATUT NET-GUARD: <span class="threat-badge threat-badge-private">RÉSEAU LOCAL RFC 1918</span>\n' +
+'SCORE DE MENACE : 0 / 100 (Aucun risque externe)\n\n' +
+'<span class="man-section-heading">ANALYSE ARCHITECTURALE</span>\n' +
+'Cette adresse appartient à une plage privée interne réservée aux communications locales (LAN/Loopback).\n' +
+'Elle ne transite jamais directement sur l\'Internet public sans passer par une passerelle NAT/Routeur.\n\n' +
+'<span class="man-section-heading">COMMANDES RECOMMANDÉES SUR LA MACHINE</span>\n' +
+'<span style="color: #636D83;"># Vérifier quel processus local communique sur cette IP :</span>\n' +
+'<span style="color: #E5C07B;">./build/rap net</span> | grep ' + ip + '\n';
+
+            } else if (threatData) {
+                // Cas IP malveillante identifiée dans la base
+                var catId = threatData[0];
+                var score = threatData[1];
+                var tag = threatData[2];
+                var catLabel = "HÔTE MALVEILLANT SIGNALÉ (ABUS / SCANNER)";
+                var badgeClass = "threat-badge-danger";
+
+                if (catId === 1) {
+                    catLabel = "SERVEUR C2 / BOTNET & RANÇONGICIEL (CRITIQUE)";
+                } else if (catId === 2) {
+                    catLabel = "RELAIS DE SORTIE TOR (ANONYMISATION)";
+                    badgeClass = "threat-badge-warning";
+                }
+
+                currentRuleText = "iptables -A OUTPUT -d " + ip + " -j DROP";
+
+                report = 
+'<span class="man-section-heading">ALERTE FORENSIQUE : CIBLE IDENTIFIÉE DANS LES FLUX HOSTILES</span>\n' +
+'CIBLE AUDITÉE   : <strong style="color: #CF222E;">' + ip + '</strong>\n' +
+'QUALIFICATION   : <span class="threat-badge ' + badgeClass + '">' + catLabel + '</span>\n' +
+'INDICE DE RISQUE: <strong style="color: #CF222E;">' + score + ' / 100 [DANGER IMMÉDIAT]</strong>\n' +
+'ÉTIQUETTE OSINT : ' + tag + '\n\n' +
+'<span class="man-section-heading">DIAGNOSTIC TACTIQUE</span>\n' +
+'Cette adresse IP est activement répertoriée par les centres de cyberdéfense internationaux (abuse.ch / IPsum).\n' +
+'Toute tentative de connexion sortante depuis votre machine vers cette IP doit être considérée comme une compromission\n' +
+'probable (exfiltration de données, balisage C2 ou téléchargement de charge utile malveillante).\n\n' +
+'<span class="man-section-heading">RIPOSTES CHIRURGICALES RECOMMANDÉES</span>\n' +
+'<span style="color: #636D83;"># 1. Traquer le processus local responsable en console RAPTOR (0-heap) :</span>\n' +
+'<span style="color: #8C1D18; font-weight: bold;">./build/rap net -i ' + ip + '</span>\n\n' +
+'<span style="color: #636D83;"># 2. Bloquer immédiatement tout paquet sortant vers cette cible (iptables) :</span>\n' +
+'<span style="color: #E5C07B;">sudo iptables -A OUTPUT -d ' + ip + ' -j DROP</span>\n\n' +
+'<span style="color: #636D83;"># 3. Équivalent pare-feu moderne (nftables) :</span>\n' +
+'<span style="color: #E5C07B;">sudo nft add rule inet filter output ip daddr ' + ip + ' drop</span>\n';
+
+            } else {
+                // Cas IP saine / non répertoriée
+                currentRuleText = "# Aucun blocage recommandé pour " + ip;
+                report = 
+'<span class="man-section-heading">RÉSULTAT FORENSIQUE : AUCUNE MENACE CONNUE RÉPERTORIÉE</span>\n' +
+'CIBLE AUDITÉE   : <strong style="color: #2EA043;">' + ip + '</strong>\n' +
+'STATUT NET-GUARD: <span class="threat-badge threat-badge-clean">NON SIGNALÉE HOSTILE</span>\n' +
+'SCORE DE MENACE : 0 / 100 [RÉPUTATION STANDARD]\n\n' +
+'<span class="man-section-heading">OBSERVATIONS FORENSIQUES</span>\n' +
+'Cette adresse ne figure sur aucune des listes de serveurs de commande (C2), rançongiciels ou scanners agressifs\n' +
+'au sein des 19 927 signatures consolidées dans la base active de RAPTOR.\n\n' +
+'<span class="man-section-heading">VÉRIFICATION COMPLÉMENTAIRE DE PERSISTANCE</span>\n' +
+'<span style="color: #636D83;"># Surveiller l\'état des flux et descripteurs de fichiers sous Linux :</span>\n' +
+'<span style="color: #E5C07B;">./build/rap net</span> | grep ' + ip + '\n';
+            }
+
+            output.innerHTML = report;
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function copyDefensiveRule() {
+            if (!currentRuleText) return;
+            navigator.clipboard.writeText(currentRuleText).then(function() {
+                var btn = document.getElementById('copyRuleBtn');
+                var origText = btn.textContent;
+                btn.textContent = "Règle copiée !";
+                setTimeout(function() {
+                    btn.textContent = origText;
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
