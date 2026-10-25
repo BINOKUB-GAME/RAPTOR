@@ -1,0 +1,57 @@
+# ==============================================================================
+# NOM DU WORKFLOW : .github/workflows/update_threats.yml
+# RÉVISION        : Rev 1.1
+# PROJET          : RAPTOR DEFENSE v2.0
+# RESPONSABILITÉ  : Pipeline d'actualisation automatique des flux de cybermenaces
+#                   - Extraction hebdomadaire OSINT (abuse.ch Feodo & IPsum).
+#                   - Régénération de src/cli/rap_threat_data.h et docs/js/threat_data.js.
+#                   - Authentification via jeton PAT dédié (THREAT_SYNC_TOKEN).
+#                   - Publication automatisée sur la branche main.
+# ==============================================================================
+
+name: "RAPTOR Net-Intel — Actualisation OSINT"
+
+on:
+  schedule:
+    # Exécution automatique : Chaque dimanche à 03h00 UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    # Déclenchement manuel à la demande depuis l'onglet Actions
+
+jobs:
+  update-threat-intelligence:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "1. Récupération du dépôt source"
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.THREAT_SYNC_TOKEN }}
+
+      - name: "2. Initialisation de l'environnement Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: "3. Exécution du générateur de menaces (SSOT)"
+        run: |
+          chmod +x tools/gen_threats.py
+          python3 tools/gen_threats.py
+
+      - name: "4. Vérification et publication des modifications"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet src/cli/rap_threat_data.h docs/js/threat_data.js; then
+            echo "[+] Aucun changement dans les flux OSINT. Dépôt à jour."
+          else
+            echo "[*] Nouvelles signatures détectées. Publication..."
+            git add src/cli/rap_threat_data.h docs/js/threat_data.js
+            
+            DATE_TAG=$(date -u +"%Y-%m-%d")
+            git commit -m "chore(threats): Synchronisation automatique des flux OSINT (${DATE_TAG}) [skip ci]"
+            
+            git push origin main
+            echo "[✓] Base Net-Intel mise à jour sur main avec succès."
+          fi
