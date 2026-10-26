@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# ==============================================================================
+#!/usr/bin/env python3a# ==============================================================================
 # NOM DU SCRIPT   : tools/gen_threats.py
 # RÉVISION        : Rev 1.0
 # PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
