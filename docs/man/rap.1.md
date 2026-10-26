@@ -54,6 +54,7 @@ COMMANDES
      preload      Audit d'intégrité du chargeur dynamique (/etc/ld.so.preload).
      heur, he     Analyse heuristique (binaires supprimés, chemins volatils).
      net          Audit TCP, corrélation PID et forensic IP (Net-Guard / OSINT).
+     netop, no    Console tactique temps réel matricielle (TUI), audit continu et remédiation active.
      sentry, se   Sentinelle passive anti-rançongiciel (canaris, fanotify et boîte noire).
      kill <PID>   Neutralisation immédiate par émission du signal SIGKILL.
      freeze <PID> Gel conservatoire via signal SIGSTOP pour examen forensique.
@@ -349,3 +350,87 @@ DESCRIPTION
 EXIT STATUS
      0    Fermeture nominale du visualiseur (touche 'q').
      1    Erreur d'accès au fichier source ou flux vide.
+
+<!-- MAN: rap-netop | 1 | RAP-NETOP(1) — Console Tactique Temps Réel -->
+NAME
+     rap netop — Console tactique réseau temps réel matricielle, 0-heap et remédiation active
+
+SYNOPSIS
+     rap netop [-n nombre]
+     rap no [-n nombre]
+
+DESCRIPTION
+     rap netop projette une console d'audit et de défense réseau active opérant
+     sans aucune allocation dynamique (0-heap) et sans scintillement (flicker-free).
+     
+     Il ingère en flux continu les structures /proc/net/tcp du noyau Linux, résout
+     les descripteurs Inode vers les PIDs et processus propriétaires, et confronte
+     chaque flux distant à la base souveraine de renseignement OSINT (19 867 signatures
+     actives). L'architecture repose sur un routeur de commandes découplé permettant
+     la neutralisation cinétique, l'embargo réseau et l'autopsie médico-légale sans
+     jamais interrompre la surveillance.
+
+OPTIONS
+     -n nombre
+             Fixe le nombre maximal de lignes de sockets affichées simultanément
+             sur la grille matricielle (valeur par défaut : 20, max : 256).
+
+COMMANDES INTERACTIVES AU CLAVIER (HOTKEYS)
+     k       Neutralisation réflexe chirurgicale (Kill).
+             Ouvre l'invite [FRAPPE REFLEXE]. Neutralise le processus par émission
+             séquentielle de SIGSTOP puis SIGKILL, mesure la latence à la microseconde
+             et active une trace rémanente ambrée (tombstone) de 7 secondes.
+             Gardes-fous stricts : tir proscrit sur PID 1, RAPTOR et shell parent.
+
+     b       Embargo et réhabilitation réseau (Ban/Déban IP).
+             Ouvre l'invite [BAN IP / DÉBAN]. Permet d'isoler une ou plusieurs cibles
+             séparées par une virgule ou un espace (ex: b 4,6,9).
+             L'injection applique une règle Netfilter (iptables -I INPUT -s IP -j DROP)
+             avec repli automatique sur une route trou noir (ip route add blackhole).
+             Le préfixe moins permet de lever l'embargo (ex: b -4, -6 ou b -B1).
+
+     Ctrl+B  Registre interactif des embargos noyau.
+             Bascule l'affichage vers la surcouche modale recensant l'ensemble des IP
+             verrouillées (#B01, #B02...), la durée d'activation, le mécanisme actif
+             et le volume de sockets associés. Le déban peut être exécuté directement
+             depuis cette vue via b 1, 2 ou b -1 -2.
+
+     s       Bascule instantanée du mode de tri (Sort Toggle).
+             Alterne cycliquement l'ordonnancement des flux sans réallocation mémoire :
+               1. DANGEROSITÉ : Float-to-top (KILLED > HOSTILE > WARN > ESTABLISHED > LISTEN).
+               2. PID         : Ordre croissant des identifiants processus système.
+               3. PORT/ACT.   : Regroupement par port distant et activité.
+
+     f       Filtre dynamique de flux (Filter Toggle).
+             Alterne instantanément le masque d'affichage par compaction in-place :
+               1. TOUS         : Vue exhaustive de tous les sockets noyau.
+               2. HORS LOCAL   : Masque le bruit 127.0.0.1, 0.0.0.0 et l'écoute LISTEN.
+               3. ÉTABLIS      : Isole strictement les connexions connectées ESTABLISHED.
+               4. ALERTES      : Cockpit de crise (HOSTILE, WARN, KILLED et BAN).
+
+     i       Inspection médico-légale approfondie (Forensic Overlay).
+             Ouvre l'invite [INSPECTION MÉDICO-LÉGALE] et projette l'autopsie du slot :
+               - Généalogie complète : PID, PPID et nom du processus parent (/proc).
+               - Intégrité binaire   : Ligne de commande brute et exécutable réel (/proc/[PID]/exe).
+               - Anti-Reverse Shell  : Analyse des flux STDIN (fd/0), STDOUT (fd/1) et détection
+                                       de détournement vers un socket réseau.
+               - Renseignement OSINT : Catégorisation de la menace (C2, Tor, Abus) et score.
+               - Actions directes    : Frappe 'k' ou embargo 'b' exécutables depuis la fiche.
+
+     p, SPC  Pause / Reprise de la capture.
+             Fige l'affichage du flux réseau. Les opérations de tri ('s') et de filtrage
+             ('f') restent immédiatement opérationnelles sur le snapshot gelé.
+
+     q, ESC  Fermeture de modale ou sortie propre de l'application.
+             Ferme la vue modale active (Ctrl+B ou inspection), ou restaure la configuration
+             du terminal (mode canonique, réaffichage du curseur) et quitte l'outil.
+
+DROITS SYSTÈME REQUIS
+     L'affichage passif et l'inspection ne requièrent que des droits utilisateurs standard.
+     L'application des embargos réseau (b / iptables) et les frappes cinétiques (k / kill)
+     requièrent les privilèges superutilisateur (sudo) ou les capacités Linux :
+     setcap 'cap_net_admin,cap_kill,cap_sys_ptrace=+ep' /usr/local/bin/rap
+
+EXIT STATUS
+     0 (RAP_EXIT_OK)      Fermeture nominale de la console interactive.
+     2 (RAP_EXIT_ERROR)   Terminal non interactif (absence de TTY) ou erreur d'initialisation.

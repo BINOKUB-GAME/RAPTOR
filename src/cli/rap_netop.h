@@ -1,17 +1,15 @@
 /* ==============================================================================
  * NOM DU SCRIPT : src/cli/rap_netop.h
- * RÉVISION      : Rev 1.6 (2026-10-26)
+ * RÉVISION      : Rev 1.8 (2026-10-26)
  * PROJET        : RAPTOR DEFENSE v2.0 // Console Tactique Temps Réel
  * RESPONSABILITÉ: En-tête interne du module 'netop', structures de données
- *                 0-heap, signatures TUI et prototypes du greffon d'action cinétique.
+ *                 0-heap et signatures du moteur d'audit.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.6) :
- *   - Calibrage de status_msg à 256 octets pour éliminer tout risque de troncature ANSI.
- *   - Intégration de NETOP_SEV_KILLED (priorité d'affichage Orange ambré).
- *   - Déclaration des fonctions 142 (netop_action_kill_slot) et 143 (netop_action_apply_tombstones).
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.8) :
+ *   - Déclaration de netop_engine_lookup_threat pour l'inspection médico-légale.
  *   - Préservation stricte de l'architecture 0-heap sans allocation dynamique.
  *
- * SECTION DU CAHIER DES CHARGES : SECTION 20 (Fonctions 136 à 143)
+ * SECTION DU CAHIER DES CHARGES : SECTION 20 (Fonctions 136 à 141)
  * ============================================================================== */
 
 #ifndef RAP_NETOP_H
@@ -25,7 +23,7 @@
 
 #define NETOP_MAX_ENTRIES    256
 #define NETOP_DEFAULT_LINES  20
-#define NETOP_DEFAULT_DELAY  1000 /* Millisecondes (1.0s) */
+#define NETOP_DEFAULT_DELAY  1000
 
 typedef enum {
     NETOP_SEV_OK = 0,
@@ -59,9 +57,6 @@ typedef struct {
     size_t         hostile_count;
     struct termios orig_termios;
     bool           raw_mode_active;
-    char           input_buffer[32];
-    size_t         input_len;
-    bool           kill_prompt_active;
     char           status_msg[256];
     uint64_t       status_msg_expire;
 } NetopContext;
@@ -74,9 +69,6 @@ void   netop_tui_render(NetopContext *ctx, const NetopEntry *entries, size_t cou
 /* Moteur d'audit et d'ingestion réseau */
 size_t netop_engine_scan(NetopContext *ctx, NetopEntry *out_entries, size_t max_entries);
 size_t netop_engine_get_threat_count(void);
-
-/* Greffon d'action cinétique (k) & pierres tombales */
-int    netop_action_kill_slot(NetopContext *ctx, NetopEntry *entries, size_t count, int line_num);
-void   netop_action_apply_tombstones(NetopEntry *entries, size_t count);
+bool   netop_engine_lookup_threat(uint32_t ip, uint8_t *out_cat, uint8_t *out_score);
 
 #endif /* RAP_NETOP_H */

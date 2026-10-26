@@ -1,28 +1,19 @@
 # ==============================================================================
 # NOM DU SCRIPT   : CMakeLists.txt
-# RÉVISION        : Rev 1.13
+# RÉVISION        : Rev 1.14 (2026-10-26)
 # PROJET          : RAPTOR v2.0 (Système d'Audit Défensif & Traque Mémoire)
 # RESPONSABILITÉ  : Configuration générale du système de construction CMake.
 #                   - Cible C99 avec extensions GNU (Linux/POSIX) et standard Windows.
-#                   - Définition par défaut du profil de build Release (-O3).
-#                   - Neutralisation des avertissements de dépréciation et tiers de Raylib.
+#                   - Profil de build Release (-O3).
 #                   - Intégration autonome de Raylib via FetchContent en mode SYSTEM.
-#                   - Neutralisation totale des avertissements internes tiers (Raylib / GLFW).
-#                   - Intégration modulaire de l'UI et des 6 greffons système.
-#                   - Intégration de Net-Guard et de Net-Intel (plugin_asn_intel.c).
-#                   - Assemblage de l'exécutable unifié 'raptor'.
-#                   - Intégration modulaire du mode CLI de secours (Sections 16 & 17) :
-#                     binaire d'urgence 'rap' et téléscripteur autonome 'rapless'.
-#                   - Chaîne de compilation automatisée de la documentation SSOT.
+#                   - Assemblage de l'exécutable unifié 'raptor' (GUI).
+#                   - Assemblage du binaire d'urgence 'rap' (CLI) et 'rapless'.
+#                   - Intégration modulaire des greffons de remédiation réseau.
 #
-# BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.13) :
-#   - Intégration du sous-système de remédiation active chirurgicale et survie
-#     (src/core/rap_oom.c, src/core/rap_blackbox.c, src/core/rap_reflex.c).
-#   - Ajout de ${CMAKE_CURRENT_SOURCE_DIR}/src/core aux chemins d'inclusion pour
-#     les cibles 'raptor' (GUI) et 'rap' (CLI).
-#   - Liaison explicite de la bibliothèque POSIX Realtime (rt) et pthread sur les
-#     deux cibles binaires pour supporter shm_open, mlockall et clock_gettime.
-#   - Inclusion des sources réflexes dans le socle universel et le dispatcher CLI.
+# BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.14) :
+#   - Ajout de src/cli/netop_cmd_sort.c dans la liste RAP_CLI_SOURCES.
+#   - Résolution des références indéfinies vers netop_cmd_sort_*.
+#   - Consolidation de l'arsenal complet des commandes TUI (k, b, s, f, i).
 # ==============================================================================
 
 cmake_minimum_required(VERSION 3.16...3.30)
@@ -69,7 +60,6 @@ FetchContent_Declare(
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(raylib)
 
-# Neutralisation totale des avertissements internes des bibliothèques tierces
 if(TARGET raylib)
     if(MSVC)
         target_compile_options(raylib PRIVATE /w)
@@ -244,7 +234,12 @@ if(UNIX)
         src/core/rap_reflex.c
         src/cli/cmd_netop.c
         src/cli/netop_engine.c
-        src/cli/netop_action.c
+        src/cli/netop_router.c
+        src/cli/netop_cmd_kill.c
+        src/cli/netop_cmd_ban.c
+        src/cli/netop_cmd_inspect.c
+        src/cli/netop_cmd_sort.c
+        src/cli/netop_cmd_filter.c
     )
 
     add_executable(rap

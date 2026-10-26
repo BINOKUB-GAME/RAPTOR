@@ -1,29 +1,28 @@
 /* ==============================================================================
- * NOM DU SCRIPT : src/cli/netop_action.c
+ * NOM DU SCRIPT : src/cli/netop_cmd_kill.c
  * RÉVISION      : Rev 1.1 (2026-10-26)
  * PROJET        : RAPTOR DEFENSE v2.0 // Console Tactique Temps Réel
- * RESPONSABILITÉ: Greffon d'action cinétique et de remédiation réseau.
+ * RESPONSABILITÉ: Greffon d'action cinétique 'k' et traçabilité médico-légale.
  *                 Contrôle les verrous d'inviolabilité (PID 1, shell, self),
  *                 exécute la frappe chirurgicale (SIGSTOP + SIGKILL), mesure la
- *                 latence et gère la trace rémanente orange (Tombstones).
+ *                 latence et gère le registre statique des tombstones (Orange ambré).
  *
  * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
- *   - Calibrage du formatage de latence sur tampon élargi à 256 octets.
- *   - Éradication de l'avertissement GCC -Wformat-truncation.
- *   - Préservation des verrous stricts anti-suicide (PID <= 1, self, ppid).
- *   - Registre statique de pierres tombales (0-heap) rémanent 3,5 secondes.
+ *   - Signature d'exécution universelle avec argument chaîne 'const char *arg'.
+ *   - Verrous stricts anti-suicide et protection des processus vitaux.
+ *   - Rémanence de confirmation portée à 7 secondes (7000 ms).
  *
  * SECTION DU CAHIER DES CHARGES : SECTION 20 (Fonctions 142 & 143)
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
- *   142. netop_action_kill_slot        - Validation de sécurité et tir cinétique cerné.
- *   143. netop_action_apply_tombstones - Application de la trace orange rémanente.
+ *   142. netop_cmd_kill_exec             - Validation de sécurité et tir cinétique cerné.
+ *   143. netop_cmd_kill_apply_tombstones - Application de la trace orange rémanente.
  * ============================================================================== */
 
 #define _POSIX_C_SOURCE 200809L
 #define _DEFAULT_SOURCE
 
-#include "rap_netop.h"
+#include "netop_cmd_kill.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,7 +33,7 @@
 #include <errno.h>
 
 #define NETOP_MAX_TOMBSTONES   16
-#define NETOP_TOMBSTONE_TTL_MS 7000 /* 3,5 secondes d'éclat orange */
+#define NETOP_TOMBSTONE_TTL_MS 7000 /* 7 secondes d'éclat orange rémanent */
 
 typedef struct {
     uint32_t pid;
@@ -54,10 +53,9 @@ static uint64_t netop_get_monotonic_ms(void)
 }
 
 /* ==============================================================================
- * FONCTION 143 : netop_action_apply_tombstones
- * Maintient la trace orange [ABATTU] sur les sockets encore visibles
+ * FONCTION 143 : netop_cmd_kill_apply_tombstones
  * ============================================================================== */
-void netop_action_apply_tombstones(NetopEntry *entries, size_t count)
+void netop_cmd_kill_apply_tombstones(NetopEntry *entries, size_t count)
 {
     uint64_t now = netop_get_monotonic_ms();
 
@@ -69,7 +67,6 @@ void netop_action_apply_tombstones(NetopEntry *entries, size_t count)
             continue;
         }
 
-        /* Confrontation avec les flux actifs rapportés par le noyau */
         for (size_t i = 0; i < count; i++) {
             NetopEntry *e = &entries[i];
 
@@ -88,27 +85,26 @@ void netop_action_apply_tombstones(NetopEntry *entries, size_t count)
 }
 
 /* ==============================================================================
- * FONCTION 142 : netop_action_kill_slot
+ * FONCTION 142 : netop_cmd_kill_exec
  * ============================================================================== */
-int netop_action_kill_slot(NetopContext *ctx, NetopEntry *entries, size_t count, int line_num)
+int netop_cmd_kill_exec(NetopContext *ctx, NetopEntry *entries, size_t count, const char *arg)
 {
-    if (!ctx || !entries || count == 0) return -1;
+    if (!ctx || !entries || count == 0 || !arg) return -1;
 
+    int slot_num = atoi(arg);
     uint64_t now = netop_get_monotonic_ms();
 
-    /* 1. Validation de la borne de sélection */
-    if (line_num < 1 || (size_t)line_num > count) {
+    if (slot_num < 1 || (size_t)slot_num > count) {
         snprintf(ctx->status_msg, sizeof(ctx->status_msg),
                  "\033[1;31m[ERREUR] Ligne #%02d inexistante (Plage valide : 01-%02zu)\033[0m",
-                 line_num, count);
+                 slot_num, count);
         ctx->status_msg_expire = now + 3000;
         return -1;
     }
 
-    NetopEntry *target = &entries[line_num - 1];
+    NetopEntry *target = &entries[slot_num - 1];
     uint32_t pid = target->pid;
 
-    /* 2. Contrôles stricts d'inviolabilité */
     if (pid == 0) {
         snprintf(ctx->status_msg, sizeof(ctx->status_msg),
                  "\033[1;33m[REFUS] Impossible d'abattre un socket orphelin ou en cours de purge.\033[0m");
@@ -137,11 +133,9 @@ int netop_action_kill_slot(NetopContext *ctx, NetopEntry *entries, size_t count,
         return -1;
     }
 
-    /* 3. Déclenchement de la frappe cinétique et mesure de latence */
     struct timespec t_start, t_end;
     clock_gettime(CLOCK_MONOTONIC, &t_start);
 
-    /* Séquence réflexe : Gel immédiat (SIGSTOP) puis destruction physique (SIGKILL) */
     kill((pid_t)pid, SIGSTOP);
     int kill_res = kill((pid_t)pid, SIGKILL);
 
@@ -159,7 +153,6 @@ int netop_action_kill_slot(NetopContext *ctx, NetopEntry *entries, size_t count,
                       (t_end.tv_nsec - t_start.tv_nsec) / 1000L;
     if (latency_us < 1) latency_us = 1;
 
-    /* 4. Enregistrement de la pierre tombale rémanente */
     for (size_t t = 0; t < NETOP_MAX_TOMBSTONES; t++) {
         if (!s_tombstones[t].active) {
             s_tombstones[t].pid = pid;
@@ -171,13 +164,11 @@ int netop_action_kill_slot(NetopContext *ctx, NetopEntry *entries, size_t count,
         }
     }
 
-    /* Mutation immédiate de la ligne ciblée pour le cycle d'affichage en cours */
     target->severity = NETOP_SEV_KILLED;
     snprintf(target->comm, sizeof(target->comm), "[ABATTU]");
     snprintf(target->state, sizeof(target->state), "DISJONCTÉ");
     snprintf(target->verdict, sizeof(target->verdict), "NEUTRALISÉ (SIGKILL)");
 
-    /* 5. Production du message médico-légal en barre d'état */
     snprintf(ctx->status_msg, sizeof(ctx->status_msg),
              "\033[1;38;5;208m[FRAPPE RÉUSSIE]\033[0m PID \033[1;37m%u\033[0m abattu via \033[1;31mSIGKILL\033[0m | Latence : \033[1;32m%ld µs\033[0m",
              pid, latency_us);

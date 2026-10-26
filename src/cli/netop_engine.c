@@ -1,23 +1,24 @@
 /* ==============================================================================
  * NOM DU SCRIPT : src/cli/netop_engine.c
- * RÉVISION      : Rev 1.7 (2026-10-26)
+ * RÉVISION      : Rev 1.11 (2026-10-26)
  * PROJET        : RAPTOR DEFENSE v2.0 // Console Tactique Temps Réel
  * RESPONSABILITÉ: Moteur d'audit et d'ingestion réseau passif temps réel.
  *                 Lit /proc/net/tcp, résout les propriétaires sans désynchronisation,
  *                 confronte les cibles à la table binaire rap_threat_data.h
  *                 via recherche dichotomique O(log N) et applique les pierres tombales.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.7) :
- *   - Intégration de netop_action_apply_tombstones pour injecter la trace rémanente [ABATTU].
- *   - Prise en compte de NETOP_SEV_KILLED au sommet du tri Float-to-top.
- *   - Maintien du cycle d'état : Hostile -> Orange [ABATTU] -> Vert Purge -> Fin.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.11) :
+ *   - Retrait du tri codé en dur (délégué intégralement à netop_cmd_sort.c).
+ *   - Moteur purement agnostique d'ingestion et de qualification.
+ *   - Préservation stricte du 0-heap sans allocation dynamique.
  *
- * SECTION DU CAHIER DES CHARGES : SECTION 20 (Fonctions 139 à 141)
+ * SECTION DU CAHIER DES CHARGES : SECTION 20 (Fonctions 139 à 141b)
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
- *   139. netop_engine_scan              - Scan complet, confrontation binaire OSINT et tri.
+ *   139. netop_engine_scan              - Scan complet, confrontation binaire OSINT.
  *   140. netop_engine_build_inode_cache - Indexation ciblée Inode/PID via /proc/[PID]/fd.
  *   141. netop_engine_get_threat_count  - Restitution du volume exact de signatures actives.
+ *  141b. netop_engine_lookup_threat     - Recherche dichotomique O(log N) unifiée.
  * ============================================================================== */
 
 #define _POSIX_C_SOURCE 200809L
@@ -25,6 +26,8 @@
 
 #include "rap_netop.h"
 #include "rap_threat_data.h"
+#include "netop_cmd_kill.h"
+#include "netop_cmd_ban.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,6 +64,18 @@ static const RapThreatRecord *netop_lookup_threat(uint32_t ip_host_order)
     return (const RapThreatRecord *)bsearch(&ip_host_order, g_rap_threat_db,
                                             RAP_THREAT_COUNT, sizeof(RapThreatRecord),
                                             netop_threat_cmp);
+}
+
+/* ==============================================================================
+ * FONCTION 141b : netop_engine_lookup_threat
+ * ============================================================================== */
+bool netop_engine_lookup_threat(uint32_t ip, uint8_t *out_cat, uint8_t *out_score)
+{
+    const RapThreatRecord *t = netop_lookup_threat(ip);
+    if (!t) return false;
+    if (out_cat)   *out_cat   = t->category;
+    if (out_score) *out_score = t->score;
+    return true;
 }
 
 /* ==============================================================================
@@ -285,7 +300,10 @@ size_t netop_engine_scan(NetopContext *ctx, NetopEntry *out_entries, size_t max_
         bool is_loopback = (strncmp(e->local_ip, "127.", 4) == 0) || (strncmp(e->remote_ip, "127.", 4) == 0);
         bool is_listen   = (strcmp(e->state, "LISTEN") == 0);
 
-        if (strcmp(e->state, "TIME_WAIT") == 0) {
+        if (netop_cmd_ban_is_banned(e->remote_ip)) {
+            e->severity = NETOP_SEV_WARN;
+            snprintf(e->verdict, sizeof(e->verdict), "ISOLÉ (BAN IP)");
+        } else if (strcmp(e->state, "TIME_WAIT") == 0) {
             e->severity = NETOP_SEV_OK;
             snprintf(e->verdict, sizeof(e->verdict), "PURGE NOYAU (60s)");
         } else if (strcmp(e->state, "LAST_ACK") == 0 ||
@@ -332,20 +350,7 @@ size_t netop_engine_scan(NetopContext *ctx, NetopEntry *out_entries, size_t max_
         }
     }
 
-    /* Injection des traces rémanentes orange [ABATTU] */
-    netop_action_apply_tombstones(out_entries, count);
-
-    /* Tri Float-to-top : KILLED > HOSTILE > WARN > ESTABLISHED > LISTEN */
-    for (size_t i = 1; i < count; i++) {
-        NetopEntry key = out_entries[i];
-        int j = (int)i - 1;
-
-        while (j >= 0 && out_entries[j].severity < key.severity) {
-            out_entries[j + 1] = out_entries[j];
-            j--;
-        }
-        out_entries[j + 1] = key;
-    }
+    netop_cmd_kill_apply_tombstones(out_entries, count);
 
     return count;
 }

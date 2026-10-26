@@ -1,16 +1,16 @@
 /* ==============================================================================
  * NOM DU SCRIPT : src/cli/cmd_netop.c
- * RÉVISION      : Rev 1.8 (2026-10-26)
+ * RÉVISION      : Rev 1.13 (2026-10-26)
  * PROJET        : RAPTOR DEFENSE v2.0 // Console Tactique Temps Réel
- * DESCRIPTION   : Contrôleur TUI principal pour 'rap netop'. Gère le cycle de
- *                 veille non bloquant sur STDIN, l'affichage ANSI anti-scintillement,
- *                 la configuration termios et le routage de l'action cinétique 'k'.
+ * DESCRIPTION   : Contrôleur TUI principal pour 'rap netop'. Gère la boucle de
+ *                 veille non-bloquante sur STDIN et le rendu graphique.
+ *                 Délègue 100% des commandes et des transformations aux greffons.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.8) :
- *   - Correction de l'accès aux membres de ctx via l'opérateur point (.) dans rap_cmd_netop.
- *   - Raccordement interactif de la commande 'k' au greffon netop_action_kill_slot.
- *   - Rendu de la trace rémanente en Orange ambré vif (\033[1;38;5;208m).
- *   - Affichage temporaire du bandeau médico-légal (latence µs, SIGKILL).
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.13) :
+ *   - Intégration de s_raw_entries (snapshot brut pour re-tri et re-filtrage en pause).
+ *   - Application de netop_cmd_sort_apply et netop_cmd_filter_apply sur la vue.
+ *   - Télémétrie d'en-tête enrichie : affichage des modes [Tri] et [Filtre] actifs.
+ *   - Zéro allocation dynamique (0-heap flicker-free).
  *
  * SECTION DU CAHIER DES CHARGES : SECTION 20 (Fonctions 136 à 138)
  *
@@ -25,6 +25,9 @@
 
 #include "rap_cli.h"
 #include "rap_netop.h"
+#include "netop_router.h"
+#include "netop_cmd_sort.h"
+#include "netop_cmd_filter.h"
 #include "rap_oom.h"
 
 #include <stdio.h>
@@ -34,8 +37,6 @@
 #include <termios.h>
 #include <poll.h>
 #include <signal.h>
-#include <ctype.h>
-#include <time.h>
 
 static NetopContext *g_active_ctx = NULL;
 
@@ -48,13 +49,6 @@ static void netop_signal_handler(int sig)
         g_active_ctx->raw_mode_active = false;
     }
     _exit(0);
-}
-
-static uint64_t netop_tui_now_ms(void)
-{
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (uint64_t)ts.tv_sec * 1000ULL + (uint64_t)(ts.tv_nsec / 1000000ULL);
 }
 
 /* ==============================================================================
@@ -119,20 +113,25 @@ void netop_tui_render(NetopContext *ctx, const NetopEntry *entries, size_t count
 {
     if (!ctx) return;
 
+    if (netop_router_render_overlay(ctx)) {
+        return;
+    }
+
     printf("\033[H");
 
     /* 1. Bandeau supérieur de télémétrie dynamique */
-    printf("\033[1;37mFlux Réseau : \033[1;32m%zu actifs\033[0m, \033[36m%zu établis\033[0m, \033[37m%zu écoute\033[0m, \033[1;31m%zu HOSTILE\033[0m    \n",
-           ctx->total_entries, ctx->established_count, ctx->listen_count, ctx->hostile_count);
+    printf("\033[1;37mFlux Réseau : \033[1;32m%zu capturés\033[0m (\033[1;36m%zu visibles\033[0m), \033[36m%zu établis\033[0m, \033[37m%zu écoute\033[0m, \033[1;31m%zu HOSTILE\033[0m\033[K\n",
+           ctx->total_entries, count, ctx->established_count, ctx->listen_count, ctx->hostile_count);
 
-    printf("\033[1;37mBase OSINT  : \033[33m%zu IP (Active)\033[0m | \033[1;37mRéflexe : \033[1;31mARMÉ\033[0m | \033[1;37mSurvie OOM : \033[32m-1000\033[0m | \033[1;37mStatut : \033[1;%sm%s\033[0m    \n",
+    printf("\033[1;37mBase OSINT  : \033[33m%zu IP (Active)\033[0m | \033[1;37mRéflexe : \033[1;31mARMÉ\033[0m | \033[1;37mSurvie OOM : \033[32m-1000\033[0m | \033[1;37mStatut : \033[1;%sm%s\033[0m\033[K\n",
            netop_engine_get_threat_count(), ctx->paused ? "33" : "32", ctx->paused ? "PAUSE" : "TEMPS RÉEL");
 
-    printf("\033[1;37mRAPTOR v2.0 : \033[36m0-Heap\033[0m | \033[37mFiltre : \033[1;33m-n %d\033[0m | \033[37mCadence : \033[36m%.1fs\033[0m                  \n\n",
+    printf("\033[1;37mRAPTOR v2.0 : \033[36m0-Heap\033[0m | \033[37mTri : \033[1;33m[%s]\033[0m | \033[37mFiltre : \033[1;36m[%s]\033[0m | \033[37mLignes : \033[32m%d\033[0m | \033[37mCadence : \033[36m%.1fs\033[0m\033[K\n\033[K\n",
+           netop_cmd_sort_get_name(), netop_cmd_filter_get_name(),
            ctx->max_display_lines, (double)ctx->refresh_delay_ms / 1000.0);
 
     /* 2. En-tête des colonnes */
-    printf("\033[7m N°  | PID   | COMMANDE         | IP LOCALE:PORT       | IP DISTANTE:PORT     | STATUT      | VERDICT OSINT            \033[0m\n");
+    printf("\033[7m N°  | PID   | COMMANDE         | IP LOCALE:PORT       | IP DISTANTE:PORT     | STATUT      | VERDICT OSINT            \033[0m\033[K\n");
 
     /* 3. Lignes de données réelles */
     int lines_to_show = ctx->max_display_lines;
@@ -150,19 +149,19 @@ void netop_tui_render(NetopContext *ctx, const NetopEntry *entries, size_t count
 
         const char *color_prefix = "\033[0m";
         if (e->severity == NETOP_SEV_KILLED) {
-            color_prefix = "\033[1;38;5;208m"; /* Orange ambré vif pour impact cinétique */
+            color_prefix = "\033[1;38;5;208m";
         } else if (e->severity == NETOP_SEV_HOSTILE) {
-            color_prefix = "\033[1;41;37m";    /* Fond rouge vif pour les menaces C2 */
+            color_prefix = "\033[1;41;37m";
         } else if (e->severity == NETOP_SEV_WARN) {
-            color_prefix = "\033[1;33m";       /* Jaune vif pour les anomalies */
+            color_prefix = "\033[1;33m";
         } else if (strcmp(e->state, "TIME_WAIT") == 0 || strcmp(e->verdict, "PURGE NOYAU (60s)") == 0) {
-            color_prefix = "\033[0;32m";       /* Vert assainissement pour la purge noyau */
+            color_prefix = "\033[0;32m";
         } else if (strcmp(e->state, "LISTEN") == 0 || strcmp(e->verdict, "LOCAL ÉCOUTE") == 0) {
-            color_prefix = "\033[0;90m";       /* Gris discret pour l'écoute locale */
+            color_prefix = "\033[0;90m";
         } else if (e->severity == NETOP_SEV_OK && strcmp(e->verdict, "LOCAL") != 0) {
-            color_prefix = "\033[1;32m";       /* Vert officiel */
+            color_prefix = "\033[1;32m";
         } else if (e->severity == NETOP_SEV_INFO) {
-            color_prefix = "\033[0;36m";       /* Cyan pour les sessions actives */
+            color_prefix = "\033[0;36m";
         }
 
         printf("%s#%02d | %-5u | %-16.16s | %-20.20s | %-20.20s | %-11.11s | %-24.24s\033[0m\033[K\n",
@@ -180,18 +179,9 @@ void netop_tui_render(NetopContext *ctx, const NetopEntry *entries, size_t count
         printf("\033[K\n");
     }
 
-    /* 4. Barre d'état, invite de frappe ou message médico-légal */
+    /* 4. Barre d'état ou prompt unifié avec purge basse */
     printf("\033[1;30m-----------------------------------------------------------------------------------------------------\033[0m\033[K\n");
-    uint64_t now = netop_tui_now_ms();
-
-    if (ctx->kill_prompt_active) {
-        printf("\033[1;31m[FRAPPE REFLEXE] Entrez le N° de la ligne a neutraliser : %s_\033[0m\033[K", ctx->input_buffer);
-    } else if (ctx->status_msg[0] != '\0' && now < ctx->status_msg_expire) {
-        printf("%s\033[K", ctx->status_msg);
-    } else {
-        printf("\033[1;37mCOMMANDE : \033[36m[k]\033[0m Neutraliser  \033[36m[p]\033[0m Pause  \033[36m[q]\033[0m Quitter  ==> \033[K");
-    }
-
+    printf("%s\033[K\n\033[J", netop_router_get_footer(ctx));
     fflush(stdout);
 }
 
@@ -207,7 +197,6 @@ int rap_cmd_netop(int argc, char **argv, const RapConfig *cfg)
     ctx.refresh_delay_ms  = NETOP_DEFAULT_DELAY;
     ctx.running           = true;
     ctx.paused            = false;
-    ctx.kill_prompt_active= false;
 
     if (cfg && cfg->limit > 0 && cfg->limit <= NETOP_MAX_ENTRIES) {
         ctx.max_display_lines = cfg->limit;
@@ -229,12 +218,17 @@ int rap_cmd_netop(int argc, char **argv, const RapConfig *cfg)
 
     rap_oom_protect();
 
+    netop_router_init();
+
     if (netop_tui_init(&ctx) != 0) {
         return RAP_EXIT_ERROR;
     }
 
-    static NetopEntry s_entries[NETOP_MAX_ENTRIES];
-    size_t count = 0;
+    /* Tampon brut 0-heap préservé pour les opérations en mode pause */
+    static NetopEntry s_raw_entries[NETOP_MAX_ENTRIES];
+    static NetopEntry s_display_entries[NETOP_MAX_ENTRIES];
+    size_t raw_count = 0;
+    size_t display_count = 0;
 
     struct pollfd pfd;
     pfd.fd     = STDIN_FILENO;
@@ -242,8 +236,15 @@ int rap_cmd_netop(int argc, char **argv, const RapConfig *cfg)
 
     while (ctx.running) {
         if (!ctx.paused) {
-            count = netop_engine_scan(&ctx, s_entries, NETOP_MAX_ENTRIES);
-            netop_tui_render(&ctx, s_entries, count);
+            raw_count = netop_engine_scan(&ctx, s_raw_entries, NETOP_MAX_ENTRIES);
+
+            memcpy(s_display_entries, s_raw_entries, raw_count * sizeof(NetopEntry));
+            display_count = raw_count;
+
+            netop_cmd_sort_apply(s_display_entries, display_count);
+            display_count = netop_cmd_filter_apply(s_display_entries, display_count);
+
+            netop_tui_render(&ctx, s_display_entries, display_count);
         }
 
         int poll_ret = poll(&pfd, 1, ctx.refresh_delay_ms);
@@ -251,38 +252,16 @@ int rap_cmd_netop(int argc, char **argv, const RapConfig *cfg)
         if (poll_ret > 0 && (pfd.revents & POLLIN)) {
             char ch = 0;
             if (read(STDIN_FILENO, &ch, 1) > 0) {
-                if (ctx.kill_prompt_active) {
-                    if (ch == '\n' || ch == '\r') {
-                        if (ctx.input_len > 0) {
-                            int line_num = atoi(ctx.input_buffer);
-                            /* Déclenchement de la frappe cinétique via le greffon */
-                            netop_action_kill_slot(&ctx, s_entries, count, line_num);
-                        }
-                        ctx.kill_prompt_active = false;
-                        ctx.input_buffer[0] = '\0';
-                        ctx.input_len = 0;
-                    } else if (ch == 27) {
-                        ctx.kill_prompt_active = false;
-                        ctx.input_buffer[0] = '\0';
-                        ctx.input_len = 0;
-                    } else if ((ch == 127 || ch == '\b') && ctx.input_len > 0) {
-                        ctx.input_buffer[--ctx.input_len] = '\0';
-                    } else if (isdigit((unsigned char)ch) && ctx.input_len < 4) {
-                        ctx.input_buffer[ctx.input_len++] = ch;
-                        ctx.input_buffer[ctx.input_len] = '\0';
-                    }
-                } else {
-                    if (ch == 'q' || ch == 'Q' || ch == 27) {
-                        ctx.running = false;
-                    } else if (ch == 'p' || ch == 'P' || ch == ' ') {
-                        ctx.paused = !ctx.paused;
-                    } else if (ch == 'k' || ch == 'K') {
-                        ctx.kill_prompt_active = true;
-                        ctx.input_len = 0;
-                        ctx.input_buffer[0] = '\0';
-                    }
-                }
-                netop_tui_render(&ctx, s_entries, count);
+                netop_router_handle_key(&ctx, s_display_entries, display_count, ch);
+
+                /* Recalcul immédiat du tri et du filtre sur le snapshot existant */
+                memcpy(s_display_entries, s_raw_entries, raw_count * sizeof(NetopEntry));
+                display_count = raw_count;
+
+                netop_cmd_sort_apply(s_display_entries, display_count);
+                display_count = netop_cmd_filter_apply(s_display_entries, display_count);
+
+                netop_tui_render(&ctx, s_display_entries, display_count);
             }
         }
     }

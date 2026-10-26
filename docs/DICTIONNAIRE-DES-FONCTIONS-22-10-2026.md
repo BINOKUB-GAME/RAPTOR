@@ -1,5 +1,5 @@
 # DICTIONNAIRE OFFICIEL DES STRUCTURES ET FONCTIONS // RAPTOR v2.0
-## RÉFÉRENTIEL TECHNIQUE D'INGÉNIERIE ET D'API (CONSOLIDÉ AU 25-10-2026)
+## RÉFÉRENTIEL TECHNIQUE D'INGÉNIERIE ET D'API (CONSOLIDÉ AU 26-10-2026)
 
 ================================================================================
 SECTION 1 : MODÈLE DE DONNÉES UNIVERSEL (src/core/raptor_data.c)
@@ -784,6 +784,194 @@ Fonction 135 : rap_oom.c -- rap_oom_lock_memory -- Verrouillage des pages physiq
                   sur disque des pages mémoires de RAPTOR, garantissant un temps de réponse
                   sans latence de défaut de page (*page fault*) lors des frappes réflexes.
   • Retour      : `0` en cas de verrouillage physique réussi, `-1` en cas de dépassement de quota.
+
+================================================================================
+SECTION 20 : CONSOLE TACTIQUE RÉSEAU TEMPS RÉEL (NETOP) & ROUTEUR DÉCOUPLÉ (src/cli/)
+================================================================================
+
+Fonction 136 : cmd_netop.c -- rap_cmd_netop -- Point d'entrée de la console netop
+  • Signature C : int rap_cmd_netop(int argc, char **argv, const RapConfig *cfg);
+  • Utilité     : Point d'entrée principal de la commande `rap netop`. Initialise le contexte,
+                  parse les options de limitation de lignes (-n), active l'immunité OOM
+                  (rap_oom_protect), configure le routeur de commandes et pilote la boucle
+                  d'écoute non-bloquante STDIN via poll().
+  • Retour      : 0 (RAP_EXIT_OK) en sortie nominale, 2 (RAP_EXIT_ERROR) si STDIN n'est pas un TTY.
+
+Fonction 137 : cmd_netop.c -- netop_tui_init -- Initialisation mode brut TTY
+  • Signature C : int netop_tui_init(NetopContext *ctx);
+  • Utilité     : Sauvegarde les attributs originaux du terminal via tcgetattr, bascule
+                  en mode brut non-canonique sans écho (VMIN=0, VTIME=0), intercepte les signaux
+                  (SIGINT, SIGTERM, SIGQUIT) pour restauration d'urgence, masque le curseur
+                  (\033[?25l) et purge l'écran (\033[2J).
+  • Retour      : 0 en cas de succès, -1 en cas d'échec termios.
+
+Fonction 138 : cmd_netop.c -- netop_tui_render -- Moteur de rendu matriciel TUI
+  • Signature C : void netop_tui_render(NetopContext *ctx, const NetopEntry *entries, size_t count);
+  • Utilité     : Orchestre le rendu graphique temps réel : délègue à l'overlay actif si présent,
+                  sinon projette la télémétrie supérieure, la base OSINT, le statut OOM,
+                  les modes de tri et de filtre actifs, la grille de sockets colorée par niveau
+                  de criticité (7 colonnes) et le pied de page dynamique avec purge basse (\033[J).
+
+Fonction 139 : netop_engine.c -- netop_engine_scan -- Ingestion et confrontation passives
+  • Signature C : size_t netop_engine_scan(NetopContext *ctx, NetopEntry *out_entries, size_t max_entries);
+  • Utilité     : Lit directement /proc/net/tcp, décode les adresses et états de connexion,
+                  déclenche l'indexation ciblée des descripteurs, confronte les IP distantes
+                  à la table OSINT souveraine g_rap_threat_db, évalue les règles Net-Guard et
+                  applique les pierres tombales rémanentes.
+  • Retour      : Nombre exact de connexions ingérées et qualifiées.
+
+Fonction 140 : netop_engine.c -- netop_engine_build_inode_cache -- Résolution Inode/PID ciblée
+  • Signature C : static void netop_engine_build_inode_cache(const NetopEntry *entries, size_t count);
+  • Utilité     : Parcourt /proc/[PID]/fd pour résoudre les descripteurs socket:[INODE]
+                  associés aux sockets actifs, extrait le nom du binaire (/proc/[PID]/comm)
+                  et alimente le cache statique 0-heap sans altération d'horodatage.
+
+Fonction 141 : netop_engine.c -- netop_engine_get_threat_count -- Dénombrement base OSINT
+  • Signature C : size_t netop_engine_get_threat_count(void);
+  • Utilité     : Restitue le volume exact de signatures d'adresses IP hostiles compilées
+                  en dur dans la section .rodata de RAPTOR.
+  • Retour      : Nombre d'enregistrements (19 867 signatures).
+
+Fonction 141b : netop_engine.c -- netop_engine_lookup_threat -- Recherche dichotomique OSINT
+  • Signature C : bool netop_engine_lookup_threat(uint32_t ip, uint8_t *out_cat, uint8_t *out_score);
+  • Utilité     : Exécute une recherche dichotomique O(log N) dans la table binaire triée
+                  g_rap_threat_db pour extraire la catégorie hostile (C2, Tor, Abus) et le score.
+  • Retour      : true si l'IP correspond à une menace répertoriée, false sinon.
+
+Fonction 142 : netop_cmd_kill.c -- netop_cmd_kill_exec -- Tir cinétique chirurgical 'k'
+  • Signature C : int netop_cmd_kill_exec(NetopContext *ctx, NetopEntry *entries, size_t count, const char *arg);
+  • Utilité     : Valide le numéro de slot cible, contrôle les verrous d'inviolabilité absolue
+                  (PID 1, RAPTOR, shell parent), paralyse le processus via SIGSTOP puis le détruit
+                  via SIGKILL. Mesure la latence à la microseconde, consigne le slot dans le
+                  registre des tombstones (7 secondes) et actualise l'affichage en orange ambré.
+  • Retour      : 0 en cas de frappe réussie, -1 en cas de violation de sécurité ou cible invalide.
+
+Fonction 143 : netop_cmd_kill.c -- netop_cmd_kill_apply_tombstones -- Rémanence des cibles
+  • Signature C : void netop_cmd_kill_apply_tombstones(NetopEntry *entries, size_t count);
+  • Utilité     : Parcourt le registre statique des tombstones et marque comme neutralisés
+                  ([ABATTU], DISJONCTÉ, NETOP_SEV_KILLED) tous les sockets appartenant à un PID
+                  ou un endpoint abattu au cours des 7 dernières secondes.
+
+Fonction 144 : netop_router.c -- netop_router_init -- Initialisation de la table de dispatch
+  • Signature C : void netop_router_init(void);
+  • Utilité     : Réinitialise l'aiguilleur central, vide les tampons d'invites et inscrit de
+                  manière déclarative l'ensemble des greffons de commandes (k, b, s, f, i, Ctrl+B, p).
+
+Fonction 145 : netop_router.c -- netop_router_handle_key -- Aiguilleur central des frappes
+  • Signature C : void netop_router_handle_key(NetopContext *ctx, NetopEntry *entries, size_t count, char ch);
+  • Utilité     : Capture non-bloquante du flux clavier. Gère la machine à états de saisie
+                  des invites (séparateurs, virgules, minus, validation Entrée, annulation Échap),
+                  route vers les gestionnaires d'overlays si une modale est active, ou déclenche
+                  le greffon associé à la touche en mode normal.
+
+Fonction 146 : netop_router.c -- netop_router_get_footer -- Composition du pied de page
+  • Signature C : const char *netop_router_get_footer(NetopContext *ctx);
+  • Utilité     : Génère dynamiquement la ligne d'état inférieure : affiche le prompt de saisie
+                  avec curseur clignotant si une commande est en attente, les notifications
+                  médico-légales minutées, ou la liste des raccourcis enregistrés.
+
+Fonction 147 : netop_cmd_ban.c -- netop_cmd_ban_exec -- Embargo et déban multi-sélection 'b'
+  • Signature C : int netop_cmd_ban_exec(NetopContext *ctx, NetopEntry *entries, size_t count, const char *arg);
+  • Utilité     : Parseur de sélections groupées (chiffres, virgules, espaces, signe moins pour déban,
+                  préfixe B pour index registre). Fige un snapshot du registre, déduplique les IP
+                  intra-batch, injecte la règle Netfilter (iptables -I INPUT -s IP -j DROP) avec repli
+                  sur route blackhole (ip route add blackhole), ou lève l'interdiction (iptables -D /
+                  ip route del). Mesure la latence en microsecondes et synchronise les flux.
+  • Retour      : 0 en cas de traitement nominal, -1 si privilèges root absents.
+
+Fonction 148 : netop_cmd_ban.c -- netop_cmd_ban_is_banned -- Statut d'embargo d'une IP
+  • Signature C : bool netop_cmd_ban_is_banned(const char *remote_ip);
+  • Utilité     : Interroge la table statique interne des embargos pour certifier si une adresse IP
+                  distante fait l'objet d'un verrouillage actif.
+  • Retour      : true si l'IP est sous embargo actif, false sinon.
+
+Fonction 149 : netop_cmd_ban.c -- netop_cmd_ban_toggle_list -- Bascule de la modale Ctrl+B
+  • Signature C : int netop_cmd_ban_toggle_list(NetopContext *ctx, NetopEntry *entries, size_t count, const char *arg);
+  • Utilité     : Intervertit l'affichage entre la grille réseau principale et le tableau d'embargo
+                  noyau lors de la combinaison Ctrl+B (ASCII 0x02).
+  • Retour      : Toujours 0.
+
+Fonction 150 : netop_cmd_ban.c -- netop_cmd_ban_render_list -- Rendu du registre d'embargo
+  • Signature C : bool netop_cmd_ban_render_list(NetopContext *ctx);
+  • Utilité     : Projette en plein écran la vue modale du registre des adresses bannies :
+                  index unique #B01, adresse IP, nombre de sockets impactés, durée d'activation
+                  et mécanisme noyau actif, avec effacement absolu des résidus graphiques.
+  • Retour      : true lorsque le rendu a été projeté.
+
+Fonction 151 : netop_router.c -- netop_router_render_overlay -- Délégation de vue modale
+  • Signature C : bool netop_router_render_overlay(NetopContext *ctx);
+  • Utilité     : Interroge le pointeur de fonction de l'overlay actif. S'il est non nul,
+                  exécute le rendu de la modale et suspend l'affichage de la grille principale.
+  • Retour      : true si une modale a pris la main sur l'affichage, false sinon.
+
+Fonction 152 : netop_router.c -- netop_router_set_overlay -- Gestion de transition d'écran
+  • Signature C : void netop_router_set_overlay(NetopOverlayRenderer renderer);
+  • Utilité     : Définit le gestionnaire d'affichage modal courant et purge physiquement
+                  l'écran (\033[2J\033[H) pour garantir une transition sans superposition de texte.
+
+Fonction 153 : netop_cmd_inspect.c -- netop_cmd_inspect_exec -- Déclencheur d'inspection 'i'
+  • Signature C : int netop_cmd_inspect_exec(NetopContext *ctx, NetopEntry *entries, size_t count, const char *arg);
+  • Utilité     : Valide le numéro de slot sélectionné, lance la collecte des indicateurs médico-légaux
+                  via netop_cmd_inspect_collect et active la surcouche modale netop_cmd_inspect_render_modal.
+  • Retour      : 0 en cas de succès, -1 si le numéro de slot est hors plage.
+
+Fonction 154 : netop_cmd_inspect.c -- netop_cmd_inspect_collect -- Autopsie médico-légale /proc
+  • Signature C : static void netop_cmd_inspect_collect(NetopForensicRecord *f, const NetopEntry *e, int slot);
+  • Utilité     : Extrait sans allocation dynamique : le PID, le PPID (/proc/[PID]/status), le nom du
+                  processus parent, le chemin canonique de l'exécutable sur disque (readlink /proc/[PID]/exe),
+                  la ligne de commande complète (/proc/[PID]/cmdline), l'évaluation OSINT et l'état d'embargo.
+
+Fonction 155 : netop_cmd_inspect.c -- netop_cmd_inspect_detect_revshell -- Traque Reverse Shell
+  • Signature C : static void netop_cmd_inspect_detect_revshell(NetopForensicRecord *f);
+  • Utilité     : Énumère /proc/[PID]/fd/* et résout les cibles des descripteurs 0 (STDIN), 1 (STDOUT)
+                  et 2 (STDERR). Déclenche l'alerte critique REVERSE SHELL DÉTECTÉ si l'entrée et la sortie
+                  standard sont conjointement redirigées vers un socket réseau.
+
+Fonction 156 : netop_cmd_inspect.c -- netop_cmd_inspect_render_modal -- Rendu de la fiche forensic
+  • Signature C : bool netop_cmd_inspect_render_modal(NetopContext *ctx);
+  • Utilité     : Projette en plein écran la fiche d'autopsie structurée en 4 blocs : Identité & Généalogie,
+                  Ancrage Réseau & Socket, Traque des Descripteurs & Détournement, et Renseignement OSINT & Embargo.
+  • Retour      : true lorsque le rendu a été projeté.
+
+Fonction 157 : netop_cmd_inspect.c -- netop_cmd_inspect_handle_key -- Clavier contextuel en modale
+  • Signature C : bool netop_cmd_inspect_handle_key(NetopContext *ctx, NetopEntry *entries, size_t count, char ch);
+  • Utilité     : Intercepte les actions contextuelles en cours d'inspection : k (neutralise immédiatement
+                  le PID inspecté), b (bascule l'embargo Netfilter sur l'IP inspectée) ou q/Échap (fermeture de la fiche).
+  • Retour      : true si la touche a été traitée par la modale, false sinon.
+
+Fonction 158 : netop_cmd_sort.c -- netop_cmd_sort_exec -- Bascule cyclique de tri 's'
+  • Signature C : int netop_cmd_sort_exec(NetopContext *ctx, NetopEntry *entries, size_t count, const char *arg);
+  • Utilité     : Commutation circulaire instantanée sans invite : DANGEROSITÉ -> PID -> PORT/ACTIVITÉ -> DANGEROSITÉ.
+                  Applique immédiatement l'ordonnancement et affiche une notification d'état temporaire.
+  • Retour      : Toujours 0.
+
+Fonction 159 : netop_cmd_sort.c -- netop_cmd_sort_apply -- Algorithme de tri stable 0-heap
+  • Signature C : void netop_cmd_sort_apply(NetopEntry *entries, size_t count);
+  • Utilité     : Réordonne le tableau d'entrées in-place via un algorithme de tri par insertion stable
+                  sans aucune allocation mémoire, garantissant une exécution déterministe en moins de 5 µs.
+
+Fonction 160 : netop_cmd_sort.c -- netop_cmd_sort_get_name -- Libellé du mode de tri
+  • Signature C : const char *netop_cmd_sort_get_name(void);
+  • Utilité     : Restitue la chaîne descriptive textuelle du tri actif ("DANGEROSITÉ", "PID", "PORT/ACTIVITÉ")
+                  pour intégration dynamique dans l'en-tête de télémétrie.
+
+Fonction 161 : netop_cmd_filter.c -- netop_cmd_filter_exec -- Bascule cyclique de filtre 'f'
+  • Signature C : int netop_cmd_filter_exec(NetopContext *ctx, NetopEntry *entries, size_t count, const char *arg);
+  • Utilité     : Commutation circulaire instantanée des filtres de vue : TOUS -> HORS LOCAL -> ÉTABLIS ->
+                  ALERTES SEULES -> TOUS. Émet la notification d'état temporaire.
+  • Retour      : Toujours 0.
+
+Fonction 162 : netop_cmd_filter.c -- netop_cmd_filter_apply -- Compaction in-place des flux
+  • Signature C : size_t netop_cmd_filter_apply(NetopEntry *entries, size_t count);
+  • Utilité     : Filtre et compacte le tableau d'entrées directement en mémoire selon les critères du mode
+                  sélectionné (masquage de 127.0.0.1/LISTEN, conservation stricte d'ESTABLISHED, ou isolation
+                  des niveaux HOSTILE/WARN/KILLED/BAN).
+  • Retour      : Nombre d'entrées visibles après filtrage.
+
+Fonction 163 : netop_cmd_filter.c -- netop_cmd_filter_get_name -- Libellé du mode de filtre
+  • Signature C : const char *netop_cmd_filter_get_name(void);
+  • Utilité     : Restitue la chaîne descriptive textuelle du filtre actif ("TOUS", "HORS LOCAL", "ÉTABLIS",
+                  "ALERTES SEULES") pour affichage dans l'en-tête de télémétrie.
 
 ================================================================================
 FIN DU RÉFÉRENTIEL TECHNIQUE OFFICIEL // RAPTOR DEFENSE v2.0
