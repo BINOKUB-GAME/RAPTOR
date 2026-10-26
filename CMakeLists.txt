@@ -242,6 +242,9 @@ if(UNIX)
         src/core/rap_oom.c
         src/core/rap_blackbox.c
         src/core/rap_reflex.c
+        src/cli/cmd_netop.c
+        src/cli/netop_engine.c
+        src/cli/netop_action.c
     )
 
     add_executable(rap

@@ -1,14 +1,16 @@
 /* ============================================================================
  * NOM DU SCRIPT   : src/cli/rap_main.c
- * RÉVISION        : Rev 1.2
+ * RÉVISION        : Rev 1.3
  * PROJET          : RAPTOR DEFENSE v2.0 (Mode CLI & Outils de Secours)
  * RESPONSABILITÉ  : Point d'entrée principal et micro-dispatcher déclaratif.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
- *   - Enregistrement de la commande 'sentry' (alias 'se') dans la table déclarative g_commands.
- *   - Intégration du pont d'aiguillage rap_cmd_sentry vers le gestionnaire cmd_sentry.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.3) :
+ *   - Enregistrement déclaratif de la commande 'netop' (alias 'no') dans g_commands.
+ *   - Mise à niveau de rap_parse_flags (Fonction 100) pour accepter indifféremment
+ *     la syntaxe collée -nXX (ex: -n20) et la syntaxe espacée -n XX.
+ *   - Maintien du pont sentinelle (rap_cmd_sentry) et de l'affichage d'urgence.
  *
- * SECTION DU CAHIER DES CHARGES : SECTION 16 (Fonctions 88 & 100, Liaison Sentinelle)
+ * SECTION DU CAHIER DES CHARGES : SECTION 16 (Fonctions 88 & 100, Liaison Sentinelle & Netop)
  *
  * LISTE EXHAUSTIVE ET NUMÉROTÉE DES FONCTIONS :
  *    88. rap_dispatch_command : Aiguillage déclaratif vers le gestionnaire de commande.
@@ -44,6 +46,7 @@ static const RapCliCommand g_commands[] = {
     {"preload", NULL, "Traque des détournements LD_PRELOAD", rap_cmd_preload},
     {"heur",    "he", "Analyse heuristique (chemins volatils, binaires supprimés, usurpations)", rap_cmd_heur},
     {"net",     NULL, "Audit des communications réseau TCP établies", rap_cmd_net},
+    {"netop",   "no", "Console de combat réseau interactive temps réel (0-heap)", rap_cmd_netop},
     {"sentry",  "se", "Sentinelle passive anti-rançongiciel (canaris & fanotify)", rap_cmd_sentry},
     {"kill",    NULL, "Neutralisation chirurgicale immédiate par signal SIGKILL", rap_cmd_kill},
     {"freeze",  NULL, "Gel d'un processus hostile via SIGSTOP pour analyse", rap_cmd_freeze},
@@ -78,8 +81,10 @@ int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg)
         } else if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
             rap_cmd_man(1, *argv, cfg);
             exit(RAP_EXIT_OK);
-        } else if (strcmp(arg, "-n") == 0) {
-            if (i + 1 < *argc) {
+        } else if (strncmp(arg, "-n", 2) == 0) {
+            if (strlen(arg) > 2) {
+                cfg->limit = atoi(arg + 2);
+            } else if (i + 1 < *argc) {
                 cfg->limit = atoi((*argv)[++i]);
             }
         } else {

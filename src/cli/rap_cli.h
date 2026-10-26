@@ -1,14 +1,15 @@
 /* ============================================================================
  * NOM DU SCRIPT   : src/cli/rap_cli.h
- * RÉVISION        : Rev 1.3
+ * RÉVISION        : Rev 1.4
  * PROJET          : RAPTOR DEFENSE v2.0 (Mode CLI & Outils de Secours)
  * RESPONSABILITÉ  : Déclarations communes, structures de configuration,
  *                   codes d'erreur POSIX et prototypes d'interface.
  *
- * NOUVELLES INTÉGRATIONS (Rev 1.3) :
- *   - Déclaration de rap_cmd_heur (Fonction 109) pour l'audit heuristique.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.4) :
+ *   - Déclaration de rap_cmd_netop (Fonction 136) pour la console temps réel.
+ *   - Maintien strict de la conformité C99 et de la palette ANSI commune.
  *
- * SECTION DU CAHIER DES CHARGES : SECTIONS 11, 16 & 17
+ * SECTION DU CAHIER DES CHARGES : SECTIONS 11, 16, 17 & 20
  * ============================================================================
  */
 
@@ -73,6 +74,8 @@ int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg);
 int rap_cmd_preload(int argc, char **argv, const RapConfig *cfg);
 int rap_cmd_heur(int argc, char **argv, const RapConfig *cfg);
 int rap_cmd_net(int argc, char **argv, const RapConfig *cfg);
+int rap_cmd_netop(int argc, char **argv, const RapConfig *cfg);
+int rap_cmd_sentry(int argc, char **argv, const RapConfig *cfg);
 int rap_cmd_kill(int argc, char **argv, const RapConfig *cfg);
 int rap_cmd_freeze(int argc, char **argv, const RapConfig *cfg);
 int rap_cmd_man(int argc, char **argv, const RapConfig *cfg);
