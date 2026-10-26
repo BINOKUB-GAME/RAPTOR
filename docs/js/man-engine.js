@@ -1,30 +1,21 @@
 /* ============================================================================
  * NOM DU SCRIPT   : docs/js/man-engine.js
- * RÉVISION        : Rev 1.3
+ * RÉVISION        : Rev 1.4
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Moteur autonome d'affichage et de recherche des pages de
  *                   manuel Unix (Sections 1, 3 et 5) pour docs/man.html.
- *                   Découplé des données : consomme window.RAP_MAN_DATABASE.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.3) :
- *   - Prise en charge des requêtes URL entrantes (?q=... ou ?search=...).
- *   - Auto-déclenchement de la recherche man/apropos lors d'une redirection depuis l'accueil.
- *   - Préservation de la navigation directe par ancre hash (#commande).
- *   - Extraction automatique des descriptions du Dictionnaire (Section 3).
- *
- * LISTE DES FONCTIONS NUMÉROTÉES :
- *   1. man_engine_populate_select : Remplissage dynamique du sélecteur par section.
- *   2. man_engine_render          : Rendu typographique et coloration des sections.
- *   3. man_engine_search          : Recherche directe par nom de commande ('man').
- *   4. man_engine_apropos         : Recherche textuelle par mots-clés ('apropos').
- *   5. man_engine_init            : Initialisation du DOM, parsing URL (?q= / #) et écouteurs.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.4) :
+ *   - Écoute active de la barre de recherche rapide de l'en-tête (.raptor-search-box input).
+ *   - Synchronisation bidirectionnelle entre la recherche du haut et le viewer man.
+ *   - Nettoyage des paramètres URL (?q=) lors de la navigation pour éviter les blocages au rafraîchissement.
+ *   - Prise en charge des requêtes entrantes (?q=... ou ?search=...).
  * ============================================================================
  */
 
 (function () {
     "use strict";
 
-    /* Consommation de la base de données unifiée SSOT */
     const MAN_DATABASE = (typeof window !== "undefined" && window.RAP_MAN_DATABASE) ? window.RAP_MAN_DATABASE : {};
 
     const elSelect = document.getElementById("manCommandSelect");
@@ -36,9 +27,11 @@
     const elBtnApropos = document.getElementById("btnAproposExec");
     const elBtnCopy = document.getElementById("btnCopyMan");
 
+    /* Champ de recherche rapide situé dans l'en-tête rouge */
+    const elHeaderSearch = document.querySelector(".raptor-header .raptor-search-box input");
+
     /* ========================================================================
      * 1. man_engine_populate_select
-     * Remplissage du menu déroulant selon la section active (1, 3, 5 ou all)
      * ========================================================================
      */
     function man_engine_populate_select(filterSection) {
@@ -57,7 +50,6 @@
 
     /* ========================================================================
      * 2. man_engine_render
-     * Rendu typographique avec mise en relief des sections standard UNIX
      * ========================================================================
      */
     function man_engine_render(key) {
@@ -70,7 +62,6 @@
             return;
         }
 
-        /* Si la page appartient à une section différente du filtre actif, basculer le filtre */
         if (elSection && elSection.value !== "all" && elSection.value !== item.section) {
             elSection.value = item.section;
             man_engine_populate_select(item.section);
@@ -78,7 +69,6 @@
 
         elTitle.textContent = item.title.toUpperCase();
 
-        /* Coloration des en-têtes standard Unix et des drapeaux */
         let formatted = item.content
             .replace(/^([A-Z][A-Z\s]+)$/gm, '<span class="man-section-heading">$1</span>')
             .replace(/(\s)(-[a-zA-Z0-9_-]+)/g, '$1<span class="man-flag">$2</span>');
@@ -88,21 +78,27 @@
             elSelect.value = key;
         }
 
-        /* Mise à jour de l'ancre URL */
-        history.replaceState(null, null, `#${key}`);
+        /* Mise à jour propre de l'URL sans recharger et sans conserver les anciens ?q= */
+        history.replaceState(null, null, `${window.location.pathname}#${key}`);
     }
 
     /* ========================================================================
      * 3. man_engine_search
-     * Recherche exacte par nom de commande ('man')
      * ========================================================================
      */
-    function man_engine_search() {
-        if (!elSearchInput) return;
-        const term = elSearchInput.value.trim().toLowerCase();
+    function man_engine_search(explicitTerm) {
+        let term = explicitTerm;
+        if (!term && elSearchInput) {
+            term = elSearchInput.value;
+        }
         if (!term) return;
 
+        term = term.trim().toLowerCase();
         const cleanKey = term.replace(/\([0-9]\)/, "");
+
+        /* Synchronisation visuelle des champs de recherche */
+        if (elSearchInput) elSearchInput.value = term;
+        if (elHeaderSearch) elHeaderSearch.value = term;
 
         if (MAN_DATABASE[cleanKey]) {
             man_engine_render(cleanKey);
@@ -113,34 +109,36 @@
         } else if (MAN_DATABASE["fn-" + cleanKey]) {
             man_engine_render("fn-" + cleanKey);
         } else {
-            man_engine_apropos();
+            man_engine_apropos(term);
         }
     }
 
     /* ========================================================================
      * 4. man_engine_apropos
-     * Recherche textuelle transversale par mot-clé ('apropos')
      * ========================================================================
      */
-    function man_engine_apropos() {
-        if (!elSearchInput || !elTitle || !elContent) return;
-        const term = elSearchInput.value.trim().toLowerCase();
+    function man_engine_apropos(explicitTerm) {
+        if (!elTitle || !elContent) return;
+        let term = explicitTerm;
+        if (!term && elSearchInput) {
+            term = elSearchInput.value;
+        }
 
-        /* Cas champ vide : aide explicative immédiate */
         if (!term) {
             elTitle.textContent = "APROPOS // GUIDE D'UTILISATION";
             elContent.innerHTML = `<span class="man-section-heading">RECHERCHE THÉMATIQUE APROPOS</span>\n\n` +
-                `La commande <span style="color: #E5C07B; font-weight: bold;">apropos</span> recherche un mot-clé dans l'ensemble des pages de manuel et du dictionnaire d'ingénierie.\n\n` +
                 `Entrez un mot-clé dans la barre de recherche ci-dessus, par exemple :\n` +
-                `  &bull; <span style="color: #61AFEF;">rx</span>          : Traque mémoire et allocations Inode 0\n` +
-                `  &bull; <span style="color: #61AFEF;">sentry</span>      : Sentinelle passive et fanotify\n` +
-                `  &bull; <span style="color: #61AFEF;">blackbox</span>    : Registre médico-légal en mémoire vive\n` +
-                `  &bull; <span style="color: #61AFEF;">114</span>         : Fiche unitaire de la fonction 114\n` +
-                `  &bull; <span style="color: #61AFEF;">preload</span>     : Détection des rootkits userland`;
+                `  &bull; <span style="color: #61AFEF;">hunt</span>         : Audit combiné et options de riposte active\n` +
+                `  &bull; <span style="color: #61AFEF;">rx</span>           : Traque mémoire et allocations Inode 0\n` +
+                `  &bull; <span style="color: #61AFEF;">sentry</span>       : Sentinelle passive et fanotify\n` +
+                `  &bull; <span style="color: #61AFEF;">blackbox</span>     : Registre médico-légal en mémoire vive\n` +
+                `  &bull; <span style="color: #61AFEF;">129</span>          : Fiche unitaire de la fonction 129 (Reflex)`;
             return;
         }
 
+        term = term.trim().toLowerCase();
         let results = [];
+
         for (const key in MAN_DATABASE) {
             const item = MAN_DATABASE[key];
             const contentLower = item.content.toLowerCase();
@@ -148,8 +146,6 @@
 
             if (key.includes(term) || contentLower.includes(term) || titleLower.includes(term)) {
                 let desc = "";
-
-                /* 1. Recherche du bloc NAME classique (Section 1 et 5) */
                 const lines = item.content.split("\n");
                 for (let i = 0; i < lines.length; i++) {
                     if (lines[i].trim() === "NAME") {
@@ -157,8 +153,6 @@
                         break;
                     }
                 }
-
-                /* 2. Repli pour le dictionnaire (Section 3) : extraction du titre propre */
                 if (!desc && item.title) {
                     desc = item.title.replace(/^[A-Z0-9_\-]+\([0-9]\)\s*[—\-]\s*/i, "");
                 }
@@ -182,7 +176,6 @@
 
             elContent.innerHTML = output;
 
-            /* Liaison des clics sur les résultats */
             elContent.querySelectorAll("a").forEach(a => {
                 a.addEventListener("click", function (e) {
                     e.preventDefault();
@@ -197,21 +190,28 @@
 
     /* ========================================================================
      * 5. man_engine_init
-     * Initialisation globale, gestion des paramètres URL (?q=) et écouteurs
      * ========================================================================
      */
     function man_engine_init() {
         man_engine_populate_select("1");
 
-        /* 1. Vérification de la présence d'une requête URL (?q=mot_cle ou ?search=mot_cle) */
+        /* 1. Écoute directe sur le champ de recherche de l'en-tête (en haut) */
+        if (elHeaderSearch) {
+            elHeaderSearch.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    man_engine_search(this.value);
+                }
+            });
+        }
+
+        /* 2. Prise en charge des requêtes URL entrantes (?q=...) */
         const urlParams = new URLSearchParams(window.location.search);
         const queryTerm = urlParams.get("q") || urlParams.get("search");
 
         if (queryTerm) {
-            if (elSearchInput) elSearchInput.value = queryTerm;
-            man_engine_search();
+            man_engine_search(queryTerm);
         } else {
-            /* 2. Vérification de la présence d'une ancre hash (#commande) */
             const hash = window.location.hash.substring(1);
             if (hash && MAN_DATABASE[hash]) {
                 man_engine_render(hash);
@@ -220,6 +220,7 @@
             }
         }
 
+        /* 3. Écouteurs de la barre d'outils locale */
         if (elSelect) {
             elSelect.addEventListener("change", function () {
                 man_engine_render(this.value);
@@ -235,12 +236,13 @@
             });
         }
 
-        if (elBtnMan) elBtnMan.addEventListener("click", man_engine_search);
-        if (elBtnApropos) elBtnApropos.addEventListener("click", man_engine_apropos);
+        if (elBtnMan) elBtnMan.addEventListener("click", function() { man_engine_search(); });
+        if (elBtnApropos) elBtnApropos.addEventListener("click", function() { man_engine_apropos(); });
 
         if (elSearchInput) {
-            elSearchInput.addEventListener("keypress", function (e) {
+            elSearchInput.addEventListener("keydown", function (e) {
                 if (e.key === "Enter") {
+                    e.preventDefault();
                     man_engine_search();
                 }
             });
