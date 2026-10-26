@@ -840,7 +840,7 @@ static const size_t g_rap_man_pages_count = sizeof(g_rap_man_pages) / sizeof(g_r
 /* Dictionnaire intégral brut pour consultation paginée (rap man fn) */
 static const char g_rap_fn_full_data[] =
     "# DICTIONNAIRE OFFICIEL DES STRUCTURES ET FONCTIONS // RAPTOR v2.0\n"
-    "## RÉFÉRENTIEL TECHNIQUE D'INGÉNIERIE ET D'API (CONSOLIDÉ AU 24-10-2026)\n"
+    "## RÉFÉRENTIEL TECHNIQUE D'INGÉNIERIE ET D'API (CONSOLIDÉ AU 25-10-2026)\n"
     "\n"
     "================================================================================\n"
     "SECTION 1 : MODÈLE DE DONNÉES UNIVERSEL (src/core/raptor_data.c)\n"
@@ -1012,7 +1012,7 @@ static const char g_rap_fn_full_data[] =
     "                  possédant simultanément les droits Read-Write-Execute (`rwx`).\n"
     "\n"
     "Fonction 31 : plugin_memory_rwx.c -- proc_mem_read_stats -- Empreinte RAM du processus\n"
-    "  • Signature C : static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len, char* out_exe, size_t exe_len, uint64_t* out_rss);\n"
+    "  • Signature C : static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len, char* out_exe, size_len, uint64_t* out_rss);\n"
     "  • Utilité     : Lit le nom d'exécutable, résout le lien `/proc/[PID]/exe` et calcule\n"
     "                  la consommation résidente RSS en mémoire physique.\n"
     "\n"
@@ -1105,7 +1105,7 @@ static const char g_rap_fn_full_data[] =
     "SECTION 8 : MOTEURS DE RESTITUTION UNIVERSELS (src/report/)\n"
     "================================================================================\n"
     "\n"
-    "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formattée\n"
+    "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formatée\n"
     "  • Signature C : void raptor_report_cli_print(const RaptorReportContext* ctx);\n"
     "  • Utilité     : Rendu textuel intégral du rapport dans le terminal avec codes\n"
     "                  ANSI pour les couleurs de sévérité et colonnage structuré.\n"
@@ -1283,12 +1283,13 @@ static const char g_rap_fn_full_data[] =
     "Fonction 81 : mem_stealth.c -- mem_stealth_is_whitelisted -- Filtrage exceptions légitimes\n"
     "  • Signature C : bool mem_stealth_is_whitelisted(const char* comm, const char* exe);\n"
     "  • Utilité     : Vérifie si un processus correspond à une signature autorisée (navigateurs,\n"
-    "                  Flatpak, environnements de bureau Cinnamon/GNOME/KDE).\n"
+    "                  Flatpak, serveurs web, serveurs d'affichage, bureaux Cinnamon/GNOME/XFCE/KDE).\n"
     "\n"
-    "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0\n"
+    "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0 & riposte\n"
     "  • Signature C : bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe, StealthEvent* ev_out);\n"
     "  • Utilité     : Analyse `/proc/[PID]/maps` pour isoler les allocations anonymes rendues\n"
-    "                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque.\n"
+    "                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque, et déclenche\n"
+    "                  la riposte réflexe `rap_reflex_dispatch`.\n"
     "\n"
     "Fonction 83 : mem_stealth.c -- mem_stealth_dispatch_diff_event -- Propagation différentielle\n"
     "  • Signature C : void mem_stealth_dispatch_diff_event(const StealthEvent* ev);\n"
@@ -1342,15 +1343,17 @@ static const char g_rap_fn_full_data[] =
     "  • Utilité     : Trie les processus par mémoire résidente physique réelle sans\n"
     "                  allocation sur le tas (tri d'insertion statique sur la pile).\n"
     "\n"
-    "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné\n"
+    "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné & riposte active\n"
     "  • Signature C : int rap_cmd_hunt(int argc, char **argv, const RapConfig *cfg);\n"
     "  • Utilité     : Enchaîne séquentiellement la traque Inode 0 (`rx`), les détournements\n"
-    "                  dynamiques (`preload`) et l'analyse heuristique (`heur`).\n"
+    "                  dynamiques (`preload`) et l'analyse heuristique (`heur`) avec support\n"
+    "                  de l'armement réflexe (`--arm`) et simulation (`--dry-run`).\n"
     "\n"
     "Fonction 92 : cmd_rx.c -- rap_cmd_rx -- Traque mutations exécutables Inode 0\n"
     "  • Signature C : int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg);\n"
     "  • Utilité     : Repère les allocations mémoires anonymes exécutables (`r-xp`)\n"
-    "                  dans `/proc/[PID]/maps` avec filtrage de liste blanche (`-v` pour mode étendu).\n"
+    "                  dans `/proc/[PID]/maps` avec filtrage strict par `mem_whitelist.conf`\n"
+    "                  et raccordement à la riposte cinétique réflexe (`rap_reflex_dispatch`).\n"
     "\n"
     "Fonction 93 : cmd_preload.c -- rap_cmd_preload -- Chasseur LD_PRELOAD\n"
     "  • Signature C : int rap_cmd_preload(int argc, char **argv, const RapConfig *cfg);\n"
@@ -1374,8 +1377,9 @@ static const char g_rap_fn_full_data[] =
     "\n"
     "Fonction 97 : cmd_man.c -- rap_cmd_man -- Manuel de référence unifié embarqué\n"
     "  • Signature C : int rap_cmd_man(int argc, char **argv, const RapConfig *cfg);\n"
-    "  • Utilité     : Restitue le manuel complet stocké en mémoire morte (`.rodata`),\n"
-    "                  avec bascule automatique vers le téléscripteur `rapless` sur terminal interactif.\n"
+    "  • Utilité     : Point d'entrée de la documentation embarquée. Gère l'affichage sélectif\n"
+    "                  par commande (`rap man sentry`, `rap man rx`), la vue complète (`all`)\n"
+    "                  ou le routage vers le dictionnaire des fonctions (`fn`).\n"
     "\n"
     "Fonction 98 : rap_common.c -- rap_output_formatter -- Formatage d'affichage universel\n"
     "  • Signature C : void rap_output_formatter(const RapConfig *cfg, const char *c1, const char *c2, const char *c3, const char *c4);\n"
@@ -1389,8 +1393,8 @@ static const char g_rap_fn_full_data[] =
     "\n"
     "Fonction 100 : rap_main.c -- rap_parse_flags -- Parseur d'arguments et drapeaux\n"
     "  • Signature C : int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg);\n"
-    "  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-n`, `-h`),\n"
-    "                  détecte le mode TTY (`isatty`) et isole le verbe d'action dans `argv`.\n"
+    "  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-a`, `--arm`,\n"
+    "                  `--dry-run`, `-n`, `-h`), détecte le mode TTY et isole le verbe d'action.\n"
     "\n"
     "Fonction 107 : rap_common.c -- rap_is_mem_whitelisted -- Filtrage liste blanche mémoire\n"
     "  • Signature C : int rap_is_mem_whitelisted(const char *comm);\n"
@@ -1413,6 +1417,26 @@ static const char g_rap_fn_full_data[] =
     "                  1. Binaires supprimés du disque en cours d'exécution (`(deleted)`).\n"
     "                  2. Exécutions depuis des zones volatiles suspectes (`/tmp`, `/dev/shm`).\n"
     "                  3. Usurpation d'identité de démons systèmes (*Masquerading*).\n"
+    "\n"
+    "Fonction 123 : cmd_man.c -- rap_man_render -- Téléscripteur et projection de documentation\n"
+    "  • Signature C : static void rap_man_render(const char *text, size_t len, const RapConfig *cfg, bool force_direct);\n"
+    "  • Utilité     : Aiguille le flux textuel vers le pager autonome `rapless` en mode interactif\n"
+    "                  ou projette directement sur STDOUT en mode tube, redirection ou `--raw`.\n"
+    "\n"
+    "Fonction 124 : cmd_man.c -- rap_man_handle_fn -- Moteur de navigation du dictionnaire API\n"
+    "  • Signature C : static int rap_man_handle_fn(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Permet l'interrogation granulaire du dictionnaire des fonctions par numéro de\n"
+    "                  section (`rap man fn <sec>`), par identifiant unique (`rap man fn <id>`) ou en intégralité.\n"
+    "\n"
+    "Fonction 125 : cmd_man.c -- rap_man_extract_topic -- Extraction sémantique de rubrique\n"
+    "  • Signature C : static const char *rap_man_extract_topic(int argc, char **argv);\n"
+    "  • Utilité     : Isole l'argument cible de documentation dans `argv` indépendamment des drapeaux\n"
+    "                  et de la position des paramètres.\n"
+    "\n"
+    "Fonction 126 : cmd_man.c -- rap_man_lookup_page -- Recherche et résolution d'entrée man\n"
+    "  • Signature C : static const RapManPageEntry *rap_man_lookup_page(const char *topic);\n"
+    "  • Utilité     : Résout une clé de commande dans la table `g_rap_man_pages[]` avec gestion des alias\n"
+    "                  courts (`st`, `se`, `he`) et résolution avec ou sans le préfixe `rap-`.\n"
     "\n"
     "================================================================================\n"
     "SECTION 17 : SENTINELLE PASSIVE ANTI-RANÇONGICIEL (FANOTIFY & LEURRES DENSES)\n"
@@ -1443,10 +1467,9 @@ static const char g_rap_fn_full_data[] =
     "\n"
     "Fonction 114 : sentry_engine.c -- sentry_trigger_reflex -- Riposte cinétique synchrone\n"
     "  • Signature C : int sentry_trigger_reflex(int fanotify_fd, int fd_event, pid_t pid);\n"
-    "  • Utilité     : Vérifie le garde-fou autonome `sentry_is_protected_pid` (PID <= 1, self, parent).\n"
-    "                  Applique instantanément le gel conservatoire de l'agresseur via `SIGSTOP`\n"
-    "                  (état noyau `T`), ordonne le rejet de l'appel d'ouverture auprès du noyau via\n"
-    "                  `FAN_DENY`, referme le descripteur d'inspection et émet l'alerte console.\n"
+    "  • Utilité     : Applique instantanément le rejet auprès du noyau via `FAN_DENY`,\n"
+    "                  ferme le descripteur d'événement et achemine le PID agresseur vers\n"
+    "                  `rap_reflex_dispatch` avec le motif `TRIGGER_CANARY_BREACH`.\n"
     "  • Retour      : `0` si la neutralisation a réussi, `-1` si le PID était protégé.\n"
     "\n"
     "Fonction 115 : sentry_engine.c -- sentry_enter_stealth -- Blindage et invisibilité mémoire\n"
@@ -1484,7 +1507,7 @@ static const char g_rap_fn_full_data[] =
     "Fonction 120 : cmd_sentry.c -- cmd_sentry -- Aiguilleur CLI sentry\n"
     "  • Signature C : int cmd_sentry(int argc, char **argv);\n"
     "  • Utilité     : Point d'entrée principal de la sous-commande `rap sentry`. Parse les\n"
-    "                  arguments et route vers `arm`, `disarm`, `status` ou `run`.\n"
+    "                  arguments et route vers `arm`, `disarm`, `status`, `dump` ou `run`.\n"
     "  • Retour      : Code de retour de la sous-commande, ou `2` si la commande est inconnue.\n"
     "\n"
     "Fonction 121 : rap_main.c -- rap_cmd_sentry -- Pont déclaratif sentinelle\n"
@@ -1492,6 +1515,12 @@ static const char g_rap_fn_full_data[] =
     "  • Utilité     : Relie la table déclarative universelle `g_commands` de RAPTOR au point\n"
     "                  d'entrée de la sentinelle anti-rançongiciel (`cmd_sentry`).\n"
     "  • Retour      : Code de retour POSIX transmis par `cmd_sentry`.\n"
+    "\n"
+    "Fonction 122 : cmd_sentry.c -- cmd_sentry_dump -- Restitution boîte noire médico-légale\n"
+    "  • Signature C : static int cmd_sentry_dump(int argc, char **argv);\n"
+    "  • Utilité     : Extrait et déverse les événements médico-légaux conservés dans l'anneau\n"
+    "                  circulaire en mémoire vive (`/dev/shm/raptor_blackbox`) avec latences nanosecondes.\n"
+    "  • Retour      : `0` après affichage, `2` si la boîte noire est vide ou inaccessible.\n"
     "\n"
     "================================================================================\n"
     "SECTION 18 : OUTILLAGE DE COMPILATION & SOURCE UNIQUE SSOT (tools/)\n"
@@ -1502,21 +1531,100 @@ static const char g_rap_fn_full_data[] =
     "  • Utilité          : Parse le fichier maître `docs/man/rap.1.md` et segmente chaque\n"
     "                       page de manuel délimitée par les balises `<!-- MAN: key | sec | titre -->`.\n"
     "\n"
-    "Outil 02 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix\n"
+    "Outil 02 : gen_man.py -- parse_functions_dict -- Segmentation du dictionnaire d'ingénierie\n"
+    "  • Signature Python : def parse_functions_dict(dict_raw) -> list\n"
+    "  • Utilité          : Extrait hiérarchiquement les Sections et les fonctions unitaires numérotées\n"
+    "                       du dictionnaire pour alimenter la table C99 `g_rap_fn_entries[]`.\n"
+    "\n"
+    "Outil 03 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix\n"
     "  • Signature Python : def format_unix_header(key, sec) -> str\n"
     "  • Utilité          : Calibre et génère la bannière d'en-tête troff/groff centrée\n"
     "                       sur 70 colonnes (ex: `RAP(1)   RAPTOR DEFENSE   RAP(1)`).\n"
     "\n"
-    "Outil 03 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99\n"
-    "  • Signature Python : def generate_cli_header(pages) -> str\n"
-    "  • Utilité          : Encode l'ensemble des pages de manuel dans le tableau constant\n"
-    "                       `g_rap_man_data[]` de `src/cli/rap_man_data.h` pour inclusion\n"
-    "                       autonome en mémoire morte dans l'exécutable `rap` (zéro heap).\n"
+    "Outil 04 : gen_man.py -- escape_c_string -- Échappement de chaînes multilignes C99\n"
+    "  • Signature Python : def escape_c_string(text) -> str\n"
+    "  • Utilité          : Convertit un bloc textuel brut en constantes littérales C99 sécurisées\n"
+    "                       sans débordement de pile pour les fichiers `.rodata`.\n"
     "\n"
-    "Outil 04 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS\n"
-    "  • Signature Python : def generate_js_database(pages) -> str\n"
+    "Outil 05 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99\n"
+    "  • Signature Python : def generate_cli_header(man_pages, fn_entries, full_dict_raw) -> str\n"
+    "  • Utilité          : Génère `src/cli/rap_man_data.h` contenant les tables constantes\n"
+    "                       `g_rap_man_pages[]`, `g_rap_man_data[]` et `g_rap_fn_entries[]` (zéro tas).\n"
+    "\n"
+    "Outil 06 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS\n"
+    "  • Signature Python : def generate_js_database(man_pages, fn_entries) -> str\n"
     "  • Utilité          : Construit la base de données JavaScript `docs/js/man_data.js`\n"
     "                       alimentant la visionneuse interactive de `docs/man.html`.\n"
+    "\n"
+    "Outil 07 : gen_man.py -- main -- Orchestrateur de compilation documentaire SSOT\n"
+    "  • Signature Python : def main() -> None\n"
+    "  • Utilité          : Point d'entrée vérifiant l'existence des sources, synchronisant le binaire C\n"
+    "                       et la documentation web en une seule passe atomique.\n"
+    "\n"
+    "================================================================================\n"
+    "SECTION 19 : MOTEUR CINÉTIQUE RÉFLEXE, BOÎTE NOIRE ET SURVIE MÉMOIRE (src/core/)\n"
+    "================================================================================\n"
+    "\n"
+    "Fonction 127 : rap_reflex.c -- rap_reflex_init -- Initialisation du moteur réflexe\n"
+    "  • Signature C : int rap_reflex_init(reflex_mode_t initial_mode);\n"
+    "  • Utilité     : Initialise les structures internes de remédiation, remet à zéro les\n"
+    "                  compteurs d'intervention et prépare l'accès à la boîte noire en mémoire vive.\n"
+    "  • Retour      : `0` en cas de succès, `-1` en cas d'erreur d'ouverture de la boîte noire.\n"
+    "\n"
+    "Fonction 128 : rap_reflex.c -- rap_reflex_set_mode -- Commutation du mode d'armement\n"
+    "  • Signature C : void rap_reflex_set_mode(reflex_mode_t mode);\n"
+    "  • Utilité     : Modifie à chaud le comportement opérationnel du disjoncteur cinétique\n"
+    "                  (`REFLEX_MODE_PASSIVE`, `REFLEX_MODE_DRYRUN`, `REFLEX_MODE_ARMED`).\n"
+    "\n"
+    "Fonction 129 : rap_reflex.c -- rap_reflex_dispatch -- Séquençage et frappe chirurgicale\n"
+    "  • Signature C : int rap_reflex_dispatch(pid_t target_pid, reflex_trigger_t trigger);\n"
+    "  • Utilité     : Exécute la riposte séquentielle déterministe en moins de 40 µs :\n"
+    "                  1. Vérification des gardes-fous (PID <= 1, self, parent).\n"
+    "                  2. Gel immédiat du processus et de son groupe de threads via `SIGSTOP`.\n"
+    "                  3. Révocation forcée des descripteurs de sockets réseau dans `/proc/[PID]/fd`.\n"
+    "                  4. Destruction physique de l'agresseur par émission de `SIGKILL`.\n"
+    "                  5. Calcul de latence nanoseconde et injection dans la boîte noire RAM.\n"
+    "  • Retour      : `0` si l'action a été appliquée ou simulée, `-1` en cas d'erreur.\n"
+    "\n"
+    "Fonction 130 : rap_reflex.c -- rap_reflex_get_stats -- Télémétrie des neutralisations\n"
+    "  • Signature C : reflex_mode_t rap_reflex_get_stats(uint64_t *out_neutralized_count);\n"
+    "  • Utilité     : Retourne le mode de fonctionnement actif et extrait le nombre cumulé\n"
+    "                  d'anomalies abattues ou consignées depuis le démarrage.\n"
+    "\n"
+    "Fonction 131 : rap_blackbox.c -- rap_blackbox_open -- Initialisation anneau circulaire RAM\n"
+    "  • Signature C : int rap_blackbox_open(void);\n"
+    "  • Utilité     : Crée ou ouvre le segment mémoire partagé `/dev/shm/raptor_blackbox`\n"
+    "                  (permissions `0666`) dimensionné pour 64 enregistrements FIFO avec\n"
+    "                  verrouillage d'écriture sans concurrence.\n"
+    "  • Retour      : `0` en cas d'initialisation réussie, `-1` en cas d'échec d'accès à `/dev/shm`.\n"
+    "\n"
+    "Fonction 132 : rap_blackbox.c -- rap_blackbox_push -- Enregistrement atomique d'incident\n"
+    "  • Signature C : int rap_blackbox_push(const reflex_record_t *record);\n"
+    "  • Utilité     : Inscrit un événement médico-légal complet (horodatage temps réel, PID,\n"
+    "                  PPID, ligne de commande, cause, latence nanoseconde, statut de destruction)\n"
+    "                  dans l'anneau circulaire avec écrasement rotatif en cas de saturation.\n"
+    "  • Retour      : `0` en cas de succès, `-1` si la boîte noire n'est pas ouverte.\n"
+    "\n"
+    "Fonction 133 : rap_blackbox.c -- rap_blackbox_dump -- Restitution formatée boîte noire\n"
+    "  • Signature C : int rap_blackbox_dump(void);\n"
+    "  • Utilité     : Lit chronologiquement l'anneau circulaire en mémoire vive et affiche\n"
+    "                  les fiches forensiques détaillées avec codes couleurs ANSI sans nécessiter\n"
+    "                  les privilèges superutilisateur.\n"
+    "  • Retour      : Nombre d'événements affichés, ou `-1` en cas d'erreur.\n"
+    "\n"
+    "Fonction 134 : rap_oom.c -- rap_oom_protect -- Immunité système anti-éviction OOM\n"
+    "  • Signature C : int rap_oom_protect(void);\n"
+    "  • Utilité     : Écrit la valeur `-1000` dans `/proc/self/oom_score_adj` pour conférer\n"
+    "                  au binaire RAPTOR une immunité vitale absolue équivalente à `init` (PID 1)\n"
+    "                  face au tueur de mémoire du noyau Linux (*Out-Of-Memory Killer*).\n"
+    "  • Retour      : `0` en cas de succès, `-1` en cas de droits administratifs insuffisants.\n"
+    "\n"
+    "Fonction 135 : rap_oom.c -- rap_oom_lock_memory -- Verrouillage des pages physiques RAM\n"
+    "  • Signature C : int rap_oom_lock_memory(void);\n"
+    "  • Utilité     : Invoque `mlockall(MCL_CURRENT | MCL_FUTURE)` pour interdire tout swap\n"
+    "                  sur disque des pages mémoires de RAPTOR, garantissant un temps de réponse\n"
+    "                  sans latence de défaut de page (*page fault*) lors des frappes réflexes.\n"
+    "  • Retour      : `0` en cas de verrouillage physique réussi, `-1` en cas de dépassement de quota.\n"
     "\n"
     "================================================================================\n"
     "FIN DU RÉFÉRENTIEL TECHNIQUE OFFICIEL // RAPTOR DEFENSE v2.0\n"
@@ -1953,7 +2061,7 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "                  possédant simultanément les droits Read-Write-Execute (`rwx`).\n"
     "\n"
     "Fonction 31 : plugin_memory_rwx.c -- proc_mem_read_stats -- Empreinte RAM du processus\n"
-    "  • Signature C : static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len, char* out_exe, size_t exe_len, uint64_t* out_rss);\n"
+    "  • Signature C : static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len, char* out_exe, size_len, uint64_t* out_rss);\n"
     "  • Utilité     : Lit le nom d'exécutable, résout le lien `/proc/[PID]/exe` et calcule\n"
     "                  la consommation résidente RSS en mémoire physique.\n"
     "\n"
@@ -1999,7 +2107,7 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
         31,
         "Fonction 31 : plugin_memory_rwx.c -- proc_mem_read_stats -- Empreinte RAM du processus",
     "Fonction 31 : plugin_memory_rwx.c -- proc_mem_read_stats -- Empreinte RAM du processus\n"
-    "  • Signature C : static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len, char* out_exe, size_t exe_len, uint64_t* out_rss);\n"
+    "  • Signature C : static bool proc_mem_read_stats(uint32_t pid, char* out_comm, size_t comm_len, char* out_exe, size_len, uint64_t* out_rss);\n"
     "  • Utilité     : Lit le nom d'exécutable, résout le lien `/proc/[PID]/exe` et calcule\n"
     "                  la consommation résidente RSS en mémoire physique.\n"
     },
@@ -2229,7 +2337,7 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
         "SECTION 8 : MOTEURS DE RESTITUTION UNIVERSELS (src/report/)",
     "=== SECTION 8 : MOTEURS DE RESTITUTION UNIVERSELS (src/report/) ===\n"
     "\n"
-    "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formattée\n"
+    "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formatée\n"
     "  • Signature C : void raptor_report_cli_print(const RaptorReportContext* ctx);\n"
     "  • Utilité     : Rendu textuel intégral du rapport dans le terminal avec codes\n"
     "                  ANSI pour les couleurs de sévérité et colonnage structuré.\n"
@@ -2242,8 +2350,8 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     {
         8,
         48,
-        "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formattée",
-    "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formattée\n"
+        "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formatée",
+    "Fonction 48 : report_cli.c -- raptor_report_cli_print -- Sortie console formatée\n"
     "  • Signature C : void raptor_report_cli_print(const RaptorReportContext* ctx);\n"
     "  • Utilité     : Rendu textuel intégral du rapport dans le terminal avec codes\n"
     "                  ANSI pour les couleurs de sévérité et colonnage structuré.\n"
@@ -2691,12 +2799,13 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "Fonction 81 : mem_stealth.c -- mem_stealth_is_whitelisted -- Filtrage exceptions légitimes\n"
     "  • Signature C : bool mem_stealth_is_whitelisted(const char* comm, const char* exe);\n"
     "  • Utilité     : Vérifie si un processus correspond à une signature autorisée (navigateurs,\n"
-    "                  Flatpak, environnements de bureau Cinnamon/GNOME/KDE).\n"
+    "                  Flatpak, serveurs web, serveurs d'affichage, bureaux Cinnamon/GNOME/XFCE/KDE).\n"
     "\n"
-    "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0\n"
+    "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0 & riposte\n"
     "  • Signature C : bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe, StealthEvent* ev_out);\n"
     "  • Utilité     : Analyse `/proc/[PID]/maps` pour isoler les allocations anonymes rendues\n"
-    "                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque.\n"
+    "                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque, et déclenche\n"
+    "                  la riposte réflexe `rap_reflex_dispatch`.\n"
     "\n"
     "Fonction 83 : mem_stealth.c -- mem_stealth_dispatch_diff_event -- Propagation différentielle\n"
     "  • Signature C : void mem_stealth_dispatch_diff_event(const StealthEvent* ev);\n"
@@ -2719,16 +2828,17 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "Fonction 81 : mem_stealth.c -- mem_stealth_is_whitelisted -- Filtrage exceptions légitimes\n"
     "  • Signature C : bool mem_stealth_is_whitelisted(const char* comm, const char* exe);\n"
     "  • Utilité     : Vérifie si un processus correspond à une signature autorisée (navigateurs,\n"
-    "                  Flatpak, environnements de bureau Cinnamon/GNOME/KDE).\n"
+    "                  Flatpak, serveurs web, serveurs d'affichage, bureaux Cinnamon/GNOME/XFCE/KDE).\n"
     },
     {
         13,
         82,
-        "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0",
-    "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0\n"
+        "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0 & riposte",
+    "Fonction 82 : mem_stealth.c -- mem_stealth_scan_maps_anon_rx -- Inspection Inode 0 & riposte\n"
     "  • Signature C : bool mem_stealth_scan_maps_anon_rx(pid_t pid, const char* comm, const char* exe, StealthEvent* ev_out);\n"
     "  • Utilité     : Analyse `/proc/[PID]/maps` pour isoler les allocations anonymes rendues\n"
-    "                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque.\n"
+    "                  exécutables (`r-xp`) avec un Inode à 0 sans ancrage disque, et déclenche\n"
+    "                  la riposte réflexe `rap_reflex_dispatch`.\n"
     },
     {
         13,
@@ -2828,15 +2938,17 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "  • Utilité     : Trie les processus par mémoire résidente physique réelle sans\n"
     "                  allocation sur le tas (tri d'insertion statique sur la pile).\n"
     "\n"
-    "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné\n"
+    "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné & riposte active\n"
     "  • Signature C : int rap_cmd_hunt(int argc, char **argv, const RapConfig *cfg);\n"
     "  • Utilité     : Enchaîne séquentiellement la traque Inode 0 (`rx`), les détournements\n"
-    "                  dynamiques (`preload`) et l'analyse heuristique (`heur`).\n"
+    "                  dynamiques (`preload`) et l'analyse heuristique (`heur`) avec support\n"
+    "                  de l'armement réflexe (`--arm`) et simulation (`--dry-run`).\n"
     "\n"
     "Fonction 92 : cmd_rx.c -- rap_cmd_rx -- Traque mutations exécutables Inode 0\n"
     "  • Signature C : int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg);\n"
     "  • Utilité     : Repère les allocations mémoires anonymes exécutables (`r-xp`)\n"
-    "                  dans `/proc/[PID]/maps` avec filtrage de liste blanche (`-v` pour mode étendu).\n"
+    "                  dans `/proc/[PID]/maps` avec filtrage strict par `mem_whitelist.conf`\n"
+    "                  et raccordement à la riposte cinétique réflexe (`rap_reflex_dispatch`).\n"
     "\n"
     "Fonction 93 : cmd_preload.c -- rap_cmd_preload -- Chasseur LD_PRELOAD\n"
     "  • Signature C : int rap_cmd_preload(int argc, char **argv, const RapConfig *cfg);\n"
@@ -2860,8 +2972,9 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "\n"
     "Fonction 97 : cmd_man.c -- rap_cmd_man -- Manuel de référence unifié embarqué\n"
     "  • Signature C : int rap_cmd_man(int argc, char **argv, const RapConfig *cfg);\n"
-    "  • Utilité     : Restitue le manuel complet stocké en mémoire morte (`.rodata`),\n"
-    "                  avec bascule automatique vers le téléscripteur `rapless` sur terminal interactif.\n"
+    "  • Utilité     : Point d'entrée de la documentation embarquée. Gère l'affichage sélectif\n"
+    "                  par commande (`rap man sentry`, `rap man rx`), la vue complète (`all`)\n"
+    "                  ou le routage vers le dictionnaire des fonctions (`fn`).\n"
     "\n"
     "Fonction 98 : rap_common.c -- rap_output_formatter -- Formatage d'affichage universel\n"
     "  • Signature C : void rap_output_formatter(const RapConfig *cfg, const char *c1, const char *c2, const char *c3, const char *c4);\n"
@@ -2875,8 +2988,8 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "\n"
     "Fonction 100 : rap_main.c -- rap_parse_flags -- Parseur d'arguments et drapeaux\n"
     "  • Signature C : int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg);\n"
-    "  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-n`, `-h`),\n"
-    "                  détecte le mode TTY (`isatty`) et isole le verbe d'action dans `argv`.\n"
+    "  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-a`, `--arm`,\n"
+    "                  `--dry-run`, `-n`, `-h`), détecte le mode TTY et isole le verbe d'action.\n"
     "\n"
     "Fonction 107 : rap_common.c -- rap_is_mem_whitelisted -- Filtrage liste blanche mémoire\n"
     "  • Signature C : int rap_is_mem_whitelisted(const char *comm);\n"
@@ -2899,6 +3012,26 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "                  1. Binaires supprimés du disque en cours d'exécution (`(deleted)`).\n"
     "                  2. Exécutions depuis des zones volatiles suspectes (`/tmp`, `/dev/shm`).\n"
     "                  3. Usurpation d'identité de démons systèmes (*Masquerading*).\n"
+    "\n"
+    "Fonction 123 : cmd_man.c -- rap_man_render -- Téléscripteur et projection de documentation\n"
+    "  • Signature C : static void rap_man_render(const char *text, size_t len, const RapConfig *cfg, bool force_direct);\n"
+    "  • Utilité     : Aiguille le flux textuel vers le pager autonome `rapless` en mode interactif\n"
+    "                  ou projette directement sur STDOUT en mode tube, redirection ou `--raw`.\n"
+    "\n"
+    "Fonction 124 : cmd_man.c -- rap_man_handle_fn -- Moteur de navigation du dictionnaire API\n"
+    "  • Signature C : static int rap_man_handle_fn(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Permet l'interrogation granulaire du dictionnaire des fonctions par numéro de\n"
+    "                  section (`rap man fn <sec>`), par identifiant unique (`rap man fn <id>`) ou en intégralité.\n"
+    "\n"
+    "Fonction 125 : cmd_man.c -- rap_man_extract_topic -- Extraction sémantique de rubrique\n"
+    "  • Signature C : static const char *rap_man_extract_topic(int argc, char **argv);\n"
+    "  • Utilité     : Isole l'argument cible de documentation dans `argv` indépendamment des drapeaux\n"
+    "                  et de la position des paramètres.\n"
+    "\n"
+    "Fonction 126 : cmd_man.c -- rap_man_lookup_page -- Recherche et résolution d'entrée man\n"
+    "  • Signature C : static const RapManPageEntry *rap_man_lookup_page(const char *topic);\n"
+    "  • Utilité     : Résout une clé de commande dans la table `g_rap_man_pages[]` avec gestion des alias\n"
+    "                  courts (`st`, `se`, `he`) et résolution avec ou sans le préfixe `rap-`.\n"
     },
     {
         16,
@@ -2930,11 +3063,12 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     {
         16,
         91,
-        "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné",
-    "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné\n"
+        "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné & riposte active",
+    "Fonction 91 : cmd_hunt.c -- rap_cmd_hunt -- Chasseur universel combiné & riposte active\n"
     "  • Signature C : int rap_cmd_hunt(int argc, char **argv, const RapConfig *cfg);\n"
     "  • Utilité     : Enchaîne séquentiellement la traque Inode 0 (`rx`), les détournements\n"
-    "                  dynamiques (`preload`) et l'analyse heuristique (`heur`).\n"
+    "                  dynamiques (`preload`) et l'analyse heuristique (`heur`) avec support\n"
+    "                  de l'armement réflexe (`--arm`) et simulation (`--dry-run`).\n"
     },
     {
         16,
@@ -2943,7 +3077,8 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "Fonction 92 : cmd_rx.c -- rap_cmd_rx -- Traque mutations exécutables Inode 0\n"
     "  • Signature C : int rap_cmd_rx(int argc, char **argv, const RapConfig *cfg);\n"
     "  • Utilité     : Repère les allocations mémoires anonymes exécutables (`r-xp`)\n"
-    "                  dans `/proc/[PID]/maps` avec filtrage de liste blanche (`-v` pour mode étendu).\n"
+    "                  dans `/proc/[PID]/maps` avec filtrage strict par `mem_whitelist.conf`\n"
+    "                  et raccordement à la riposte cinétique réflexe (`rap_reflex_dispatch`).\n"
     },
     {
         16,
@@ -2987,8 +3122,9 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
         "Fonction 97 : cmd_man.c -- rap_cmd_man -- Manuel de référence unifié embarqué",
     "Fonction 97 : cmd_man.c -- rap_cmd_man -- Manuel de référence unifié embarqué\n"
     "  • Signature C : int rap_cmd_man(int argc, char **argv, const RapConfig *cfg);\n"
-    "  • Utilité     : Restitue le manuel complet stocké en mémoire morte (`.rodata`),\n"
-    "                  avec bascule automatique vers le téléscripteur `rapless` sur terminal interactif.\n"
+    "  • Utilité     : Point d'entrée de la documentation embarquée. Gère l'affichage sélectif\n"
+    "                  par commande (`rap man sentry`, `rap man rx`), la vue complète (`all`)\n"
+    "                  ou le routage vers le dictionnaire des fonctions (`fn`).\n"
     },
     {
         16,
@@ -3014,8 +3150,8 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
         "Fonction 100 : rap_main.c -- rap_parse_flags -- Parseur d'arguments et drapeaux",
     "Fonction 100 : rap_main.c -- rap_parse_flags -- Parseur d'arguments et drapeaux\n"
     "  • Signature C : int rap_parse_flags(int *argc, char ***argv, RapConfig *cfg);\n"
-    "  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-n`, `-h`),\n"
-    "                  détecte le mode TTY (`isatty`) et isole le verbe d'action dans `argv`.\n"
+    "  • Utilité     : Extrait les drapeaux universels (`-q`, `-r`, `-f`, `-v`, `-a`, `--arm`,\n"
+    "                  `--dry-run`, `-n`, `-h`), détecte le mode TTY et isole le verbe d'action.\n"
     },
     {
         16,
@@ -3056,6 +3192,42 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "                  3. Usurpation d'identité de démons systèmes (*Masquerading*).\n"
     },
     {
+        16,
+        123,
+        "Fonction 123 : cmd_man.c -- rap_man_render -- Téléscripteur et projection de documentation",
+    "Fonction 123 : cmd_man.c -- rap_man_render -- Téléscripteur et projection de documentation\n"
+    "  • Signature C : static void rap_man_render(const char *text, size_t len, const RapConfig *cfg, bool force_direct);\n"
+    "  • Utilité     : Aiguille le flux textuel vers le pager autonome `rapless` en mode interactif\n"
+    "                  ou projette directement sur STDOUT en mode tube, redirection ou `--raw`.\n"
+    },
+    {
+        16,
+        124,
+        "Fonction 124 : cmd_man.c -- rap_man_handle_fn -- Moteur de navigation du dictionnaire API",
+    "Fonction 124 : cmd_man.c -- rap_man_handle_fn -- Moteur de navigation du dictionnaire API\n"
+    "  • Signature C : static int rap_man_handle_fn(int argc, char **argv, const RapConfig *cfg);\n"
+    "  • Utilité     : Permet l'interrogation granulaire du dictionnaire des fonctions par numéro de\n"
+    "                  section (`rap man fn <sec>`), par identifiant unique (`rap man fn <id>`) ou en intégralité.\n"
+    },
+    {
+        16,
+        125,
+        "Fonction 125 : cmd_man.c -- rap_man_extract_topic -- Extraction sémantique de rubrique",
+    "Fonction 125 : cmd_man.c -- rap_man_extract_topic -- Extraction sémantique de rubrique\n"
+    "  • Signature C : static const char *rap_man_extract_topic(int argc, char **argv);\n"
+    "  • Utilité     : Isole l'argument cible de documentation dans `argv` indépendamment des drapeaux\n"
+    "                  et de la position des paramètres.\n"
+    },
+    {
+        16,
+        126,
+        "Fonction 126 : cmd_man.c -- rap_man_lookup_page -- Recherche et résolution d'entrée man",
+    "Fonction 126 : cmd_man.c -- rap_man_lookup_page -- Recherche et résolution d'entrée man\n"
+    "  • Signature C : static const RapManPageEntry *rap_man_lookup_page(const char *topic);\n"
+    "  • Utilité     : Résout une clé de commande dans la table `g_rap_man_pages[]` avec gestion des alias\n"
+    "                  courts (`st`, `se`, `he`) et résolution avec ou sans le préfixe `rap-`.\n"
+    },
+    {
         17,
         0,
         "SECTION 17 : SENTINELLE PASSIVE ANTI-RANÇONGICIEL (FANOTIFY & LEURRES DENSES)",
@@ -3086,10 +3258,9 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "\n"
     "Fonction 114 : sentry_engine.c -- sentry_trigger_reflex -- Riposte cinétique synchrone\n"
     "  • Signature C : int sentry_trigger_reflex(int fanotify_fd, int fd_event, pid_t pid);\n"
-    "  • Utilité     : Vérifie le garde-fou autonome `sentry_is_protected_pid` (PID <= 1, self, parent).\n"
-    "                  Applique instantanément le gel conservatoire de l'agresseur via `SIGSTOP`\n"
-    "                  (état noyau `T`), ordonne le rejet de l'appel d'ouverture auprès du noyau via\n"
-    "                  `FAN_DENY`, referme le descripteur d'inspection et émet l'alerte console.\n"
+    "  • Utilité     : Applique instantanément le rejet auprès du noyau via `FAN_DENY`,\n"
+    "                  ferme le descripteur d'événement et achemine le PID agresseur vers\n"
+    "                  `rap_reflex_dispatch` avec le motif `TRIGGER_CANARY_BREACH`.\n"
     "  • Retour      : `0` si la neutralisation a réussi, `-1` si le PID était protégé.\n"
     "\n"
     "Fonction 115 : sentry_engine.c -- sentry_enter_stealth -- Blindage et invisibilité mémoire\n"
@@ -3127,7 +3298,7 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "Fonction 120 : cmd_sentry.c -- cmd_sentry -- Aiguilleur CLI sentry\n"
     "  • Signature C : int cmd_sentry(int argc, char **argv);\n"
     "  • Utilité     : Point d'entrée principal de la sous-commande `rap sentry`. Parse les\n"
-    "                  arguments et route vers `arm`, `disarm`, `status` ou `run`.\n"
+    "                  arguments et route vers `arm`, `disarm`, `status`, `dump` ou `run`.\n"
     "  • Retour      : Code de retour de la sous-commande, ou `2` si la commande est inconnue.\n"
     "\n"
     "Fonction 121 : rap_main.c -- rap_cmd_sentry -- Pont déclaratif sentinelle\n"
@@ -3135,6 +3306,12 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "  • Utilité     : Relie la table déclarative universelle `g_commands` de RAPTOR au point\n"
     "                  d'entrée de la sentinelle anti-rançongiciel (`cmd_sentry`).\n"
     "  • Retour      : Code de retour POSIX transmis par `cmd_sentry`.\n"
+    "\n"
+    "Fonction 122 : cmd_sentry.c -- cmd_sentry_dump -- Restitution boîte noire médico-légale\n"
+    "  • Signature C : static int cmd_sentry_dump(int argc, char **argv);\n"
+    "  • Utilité     : Extrait et déverse les événements médico-légaux conservés dans l'anneau\n"
+    "                  circulaire en mémoire vive (`/dev/shm/raptor_blackbox`) avec latences nanosecondes.\n"
+    "  • Retour      : `0` après affichage, `2` si la boîte noire est vide ou inaccessible.\n"
     },
     {
         17,
@@ -3177,10 +3354,9 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
         "Fonction 114 : sentry_engine.c -- sentry_trigger_reflex -- Riposte cinétique synchrone",
     "Fonction 114 : sentry_engine.c -- sentry_trigger_reflex -- Riposte cinétique synchrone\n"
     "  • Signature C : int sentry_trigger_reflex(int fanotify_fd, int fd_event, pid_t pid);\n"
-    "  • Utilité     : Vérifie le garde-fou autonome `sentry_is_protected_pid` (PID <= 1, self, parent).\n"
-    "                  Applique instantanément le gel conservatoire de l'agresseur via `SIGSTOP`\n"
-    "                  (état noyau `T`), ordonne le rejet de l'appel d'ouverture auprès du noyau via\n"
-    "                  `FAN_DENY`, referme le descripteur d'inspection et émet l'alerte console.\n"
+    "  • Utilité     : Applique instantanément le rejet auprès du noyau via `FAN_DENY`,\n"
+    "                  ferme le descripteur d'événement et achemine le PID agresseur vers\n"
+    "                  `rap_reflex_dispatch` avec le motif `TRIGGER_CANARY_BREACH`.\n"
     "  • Retour      : `0` si la neutralisation a réussi, `-1` si le PID était protégé.\n"
     },
     {
@@ -3242,7 +3418,7 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "Fonction 120 : cmd_sentry.c -- cmd_sentry -- Aiguilleur CLI sentry\n"
     "  • Signature C : int cmd_sentry(int argc, char **argv);\n"
     "  • Utilité     : Point d'entrée principal de la sous-commande `rap sentry`. Parse les\n"
-    "                  arguments et route vers `arm`, `disarm`, `status` ou `run`.\n"
+    "                  arguments et route vers `arm`, `disarm`, `status`, `dump` ou `run`.\n"
     "  • Retour      : Code de retour de la sous-commande, ou `2` si la commande est inconnue.\n"
     },
     {
@@ -3256,6 +3432,16 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "  • Retour      : Code de retour POSIX transmis par `cmd_sentry`.\n"
     },
     {
+        17,
+        122,
+        "Fonction 122 : cmd_sentry.c -- cmd_sentry_dump -- Restitution boîte noire médico-légale",
+    "Fonction 122 : cmd_sentry.c -- cmd_sentry_dump -- Restitution boîte noire médico-légale\n"
+    "  • Signature C : static int cmd_sentry_dump(int argc, char **argv);\n"
+    "  • Utilité     : Extrait et déverse les événements médico-légaux conservés dans l'anneau\n"
+    "                  circulaire en mémoire vive (`/dev/shm/raptor_blackbox`) avec latences nanosecondes.\n"
+    "  • Retour      : `0` après affichage, `2` si la boîte noire est vide ou inaccessible.\n"
+    },
+    {
         18,
         0,
         "SECTION 18 : OUTILLAGE DE COMPILATION & SOURCE UNIQUE SSOT (tools/)",
@@ -3266,25 +3452,35 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     "  • Utilité          : Parse le fichier maître `docs/man/rap.1.md` et segmente chaque\n"
     "                       page de manuel délimitée par les balises `<!-- MAN: key | sec | titre -->`.\n"
     "\n"
-    "Outil 02 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix\n"
+    "Outil 02 : gen_man.py -- parse_functions_dict -- Segmentation du dictionnaire d'ingénierie\n"
+    "  • Signature Python : def parse_functions_dict(dict_raw) -> list\n"
+    "  • Utilité          : Extrait hiérarchiquement les Sections et les fonctions unitaires numérotées\n"
+    "                       du dictionnaire pour alimenter la table C99 `g_rap_fn_entries[]`.\n"
+    "\n"
+    "Outil 03 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix\n"
     "  • Signature Python : def format_unix_header(key, sec) -> str\n"
     "  • Utilité          : Calibre et génère la bannière d'en-tête troff/groff centrée\n"
     "                       sur 70 colonnes (ex: `RAP(1)   RAPTOR DEFENSE   RAP(1)`).\n"
     "\n"
-    "Outil 03 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99\n"
-    "  • Signature Python : def generate_cli_header(pages) -> str\n"
-    "  • Utilité          : Encode l'ensemble des pages de manuel dans le tableau constant\n"
-    "                       `g_rap_man_data[]` de `src/cli/rap_man_data.h` pour inclusion\n"
-    "                       autonome en mémoire morte dans l'exécutable `rap` (zéro heap).\n"
+    "Outil 04 : gen_man.py -- escape_c_string -- Échappement de chaînes multilignes C99\n"
+    "  • Signature Python : def escape_c_string(text) -> str\n"
+    "  • Utilité          : Convertit un bloc textuel brut en constantes littérales C99 sécurisées\n"
+    "                       sans débordement de pile pour les fichiers `.rodata`.\n"
     "\n"
-    "Outil 04 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS\n"
-    "  • Signature Python : def generate_js_database(pages) -> str\n"
+    "Outil 05 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99\n"
+    "  • Signature Python : def generate_cli_header(man_pages, fn_entries, full_dict_raw) -> str\n"
+    "  • Utilité          : Génère `src/cli/rap_man_data.h` contenant les tables constantes\n"
+    "                       `g_rap_man_pages[]`, `g_rap_man_data[]` et `g_rap_fn_entries[]` (zéro tas).\n"
+    "\n"
+    "Outil 06 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS\n"
+    "  • Signature Python : def generate_js_database(man_pages, fn_entries) -> str\n"
     "  • Utilité          : Construit la base de données JavaScript `docs/js/man_data.js`\n"
     "                       alimentant la visionneuse interactive de `docs/man.html`.\n"
     "\n"
-    "================================================================================\n"
-    "FIN DU RÉFÉRENTIEL TECHNIQUE OFFICIEL // RAPTOR DEFENSE v2.0\n"
-    "================================================================================\n"
+    "Outil 07 : gen_man.py -- main -- Orchestrateur de compilation documentaire SSOT\n"
+    "  • Signature Python : def main() -> None\n"
+    "  • Utilité          : Point d'entrée vérifiant l'existence des sources, synchronisant le binaire C\n"
+    "                       et la documentation web en une seule passe atomique.\n"
     },
     {
         18,
@@ -3298,30 +3494,224 @@ static const RapFnDocEntry g_rap_fn_entries[] = {
     {
         18,
         2,
-        "Outil 2 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix",
-    "Outil 02 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix\n"
+        "Outil 2 : gen_man.py -- parse_functions_dict -- Segmentation du dictionnaire d'ingénierie",
+    "Outil 02 : gen_man.py -- parse_functions_dict -- Segmentation du dictionnaire d'ingénierie\n"
+    "  • Signature Python : def parse_functions_dict(dict_raw) -> list\n"
+    "  • Utilité          : Extrait hiérarchiquement les Sections et les fonctions unitaires numérotées\n"
+    "                       du dictionnaire pour alimenter la table C99 `g_rap_fn_entries[]`.\n"
+    },
+    {
+        18,
+        3,
+        "Outil 3 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix",
+    "Outil 03 : gen_man.py -- format_unix_header -- Bannière d'en-tête Unix\n"
     "  • Signature Python : def format_unix_header(key, sec) -> str\n"
     "  • Utilité          : Calibre et génère la bannière d'en-tête troff/groff centrée\n"
     "                       sur 70 colonnes (ex: `RAP(1)   RAPTOR DEFENSE   RAP(1)`).\n"
     },
     {
         18,
-        3,
-        "Outil 3 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99",
-    "Outil 03 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99\n"
-    "  • Signature Python : def generate_cli_header(pages) -> str\n"
-    "  • Utilité          : Encode l'ensemble des pages de manuel dans le tableau constant\n"
-    "                       `g_rap_man_data[]` de `src/cli/rap_man_data.h` pour inclusion\n"
-    "                       autonome en mémoire morte dans l'exécutable `rap` (zéro heap).\n"
+        4,
+        "Outil 4 : gen_man.py -- escape_c_string -- Échappement de chaînes multilignes C99",
+    "Outil 04 : gen_man.py -- escape_c_string -- Échappement de chaînes multilignes C99\n"
+    "  • Signature Python : def escape_c_string(text) -> str\n"
+    "  • Utilité          : Convertit un bloc textuel brut en constantes littérales C99 sécurisées\n"
+    "                       sans débordement de pile pour les fichiers `.rodata`.\n"
     },
     {
         18,
-        4,
-        "Outil 4 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS",
-    "Outil 04 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS\n"
-    "  • Signature Python : def generate_js_database(pages) -> str\n"
+        5,
+        "Outil 5 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99",
+    "Outil 05 : gen_man.py -- generate_cli_header -- Sérialisation .rodata C99\n"
+    "  • Signature Python : def generate_cli_header(man_pages, fn_entries, full_dict_raw) -> str\n"
+    "  • Utilité          : Génère `src/cli/rap_man_data.h` contenant les tables constantes\n"
+    "                       `g_rap_man_pages[]`, `g_rap_man_data[]` et `g_rap_fn_entries[]` (zéro tas).\n"
+    },
+    {
+        18,
+        6,
+        "Outil 6 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS",
+    "Outil 06 : gen_man.py -- generate_js_database -- Sérialisation Web JSON/JS\n"
+    "  • Signature Python : def generate_js_database(man_pages, fn_entries) -> str\n"
     "  • Utilité          : Construit la base de données JavaScript `docs/js/man_data.js`\n"
     "                       alimentant la visionneuse interactive de `docs/man.html`.\n"
+    },
+    {
+        18,
+        7,
+        "Outil 7 : gen_man.py -- main -- Orchestrateur de compilation documentaire SSOT",
+    "Outil 07 : gen_man.py -- main -- Orchestrateur de compilation documentaire SSOT\n"
+    "  • Signature Python : def main() -> None\n"
+    "  • Utilité          : Point d'entrée vérifiant l'existence des sources, synchronisant le binaire C\n"
+    "                       et la documentation web en une seule passe atomique.\n"
+    },
+    {
+        19,
+        0,
+        "SECTION 19 : MOTEUR CINÉTIQUE RÉFLEXE, BOÎTE NOIRE ET SURVIE MÉMOIRE (src/core/)",
+    "=== SECTION 19 : MOTEUR CINÉTIQUE RÉFLEXE, BOÎTE NOIRE ET SURVIE MÉMOIRE (src/core/) ===\n"
+    "\n"
+    "Fonction 127 : rap_reflex.c -- rap_reflex_init -- Initialisation du moteur réflexe\n"
+    "  • Signature C : int rap_reflex_init(reflex_mode_t initial_mode);\n"
+    "  • Utilité     : Initialise les structures internes de remédiation, remet à zéro les\n"
+    "                  compteurs d'intervention et prépare l'accès à la boîte noire en mémoire vive.\n"
+    "  • Retour      : `0` en cas de succès, `-1` en cas d'erreur d'ouverture de la boîte noire.\n"
+    "\n"
+    "Fonction 128 : rap_reflex.c -- rap_reflex_set_mode -- Commutation du mode d'armement\n"
+    "  • Signature C : void rap_reflex_set_mode(reflex_mode_t mode);\n"
+    "  • Utilité     : Modifie à chaud le comportement opérationnel du disjoncteur cinétique\n"
+    "                  (`REFLEX_MODE_PASSIVE`, `REFLEX_MODE_DRYRUN`, `REFLEX_MODE_ARMED`).\n"
+    "\n"
+    "Fonction 129 : rap_reflex.c -- rap_reflex_dispatch -- Séquençage et frappe chirurgicale\n"
+    "  • Signature C : int rap_reflex_dispatch(pid_t target_pid, reflex_trigger_t trigger);\n"
+    "  • Utilité     : Exécute la riposte séquentielle déterministe en moins de 40 µs :\n"
+    "                  1. Vérification des gardes-fous (PID <= 1, self, parent).\n"
+    "                  2. Gel immédiat du processus et de son groupe de threads via `SIGSTOP`.\n"
+    "                  3. Révocation forcée des descripteurs de sockets réseau dans `/proc/[PID]/fd`.\n"
+    "                  4. Destruction physique de l'agresseur par émission de `SIGKILL`.\n"
+    "                  5. Calcul de latence nanoseconde et injection dans la boîte noire RAM.\n"
+    "  • Retour      : `0` si l'action a été appliquée ou simulée, `-1` en cas d'erreur.\n"
+    "\n"
+    "Fonction 130 : rap_reflex.c -- rap_reflex_get_stats -- Télémétrie des neutralisations\n"
+    "  • Signature C : reflex_mode_t rap_reflex_get_stats(uint64_t *out_neutralized_count);\n"
+    "  • Utilité     : Retourne le mode de fonctionnement actif et extrait le nombre cumulé\n"
+    "                  d'anomalies abattues ou consignées depuis le démarrage.\n"
+    "\n"
+    "Fonction 131 : rap_blackbox.c -- rap_blackbox_open -- Initialisation anneau circulaire RAM\n"
+    "  • Signature C : int rap_blackbox_open(void);\n"
+    "  • Utilité     : Crée ou ouvre le segment mémoire partagé `/dev/shm/raptor_blackbox`\n"
+    "                  (permissions `0666`) dimensionné pour 64 enregistrements FIFO avec\n"
+    "                  verrouillage d'écriture sans concurrence.\n"
+    "  • Retour      : `0` en cas d'initialisation réussie, `-1` en cas d'échec d'accès à `/dev/shm`.\n"
+    "\n"
+    "Fonction 132 : rap_blackbox.c -- rap_blackbox_push -- Enregistrement atomique d'incident\n"
+    "  • Signature C : int rap_blackbox_push(const reflex_record_t *record);\n"
+    "  • Utilité     : Inscrit un événement médico-légal complet (horodatage temps réel, PID,\n"
+    "                  PPID, ligne de commande, cause, latence nanoseconde, statut de destruction)\n"
+    "                  dans l'anneau circulaire avec écrasement rotatif en cas de saturation.\n"
+    "  • Retour      : `0` en cas de succès, `-1` si la boîte noire n'est pas ouverte.\n"
+    "\n"
+    "Fonction 133 : rap_blackbox.c -- rap_blackbox_dump -- Restitution formatée boîte noire\n"
+    "  • Signature C : int rap_blackbox_dump(void);\n"
+    "  • Utilité     : Lit chronologiquement l'anneau circulaire en mémoire vive et affiche\n"
+    "                  les fiches forensiques détaillées avec codes couleurs ANSI sans nécessiter\n"
+    "                  les privilèges superutilisateur.\n"
+    "  • Retour      : Nombre d'événements affichés, ou `-1` en cas d'erreur.\n"
+    "\n"
+    "Fonction 134 : rap_oom.c -- rap_oom_protect -- Immunité système anti-éviction OOM\n"
+    "  • Signature C : int rap_oom_protect(void);\n"
+    "  • Utilité     : Écrit la valeur `-1000` dans `/proc/self/oom_score_adj` pour conférer\n"
+    "                  au binaire RAPTOR une immunité vitale absolue équivalente à `init` (PID 1)\n"
+    "                  face au tueur de mémoire du noyau Linux (*Out-Of-Memory Killer*).\n"
+    "  • Retour      : `0` en cas de succès, `-1` en cas de droits administratifs insuffisants.\n"
+    "\n"
+    "Fonction 135 : rap_oom.c -- rap_oom_lock_memory -- Verrouillage des pages physiques RAM\n"
+    "  • Signature C : int rap_oom_lock_memory(void);\n"
+    "  • Utilité     : Invoque `mlockall(MCL_CURRENT | MCL_FUTURE)` pour interdire tout swap\n"
+    "                  sur disque des pages mémoires de RAPTOR, garantissant un temps de réponse\n"
+    "                  sans latence de défaut de page (*page fault*) lors des frappes réflexes.\n"
+    "  • Retour      : `0` en cas de verrouillage physique réussi, `-1` en cas de dépassement de quota.\n"
+    "\n"
+    "================================================================================\n"
+    "FIN DU RÉFÉRENTIEL TECHNIQUE OFFICIEL // RAPTOR DEFENSE v2.0\n"
+    "================================================================================\n"
+    },
+    {
+        19,
+        127,
+        "Fonction 127 : rap_reflex.c -- rap_reflex_init -- Initialisation du moteur réflexe",
+    "Fonction 127 : rap_reflex.c -- rap_reflex_init -- Initialisation du moteur réflexe\n"
+    "  • Signature C : int rap_reflex_init(reflex_mode_t initial_mode);\n"
+    "  • Utilité     : Initialise les structures internes de remédiation, remet à zéro les\n"
+    "                  compteurs d'intervention et prépare l'accès à la boîte noire en mémoire vive.\n"
+    "  • Retour      : `0` en cas de succès, `-1` en cas d'erreur d'ouverture de la boîte noire.\n"
+    },
+    {
+        19,
+        128,
+        "Fonction 128 : rap_reflex.c -- rap_reflex_set_mode -- Commutation du mode d'armement",
+    "Fonction 128 : rap_reflex.c -- rap_reflex_set_mode -- Commutation du mode d'armement\n"
+    "  • Signature C : void rap_reflex_set_mode(reflex_mode_t mode);\n"
+    "  • Utilité     : Modifie à chaud le comportement opérationnel du disjoncteur cinétique\n"
+    "                  (`REFLEX_MODE_PASSIVE`, `REFLEX_MODE_DRYRUN`, `REFLEX_MODE_ARMED`).\n"
+    },
+    {
+        19,
+        129,
+        "Fonction 129 : rap_reflex.c -- rap_reflex_dispatch -- Séquençage et frappe chirurgicale",
+    "Fonction 129 : rap_reflex.c -- rap_reflex_dispatch -- Séquençage et frappe chirurgicale\n"
+    "  • Signature C : int rap_reflex_dispatch(pid_t target_pid, reflex_trigger_t trigger);\n"
+    "  • Utilité     : Exécute la riposte séquentielle déterministe en moins de 40 µs :\n"
+    "                  1. Vérification des gardes-fous (PID <= 1, self, parent).\n"
+    "                  2. Gel immédiat du processus et de son groupe de threads via `SIGSTOP`.\n"
+    "                  3. Révocation forcée des descripteurs de sockets réseau dans `/proc/[PID]/fd`.\n"
+    "                  4. Destruction physique de l'agresseur par émission de `SIGKILL`.\n"
+    "                  5. Calcul de latence nanoseconde et injection dans la boîte noire RAM.\n"
+    "  • Retour      : `0` si l'action a été appliquée ou simulée, `-1` en cas d'erreur.\n"
+    },
+    {
+        19,
+        130,
+        "Fonction 130 : rap_reflex.c -- rap_reflex_get_stats -- Télémétrie des neutralisations",
+    "Fonction 130 : rap_reflex.c -- rap_reflex_get_stats -- Télémétrie des neutralisations\n"
+    "  • Signature C : reflex_mode_t rap_reflex_get_stats(uint64_t *out_neutralized_count);\n"
+    "  • Utilité     : Retourne le mode de fonctionnement actif et extrait le nombre cumulé\n"
+    "                  d'anomalies abattues ou consignées depuis le démarrage.\n"
+    },
+    {
+        19,
+        131,
+        "Fonction 131 : rap_blackbox.c -- rap_blackbox_open -- Initialisation anneau circulaire RAM",
+    "Fonction 131 : rap_blackbox.c -- rap_blackbox_open -- Initialisation anneau circulaire RAM\n"
+    "  • Signature C : int rap_blackbox_open(void);\n"
+    "  • Utilité     : Crée ou ouvre le segment mémoire partagé `/dev/shm/raptor_blackbox`\n"
+    "                  (permissions `0666`) dimensionné pour 64 enregistrements FIFO avec\n"
+    "                  verrouillage d'écriture sans concurrence.\n"
+    "  • Retour      : `0` en cas d'initialisation réussie, `-1` en cas d'échec d'accès à `/dev/shm`.\n"
+    },
+    {
+        19,
+        132,
+        "Fonction 132 : rap_blackbox.c -- rap_blackbox_push -- Enregistrement atomique d'incident",
+    "Fonction 132 : rap_blackbox.c -- rap_blackbox_push -- Enregistrement atomique d'incident\n"
+    "  • Signature C : int rap_blackbox_push(const reflex_record_t *record);\n"
+    "  • Utilité     : Inscrit un événement médico-légal complet (horodatage temps réel, PID,\n"
+    "                  PPID, ligne de commande, cause, latence nanoseconde, statut de destruction)\n"
+    "                  dans l'anneau circulaire avec écrasement rotatif en cas de saturation.\n"
+    "  • Retour      : `0` en cas de succès, `-1` si la boîte noire n'est pas ouverte.\n"
+    },
+    {
+        19,
+        133,
+        "Fonction 133 : rap_blackbox.c -- rap_blackbox_dump -- Restitution formatée boîte noire",
+    "Fonction 133 : rap_blackbox.c -- rap_blackbox_dump -- Restitution formatée boîte noire\n"
+    "  • Signature C : int rap_blackbox_dump(void);\n"
+    "  • Utilité     : Lit chronologiquement l'anneau circulaire en mémoire vive et affiche\n"
+    "                  les fiches forensiques détaillées avec codes couleurs ANSI sans nécessiter\n"
+    "                  les privilèges superutilisateur.\n"
+    "  • Retour      : Nombre d'événements affichés, ou `-1` en cas d'erreur.\n"
+    },
+    {
+        19,
+        134,
+        "Fonction 134 : rap_oom.c -- rap_oom_protect -- Immunité système anti-éviction OOM",
+    "Fonction 134 : rap_oom.c -- rap_oom_protect -- Immunité système anti-éviction OOM\n"
+    "  • Signature C : int rap_oom_protect(void);\n"
+    "  • Utilité     : Écrit la valeur `-1000` dans `/proc/self/oom_score_adj` pour conférer\n"
+    "                  au binaire RAPTOR une immunité vitale absolue équivalente à `init` (PID 1)\n"
+    "                  face au tueur de mémoire du noyau Linux (*Out-Of-Memory Killer*).\n"
+    "  • Retour      : `0` en cas de succès, `-1` en cas de droits administratifs insuffisants.\n"
+    },
+    {
+        19,
+        135,
+        "Fonction 135 : rap_oom.c -- rap_oom_lock_memory -- Verrouillage des pages physiques RAM",
+    "Fonction 135 : rap_oom.c -- rap_oom_lock_memory -- Verrouillage des pages physiques RAM\n"
+    "  • Signature C : int rap_oom_lock_memory(void);\n"
+    "  • Utilité     : Invoque `mlockall(MCL_CURRENT | MCL_FUTURE)` pour interdire tout swap\n"
+    "                  sur disque des pages mémoires de RAPTOR, garantissant un temps de réponse\n"
+    "                  sans latence de défaut de page (*page fault*) lors des frappes réflexes.\n"
+    "  • Retour      : `0` en cas de verrouillage physique réussi, `-1` en cas de dépassement de quota.\n"
     "\n"
     "================================================================================\n"
     "FIN DU RÉFÉRENTIEL TECHNIQUE OFFICIEL // RAPTOR DEFENSE v2.0\n"
