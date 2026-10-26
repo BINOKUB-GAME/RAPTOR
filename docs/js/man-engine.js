@@ -1,23 +1,23 @@
 /* ============================================================================
  * NOM DU SCRIPT   : docs/js/man-engine.js
- * RÉVISION        : Rev 1.2
+ * RÉVISION        : Rev 1.3
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Moteur autonome d'affichage et de recherche des pages de
  *                   manuel Unix (Sections 1, 3 et 5) pour docs/man.html.
  *                   Découplé des données : consomme window.RAP_MAN_DATABASE.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
- *   - Gestion du clic 'apropos' à vide avec panneau d'aide guidée.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.3) :
+ *   - Prise en charge des requêtes URL entrantes (?q=... ou ?search=...).
+ *   - Auto-déclenchement de la recherche man/apropos lors d'une redirection depuis l'accueil.
+ *   - Préservation de la navigation directe par ancre hash (#commande).
  *   - Extraction automatique des descriptions du Dictionnaire (Section 3).
- *   - Bascule automatique du sélecteur de section lors d'un clic sur un résultat apropos.
- *   - Coloration et navigation fluide pour les sections 1, 3 et 5.
  *
  * LISTE DES FONCTIONS NUMÉROTÉES :
  *   1. man_engine_populate_select : Remplissage dynamique du sélecteur par section.
  *   2. man_engine_render          : Rendu typographique et coloration des sections.
  *   3. man_engine_search          : Recherche directe par nom de commande ('man').
  *   4. man_engine_apropos         : Recherche textuelle par mots-clés ('apropos').
- *   5. man_engine_init            : Initialisation du DOM, gestion des URL hash et événements.
+ *   5. man_engine_init            : Initialisation du DOM, parsing URL (?q= / #) et écouteurs.
  * ============================================================================
  */
 
@@ -134,7 +134,7 @@
                 `Entrez un mot-clé dans la barre de recherche ci-dessus, par exemple :\n` +
                 `  &bull; <span style="color: #61AFEF;">rx</span>          : Traque mémoire et allocations Inode 0\n` +
                 `  &bull; <span style="color: #61AFEF;">sentry</span>      : Sentinelle passive et fanotify\n` +
-                `  &bull; <span style="color: #61AFEF;">netguard</span>    : Qualification réseau et règles CIDR\n` +
+                `  &bull; <span style="color: #61AFEF;">blackbox</span>    : Registre médico-légal en mémoire vive\n` +
                 `  &bull; <span style="color: #61AFEF;">114</span>         : Fiche unitaire de la fonction 114\n` +
                 `  &bull; <span style="color: #61AFEF;">preload</span>     : Détection des rootkits userland`;
             return;
@@ -197,17 +197,27 @@
 
     /* ========================================================================
      * 5. man_engine_init
-     * Initialisation globale et écouteurs d'événements
+     * Initialisation globale, gestion des paramètres URL (?q=) et écouteurs
      * ========================================================================
      */
     function man_engine_init() {
         man_engine_populate_select("1");
 
-        const hash = window.location.hash.substring(1);
-        if (hash && MAN_DATABASE[hash]) {
-            man_engine_render(hash);
+        /* 1. Vérification de la présence d'une requête URL (?q=mot_cle ou ?search=mot_cle) */
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryTerm = urlParams.get("q") || urlParams.get("search");
+
+        if (queryTerm) {
+            if (elSearchInput) elSearchInput.value = queryTerm;
+            man_engine_search();
         } else {
-            man_engine_render("rap");
+            /* 2. Vérification de la présence d'une ancre hash (#commande) */
+            const hash = window.location.hash.substring(1);
+            if (hash && MAN_DATABASE[hash]) {
+                man_engine_render(hash);
+            } else {
+                man_engine_render("rap");
+            }
         }
 
         if (elSelect) {
