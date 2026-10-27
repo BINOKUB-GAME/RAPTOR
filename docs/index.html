@@ -1,16 +1,18 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/index.html
- * RÉVISION        : Rev 1.3
+ * RÉVISION        : Rev 1.4 (2026-10-27)
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Page d'accueil officielle, présentation de l'architecture
  *                   souveraine, appel aux contributeurs / développeurs C/Linux,
  *                   vitrine des sondes de combat et guide d'amorçage.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.3) :
- *   - Attribution de l'identifiant #navSearchInput sur le champ de recherche rapide.
- *   - Raccordement du gestionnaire d'événement clavier (Touche Entrée) redirigeant
- *     vers le manuel dynamique avec le paramètre de requête (man.html?q=...).
- *   - Maintien du script de navigation mobile (navToggle) et des styles institutionnels.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.4) :
+ *   - Intégration de la console tactique temps réel 'rap netop' (badge NO)
+ *     dans les 6 piliers d'outils de combat en remplacement de rapless.
+ *   - Mise en avant du routeur d'actions chirurgicales in-place (k, b, i, s, f).
+ *   - Actualisation de l'étape 4 du terminal d'amorçage avec 'rap netop'.
+ *   - Conservation intégrale de la recherche rapide (#navSearchInput), du menu
+ *     responsive et de la charte visuelle institutionnelle.
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -144,12 +146,12 @@
                 </div>
 
                 <div class="raptor-card">
-                    <div class="card-icon">0H</div>
-                    <h3>Téléscripteur rapless</h3>
+                    <div class="card-icon">NO</div>
+                    <h3>Console Tactique netop</h3>
                     <p>
-                        Pager autonome d'urgence opérant strictement en 0 heap (zéro allocation dynamique). Capable d'indexer et naviguer dans des dizaines de milliers de lignes du noyau (/proc/kallsyms) en cas d'effondrement du terminal ou du serveur X11/Wayland.
+                        Surveillance matricielle continue plein écran (flicker-free). Résolution directe des sockets noyau vers les PIDs réels, confrontation aux 19 867 signatures hostiles et routeur d'interventions in-place : tri (<code>s</code>), filtre (<code>f</code>), inspection (<code>i</code>), ban IP (<code>b</code>) et frappe cinétique (<code>k</code>).
                     </p>
-                    <div class="card-footer-tag">UTILITAIRE : rapless</div>
+                    <div class="card-footer-tag">COMMANDES : rap netop | rap no</div>
                 </div>
 
                 <div class="raptor-card">
@@ -191,8 +193,8 @@
 <span style="color: #636D83;"># 3. Lancer l'audit de sécurité universel combiné</span>
 <span style="color: #8C1D18; font-weight: bold;">./build/rap</span> hunt
 
-<span style="color: #636D83;"># 4. Naviguer dans les flux massifs avec le téléscripteur 0 heap</span>
-<span style="color: #8C1D18; font-weight: bold;">./build/rap</span> hunt | ./build/rapless</div>
+<span style="color: #636D83;"># 4. Déployer la console matricielle temps réel (netop)</span>
+<span style="color: #8C1D18; font-weight: bold;">sudo ./build/rap</span> netop</div>
             </div>
         </div>
     </section>
