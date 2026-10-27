@@ -1,11 +1,16 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/faq.html
- * RÉVISION        : Rev 1.1
+ * RÉVISION        : Rev 1.2 (2026-10-27)
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Base de connaissances technique et foire aux questions (FAQ).
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
- *   - Remplacement du lien générique GitHub par https://github.com/BINOKUB-GAME/RAPTOR.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
+ *   - Intégration de la section 4 dédiée à la console tactique temps réel 'rap netop'
+ *     (raccourcis k, b, Ctrl+B, i, s, f, traque des reverse shells, modales 0-heap).
+ *   - Intégration de la section 5 dédiée au bouclier anti-rançongiciel 'rap sentry'
+ *     (fonctionnement des canaris !00_raptor_vault.kdbx, fanotify Ring 0, cycle arm/disarm).
+ *   - Ajout de la section 7 sur les bonnes pratiques d'intervention et le déploiement
+ *     portable (.tar.gz, install.sh, paquet .deb).
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -13,7 +18,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAPTOR DEFENSE // Foire Aux Questions Technique (FAQ)</title>
-    <meta name="description" content="Base de connaissances technique de RAPTOR DEFENSE : architecture C99, gestion de la mémoire, Net-Guard et guide développeur.">
+    <meta name="description" content="Base de connaissances technique de RAPTOR DEFENSE : architecture C99, gestion de la mémoire, console tactique netop, Net-Guard et guide développeur.">
     <link rel="stylesheet" href="css/raptor-core.css">
     <link rel="icon" type="image/png" href="raptor-icon.png">
 </head>
@@ -55,7 +60,7 @@
             <div style="margin-bottom: 32px;">
                 <h1 style="font-size: 2rem; margin-bottom: 8px;">Foire Aux Questions Technique (FAQ)</h1>
                 <p style="color: var(--color-text-muted); font-size: 0.95rem;">
-                    Principes architecturaux, gestion forensique des alertes et guide pratique pour les développeurs et administrateurs.
+                    Principes architecturaux, console matricielle netop, traque forensique et guide pratique d'intervention.
                 </p>
             </div>
 
@@ -65,10 +70,13 @@
                     <h4>Sommaire des Sujets</h4>
                     <ul class="faq-toc-list" id="faqToc">
                         <li><a href="#faq-intro" class="active">1. Architecture & Survie C99</a></li>
-                        <li><a href="#faq-mem" class="">2. Forensic Mémoire & Inode 0</a></li>
-                        <li><a href="#faq-net" class="">3. Net-Guard & Flux Réseau</a></li>
-                        <li><a href="#faq-cinetique" class="">4. Neutralisation & Gardes-fous</a></li>
-                        <li><a href="#faq-contrib" class="">5. Rejoindre l'Équipe & Bogues</a></li>
+                        <li><a href="#faq-mem">2. Forensic Mémoire & Inode 0</a></li>
+                        <li><a href="#faq-net">3. Net-Guard & Flux Réseau</a></li>
+                        <li><a href="#faq-netop">4. Console Tactique Temps Réel (netop)</a></li>
+                        <li><a href="#faq-sentry">5. Sentinelle & Canaris Anti-Ransomware</a></li>
+                        <li><a href="#faq-cinetique">6. Neutralisation & Gardes-fous</a></li>
+                        <li><a href="#faq-usage">7. Déploiement & Bonnes Pratiques</a></li>
+                        <li><a href="#faq-contrib">8. Rejoindre l'Équipe & Bogues</a></li>
                     </ul>
                 </aside>
 
@@ -117,7 +125,7 @@
                                 Les navigateurs modernes (Chromium, Firefox) et les moteurs d'interfaces (Cinnamon, GNOME GJS, Python) utilisent des compilateurs Just-In-Time (JIT) ou des trampolines <code>libffi</code> qui allouent légitimement du code dynamique en mémoire.
                             </p>
                             <p>
-                                Pour éviter de saturer l'administrateur de faux positifs, RAPTOR intègre le registre <code>assets/rules/mem_whitelist.conf</code>[cite: 16]. Par défaut, les processus approuvés sont éliminés du flux. Si un analyste souhaite inspecter l'intégralité des régions mémoires JIT, l'option <code>-v</code> (verbose) les affiche avec la mention <code>[LISTE BLANCHE]</code>.
+                                Pour éviter de saturer l'administrateur de faux positifs, RAPTOR intègre le registre <code>assets/rules/mem_whitelist.conf</code>. Par défaut, les processus approuvés sont éliminés du flux. Si un analyste souhaite inspecter l'intégralité des régions mémoires JIT, l'option <code>-v</code> (verbose) les affiche avec la mention <code>[LISTE BLANCHE]</code>.
                             </p>
                         </div>
                     </div>
@@ -151,8 +159,124 @@
                     </div>
 
                     <!-- GROUPE 4 -->
+                    <div class="faq-group" id="faq-netop">
+                        <h3>4. Console Tactique Temps Réel (rap netop)</h3>
+
+                        <div class="faq-item">
+                            <h4>En quoi consiste la console matricielle rap netop ?</h4>
+                            <p>
+                                Accessible via <code>sudo rap netop</code> (ou l'alias <code>rap no</code>), cette interface plein écran sans scintillement (<em>flicker-free</em>) offre une vue matricielle continue des communications réseau actives. Elle résout les sockets noyau en temps réel vers les PIDs et noms de processus propriétaires, et confronte chaque destination aux <strong>19 867 signatures hostiles</strong> de la base OSINT compilée en mémoire morte.
+                            </p>
+                            <p>
+                                Contrairement aux outils passifs classiques, <code>netop</code> intègre un <strong>routeur de commandes découplé</strong> permettant de trier, filtrer, inspecter, bannir ou neutraliser une menace sans jamais quitter la surveillance ni recharger le programme.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Quels sont les raccourcis tactiques (Hotkeys) disponibles au clavier ?</h4>
+                            <p>
+                                La navigation est conçue pour une efficacité opérationnelle absolue, sans souris :
+                            </p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li><code>k</code> : <strong>Neutraliser (Kill)</strong> — Ouvre l'invite de frappe réflexe (<code>SIGSTOP</code> + <code>SIGKILL</code> avec trace ambrée de 7s).</li>
+                                <li><code>b</code> : <strong>Ban / Déban IP</strong> — Isole une ou plusieurs cibles (ex: <code>4,6</code>) ou lève l'embargo (ex: <code>-4</code> ou <code>-B1</code>).</li>
+                                <li><code>Ctrl+B</code> : <strong>Registre des Bans</strong> — Surcouche modale recensant l'inventaire des embargos noyau actifs.</li>
+                                <li><code>i</code> : <strong>Inspecter</strong> — Surcouche d'inspection médico-légale approfondie du socket ciblé.</li>
+                                <li><code>s</code> : <strong>Bascule de Tri</strong> — Commutation en place : <em>Dangerosité</em> &rarr; <em>PID</em> &rarr; <em>Port / Activité</em>.</li>
+                                <li><code>f</code> : <strong>Filtre dynamique</strong> — Masque sélectif : <em>Tous</em> &rarr; <em>Hors Local</em> &rarr; <em>Établis</em> &rarr; <em>Alertes seules</em>.</li>
+                                <li><code>p</code> ou <code>Espace</code> : <strong>Pause / Reprise</strong> — Gèle l'écran tout en autorisant les tris et filtres sur le snapshot.</li>
+                                <li><code>q</code> ou <code>Échap</code> : <strong>Fermer / Quitter</strong> — Ferme la modale active ou quitte proprement RAPTOR.</li>
+                            </ul>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment fonctionne le bannissement d'IP (Touche b) et pourquoi une seule entrée dans Ctrl+B ?</h4>
+                            <p>
+                                Lorsqu'une ligne est bannie, RAPTOR injecte une règle de filtrage immédiate dans le pare-feu du noyau (<code>iptables -I INPUT -s &lt;IP&gt; -j DROP</code>) avec un repli automatique par route trou noir (<code>ip route add blackhole</code>).
+                            </p>
+                            <p>
+                                <strong>La déduplication Couche 3 vs Couche 4 :</strong> Sur la grille réseau, un navigateur peut ouvrir 5 ou 10 sockets simultanés (Couche 4) vers le même serveur avec des ports locaux différents. Lorsque vous bannissez ces lignes, RAPTOR applique une seule règle globale sur l'IP distante[cite: 10]. Dans le registre <code>Ctrl+B</code>, une entrée unique est conservée avec la mention explicite du volume de sockets interceptés (ex: <em>« 4 socket(s) »</em>), évitant d'encombrer inutilement les tables du noyau.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment la commande d'inspection (Touche i) détecte-t-elle un Reverse Shell ?</h4>
+                            <p>
+                                Lorsqu'un pirate prend le contrôle d'une machine via une vulnérabilité RCE (<em>Remote Code Execution</em>), il détourne généralement un interpréteur (<code>bash</code>, <code>sh</code>, <code>python</code>) en branchant ses entrées/sorties standard sur un socket réseau distant.
+                            </p>
+                            <p>
+                                Le greffon d'inspection interroge <code>/proc/[PID]/fd/</code> et résout les cibles des descripteurs de fichiers :
+                            </p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li>Si <code>fd/0</code> (STDIN) et <code>fd/1</code> (STDOUT) pointent tous deux vers <code>socket:[INODE]</code>, RAPTOR déclenche l'alarme critique : <strong><code>[!] REVERSE SHELL DÉTECTÉ</code></strong>.</li>
+                                <li>Si les flux écrivent vers un terminal interactif (<code>/dev/pts/*</code>) ou des journaux (ex: <code>.xsession-errors</code>), RAPTOR certifie la conformité avec <code>[✓] FLUX STANDARD</code>.</li>
+                            </ul>
+                            <p>
+                                La modale projette également la ligne de commande complète (<code>cmdline</code>), l'exécutable réel sur disque (démasquant les binaires cachés dans <code>/tmp</code>) et permet de déclencher une frappe (<code>k</code>) ou un embargo (<code>b</code>) directement depuis la fiche.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment épurer l'affichage pour passer en mode « Cockpit de Crise » ?</h4>
+                            <p>
+                                En situation de saturation d'écran, utilisez la synergie des touches <code>f</code> et <code>s</code> :
+                            </p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li>Appuyez sur <code>f</code> pour passer en mode <strong><code>[HORS LOCAL]</code></strong> : tout le bruit local (<code>127.0.0.1</code> et écoutes passives <code>LISTEN</code>) est masqué. Ne restent que les flux traversant votre carte réseau vers l'extérieur.</li>
+                                <li>Appuyez à nouveau sur <code>f</code> jusqu'au mode <strong><code>[ALERTES SEULES]</code></strong> : l'écran devient un tableau de bord épuré ne conservant que les sockets hostiles, suspects, sous embargo ou neutralisés.</li>
+                                <li>Appuyez sur <code>s</code> pour forcer le tri <strong><code>[DANGEROSITÉ]</code></strong> afin que les menaces répertoriées restent en tête de grille.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- GROUPE 5 -->
+                    <div class="faq-group" id="faq-sentry">
+                        <h3>5. Sentinelle & Canaris Anti-Ransomware</h3>
+
+                        <div class="faq-item">
+                            <h4>Qu'est-ce qu'un « Canari » et pourquoi son nom commence-t-il par un point d'exclamation ?</h4>
+                            <p>
+                                Le canari de RAPTOR est un fichier appât dense de 32 Ko nommé <strong><code>!00_raptor_vault.kdbx</code></strong>. Il reproduit à l'octet près l'en-tête et les marqueurs magiques d'un coffre-fort de mots de passe KeePass KDBX4 authentique, avec un corps à haute entropie. C'est une cible d'extorsion prioritaire pour n'importe quel logiciel malveillant.
+                            </p>
+                            <p>
+                                <strong>La ruse du point d'exclamation :</strong> Les rançongiciels parcourent les répertoires par ordre alphabétique pour chiffrer les données. Grâce au caractère <code>!</code>, le canari se positionne tout en haut de la liste des fichiers : l'attaquant s'y attaque en premier, déclenchant le piège avant de pouvoir toucher à vos véritables documents.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment la sentinelle peut-elle consommer 0% CPU tout en neutralisant en 40 microsecondes ?</h4>
+                            <p>
+                                Contrairement aux solutions de surveillance traditionnelles qui analysent les disques en boucle, <code>rap sentry</code> délègue le guet au noyau Linux grâce à l'infrastructure <strong>fanotify Ring 0</strong> (<code>FAN_OPEN_PERM</code>).
+                            </p>
+                            <p>
+                                Tant qu'aucun processus ne tente d'ouvrir le fichier leurre, la sentinelle est en attente passive bloquante sur un appel système <code>poll()</code> (consommation CPU rigoureusement nulle). Dès qu'un intrus effectue un <code>open()</code> sur l'appât, le noyau suspend l'agresseur :
+                            </p>
+                            <ol style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li>Le noyau interroge RAPTOR qui répond immédiatement par un rejet d'ouverture (<code>FAN_DENY</code>).</li>
+                                <li>Si le mode armé est actif (<code>--arm</code>), RAPTOR paralyse le groupe de processus par <code>SIGSTOP</code> en moins de 40 &micro;s.</li>
+                                <li>Les descripteurs de sockets réseau sont révoqués de force.</li>
+                                <li>Le processus agresseur est anéanti par <code>SIGKILL</code>.</li>
+                                <li>L'incident médico-légal est consigné dans la boîte noire en mémoire vive (<code>/dev/shm/raptor_blackbox</code>).</li>
+                            </ol>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Quel est le cycle de vie recommandé pour gérer les leurres ?</h4>
+                            <p>
+                                L'administration des canaris s'effectue en quatre étapes élémentaires :
+                            </p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li><strong>1. Déploiement :</strong> <code>sudo rap sentry arm</code> installe les appâts dans les dossiers par défaut (<code>/home</code>, <code>/etc</code>, <code>/var/www</code>) ou dans des répertoires personnalisés.</li>
+                                <li><strong>2. Vérification :</strong> <code>sudo rap sentry status</code> confirme leur intégrité physique (taille stricte de 32 768 octets et statut <code>[ACTIF]</code>).</li>
+                                <li><strong>3. Surveillance permanente :</strong> <code>sudo rap sentry run -d --arm</code> détache la sentinelle en tâche de fond camouflée (<code>[kworker/u16:3]</code>) avec immunité OOM -1000.</li>
+                                <li><strong>4. Maintenance / Nettoyage :</strong> <code>sudo rap sentry disarm</code> supprime proprement les leurres sans déclencher de fausse alerte lors d'une sauvegarde.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- GROUPE 6 -->
                     <div class="faq-group" id="faq-cinetique">
-                        <h3>4. Neutralisation & Gardes-fous</h3>
+                        <h3>6. Neutralisation & Gardes-fous</h3>
 
                         <div class="faq-item">
                             <h4>Est-il possible d'abattre accidentellement le système avec rap kill ?</h4>
@@ -178,9 +302,52 @@
                         </div>
                     </div>
 
-                    <!-- GROUPE 5 -->
+                    <!-- GROUPE 7 -->
+                    <div class="faq-group" id="faq-usage">
+                        <h3>7. Déploiement & Bonnes Pratiques</h3>
+
+                        <div class="faq-item">
+                            <h4>Quelle est la règle d'or lors d'une alerte sur un flux suspect ?</h4>
+                            <p>
+                                <strong>Ne neutralisez jamais à l'aveugle.</strong> En défense active, la précipitation peut interrompre un service légitime ou alerter un attaquant qui détruirait ses traces :
+                            </p>
+                            <ol style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li><strong>Inspectez d'abord (Touche <code>i</code>) :</strong> Vérifiez le binaire réel sur disque et l'arborescence parent (PPID). Un script Python légitime peut communiquer sur un port inhabituel sans être malveillant.</li>
+                                <li><strong>Isolez avant de détruire (Touche <code>b</code>) :</strong> Si le doute persiste, appliquez un embargo IP. Le flux malveillant est coupé du serveur C2 sans tuer le processus, ce qui fige la communication tout en maintenant les preuves en mémoire.</li>
+                                <li><strong>Neutralisez si la menace est avérée (Touche <code>k</code>) :</strong> Si l'inspection révèle un Reverse Shell ou un binaire caché dans <code>/tmp</code>, appliquez la frappe cinétique.</li>
+                            </ol>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Toutes les connexions vers le port 443 (HTTPS) sont-elles sûres ?</h4>
+                            <p>
+                                Presque l'intégralité du trafic moderne est chiffrée via TLS (port 443). Les attaquants exploitent fréquemment ce port pour dissimuler leurs canaux de commande et contrôle (C2) au milieu du trafic web légitime.
+                            </p>
+                            <p>
+                                Fiez-vous d'abord à la couleur du verdict :
+                            </p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li><span style="color: var(--color-success, #28a745); font-weight: bold;">VERT :</span> Flux local ou destination neutre certifiée.</li>
+                                <li><span style="color: var(--color-warning, #ffc107); font-weight: bold;">JAUNE / ORANGE :</span> Port inhabituel ou adresse sous embargo récent.</li>
+                                <li><span style="color: var(--color-danger, #dc3545); font-weight: bold;">ROUGE :</span> Match formel dans la base OSINT souveraine (Botnet Feodo Tracker, IPsum, relais d'attaque répertorié).</li>
+                            </ul>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment installer RAPTOR sur un poste sans outils de compilation ?</h4>
+                            <p>
+                                Pour déployer RAPTOR sur une machine de production dépourvue de compilateur :
+                            </p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px; font-size: 0.92rem; color: var(--color-text-muted);">
+                                <li><strong>Archive autonome portable :</strong> Téléchargez <code>raptor-v2.0.0-Linux-x86_64.tar.gz</code>, décompressez-le (<code>tar -xzf ...</code>) et exécutez directement <code>./bin/rap netop</code>[cite: 9]. Pour l'installer globalement avec ses manuels PDF et capacités noyau, lancez <code>sudo ./install.sh</code>.</li>
+                                <li><strong>Paquet Debian / Ubuntu / Mint :</strong> Installez directement le fichier <code>.deb</code> généré via <code>sudo dpkg -i raptor-*.deb</code>.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- GROUPE 8 -->
                     <div class="faq-group" id="faq-contrib">
-                        <h3>5. Rejoindre l'Équipe & Signaler un Bogue</h3>
+                        <h3>8. Rejoindre l'Équipe & Signaler un Bogue</h3>
 
                         <div class="faq-item">
                             <h4>Quels sont les objectifs prioritaires pour les développeurs ?</h4>
