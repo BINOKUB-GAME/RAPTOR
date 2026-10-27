@@ -434,3 +434,83 @@ DROITS SYSTÈME REQUIS
 EXIT STATUS
      0 (RAP_EXIT_OK)      Fermeture nominale de la console interactive.
      2 (RAP_EXIT_ERROR)   Terminal non interactif (absence de TTY) ou erreur d'initialisation.
+
+<!-- MAN: mem_whitelist | 5 | MEM_WHITELIST(5) — Liste Blanche Mémoire -->
+NAME
+     mem_whitelist.conf — Registre d'exception et filtrage des faux positifs mémoire Inode 0
+
+DESCRIPTION
+     mem_whitelist.conf définit la liste des binaires et motifs d'exécution autorisés
+     à allouer des régions mémoires exécutables anonymes (r-xp) sans ancrage disque (Inode 0).
+     
+     Ce registre permet à rap rx, rap hunt et au module mem_stealth d'ignorer le bruit
+     légitime des compilateurs à la volée (JIT) utilisés par les navigateurs modernes
+     (Chromium, Firefox), les environnements d'exécution (Node.js, JVM) ainsi que les
+     trampolines de liaisons dynamiques libffi (environnements Cinnamon, GNOME, GTK).
+
+STRUCTURE ET FORMAT
+     Le fichier utilise une syntaxe tabulaire délimitée par des barres verticales (|) :
+         TYPE | MOTIF | DESCRIPTION
+
+     Champs :
+       TYPE         Méthode de filtrage (COMM, PATH, PREFIX, EXACT).
+       MOTIF        Nom de commande (/proc/[PID]/comm), chemin absolu (/proc/[PID]/exe) ou préfixe.
+       DESCRIPTION  Commentaire justificatif sur la légitimité de l'allocation mémoire.
+
+     Les lignes débutant par '#' et les lignes vides sont ignorées lors du parsing.
+
+EXEMPLES
+     COMM | chrome          | Navigateur Chromium (moteur V8 JIT)
+     COMM | firefox         | Navigateur Mozilla Firefox (moteur SpiderMonkey JIT)
+     COMM | cinnamon        | Bureau Cinnamon Desktop (trampolines libffi)
+     COMM | code            | Éditeur Visual Studio Code (moteur Electron V8)
+     PATH | /usr/bin/python3 | Interpréteur Python système
+
+FICHIERS
+     assets/rules/mem_whitelist.conf
+     /usr/local/share/raptor/mem_whitelist.conf
+
+VOIR AUSSI
+     rap(1), rap-rx(1), rap-hunt(1)
+
+<!-- MAN: fw_officiel | 5 | FW_OFFICIEL(5) — Registre Net-Guard Officiel -->
+NAME
+     fw_officiel.conf — Base de règles réseau et signatures de confiance Net-Guard
+
+DESCRIPTION
+     fw_officiel.conf constitue le socle officiel de filtrage et de réputation réseau
+     de RAPTOR Net-Guard. Il définit les plages locales protégées (RFC 1918), les
+     infrastructures de confiance autorisées (DNS, NTP, CDN) et les règles heuristiques
+     de détection anti-combosquatting.
+     
+     Ce registre est chargé en mémoire au démarrage par plugin_net_guard et est
+     fusionné sans conflit avec les surcharges locales définies dans fw_custom.conf.
+
+STRUCTURE ET FORMAT
+     Chaque directive est segmentée par le séparateur pipe (|) :
+         TYPE | CIBLE | PARAMÈTRE | DESCRIPTION
+
+     Types de directives reconnus :
+       IP     Adresse IPv4 unitaire ou sous-réseau en notation CIDR (ex: 192.168.0.0/16).
+       DOM    Nom de domaine qualifié (FQDN) ou mot-clé de marque protégée.
+       PORT   Port de communication standardisé.
+
+     Verdicts applicables :
+       ALLOW  Flux légitime approuvé (qualification APPROUVÉ, code couleur vert).
+       BLOCK  Cible hostile identifiée (qualification HOSTILE, déclenche l'alerte rouge).
+       WARN   Flux inhabituel nécessitant une analyse (qualification SUSPECT, couleur jaune).
+
+EXEMPLES
+     IP  | 192.168.0.0/16 | ALLOW | Réseau local privé RFC 1918
+     IP  | 10.0.0.0/8     | ALLOW | Réseau local privé classe A
+     IP  | 127.0.0.0/8    | ALLOW | Interface de boucle locale (Loopback)
+     DOM | google.com     | ALLOW | Infrastructure de confiance Google
+     DOM | paypal         | BLOCK | Détection de marque protégée (anti-hameçonnage)
+
+FICHIERS
+     assets/rules/fw_officiel.conf
+     assets/rules/fw_custom.conf
+     /usr/local/share/raptor/fw_officiel.conf
+
+VOIR AUSSI
+     rap(1), rap-net(1), rap-netop(1)
