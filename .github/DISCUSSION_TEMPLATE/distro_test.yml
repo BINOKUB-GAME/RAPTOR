@@ -1,0 +1,64 @@
+title: "[Test Distro] <Nom de la distribution et version>"
+labels: ["testing", "kernel"]
+description: "Rapporter un résultat de compilation ou d'exécution sur une distribution Linux spécifique"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de tester **RAPTOR DEFENSE**. Renseignez les champs ci-dessous pour aider à documenter la compatibilité de l'outil avec différents noyaux et environnements.
+
+  - type: input
+    id: os_info
+    attributes:
+      label: Distribution et Architecture
+      description: "Indiquez votre système d'exploitation et son architecture."
+      placeholder: "ex. Debian 13 (Trixie) x86_64, AlmaLinux 9 aarch64, Arch Linux"
+    validations:
+      required: true
+
+  - type: input
+    id: kernel_ver
+    attributes:
+      label: Version du noyau Linux
+      description: "Indiquez le résultat de la commande 'uname -r'."
+      placeholder: "ex. 6.8.0-45-generic"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: compiler_used
+    attributes:
+      label: Compilateur C utilisé
+      options:
+        - "GCC (par défaut)"
+        - "Clang / LLVM"
+        - "Autre"
+    validations:
+      required: true
+
+  - type: textarea
+    id: build_result
+    attributes:
+      label: Journal de compilation (cmake)
+      description: "Collez ici les alertes (warnings) ou erreurs retournées lors de la compilation."
+      placeholder: "Sortie de 'cmake --build build'..."
+      render: shell
+
+  - type: checkboxes
+    id: features_tested
+    attributes:
+      label: Outils testés avec succès
+      description: "Cochez les modules ayant tourné sans anomalie :"
+      options:
+        - label: "rap hunt (Audit universel combiné)"
+        - label: "rap rx (Traque Inode 0)"
+        - label: "rap netop / rap no (Console tactique matricielle)"
+        - label: "rap sentry (Surveillance synchrone fanotify)"
+        - label: "rapless (Téléscripteur 0-heap)"
+
+  - type: textarea
+    id: observations
+    attributes:
+      label: Observations et comportement mémoire
+      description: "Remarques sur la réactivité, l'affichage du terminal ou la consommation de ressources."
+      placeholder: "Comportement normal, aucune allocation parasite observée..."
