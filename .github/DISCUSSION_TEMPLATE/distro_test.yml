@@ -1,5 +1,4 @@
 title: "[Test Distro] <RAPTOR VER 2.0>"
-category: "Ideas"
 labels: ["testing", "kernel"]
 description: "Rapporter un résultat de compilation ou d'exécution sur une distribution Linux spécifique"
 body:
