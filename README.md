@@ -181,8 +181,10 @@ Subreddit officiel : r/RaptorSecurity
 
 | Format | Architecture | Lien de téléchargement direct |
 | :--- | :--- | :--- |
-| **Paquet Debian / Ubuntu / Mint (`.deb`)** | `x86_64` (amd64) | [Télécharger le .deb](https://github.com/BINOKUB-GAME/RAPTOR/releases/download/v2.0/raptor-v2.0.0-Linux-x86_64.deb) |
-| **Archive universelle CLI + Raylib (`.tar.gz`)** | `x86_64` | [Télécharger le .tar.gz](https://github.com/BINOKUB-GAME/RAPTOR/releases/download/v2.0/raptor-v2.0.0-linux-x86_64.tar.gz) |
+| **Paquet Debian / Ubuntu / Mint (`.deb`)** | `x86_64` (amd64) | [Télécharger le .deb]
+(https://github.com/BINOKUB-GAME/RAPTOR/releases/download/v2.0/raptor-v2.0.0-Linux-x86_64.deb) |
+| **Archive universelle CLI + Raylib (`.tar.gz`)** | `x86_64` | [Télécharger le .tar.gz]
+(https://github.com/BINOKUB-GAME/RAPTOR/releases/download/v2.0/raptor-v2.0.0-linux-x86_64.tar.gz) |
 
 #### Installation rapide via le paquet .deb :
 ```bash
