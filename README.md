@@ -176,5 +176,35 @@ Hub d'ingénierie & RFC : GitHub Discussions
 
 Subreddit officiel : r/RaptorSecurity
 
+
+### 📦 Téléchargements Directs (Prêts à l'emploi)
+
+| Format | Architecture | Lien de téléchargement direct |
+| :--- | :--- | :--- |
+| **Paquet Debian / Ubuntu / Mint (`.deb`)** | `x86_64` (amd64) | [Télécharger le .deb](https://github.com/BINOKUB-GAME/RAPTOR/releases/download/v2.0/raptor-v2.0.0-Linux-x86_64.deb) |
+| **Archive universelle CLI + Raylib (`.tar.gz`)** | `x86_64` | [Télécharger le .tar.gz](https://github.com/BINOKUB-GAME/RAPTOR/releases/download/v2.0/raptor-v2.0.0-linux-x86_64.tar.gz) |
+
+#### Installation rapide via le paquet .deb :
+```bash
+sudo dpkg -i raptor_2.0.0_amd64.deb
+sudo apt-get install -f   # Si des dépendances runtime X11 manquent
+
+Exécution directe depuis l'archive .tar.gz :
+
+tar -xzf raptor-v2.0-linux-x86_64.tar.gz
+cd raptor-v2.0
+sudo ./rap netop   # Lancer immédiatement la suite CLI 0-heap
+
+---
+
+### Vérification de l'intégrité (Pratique recommandée en cybersécurité)
+
+Avant de téléverser vos fichiers, générez leurs sommes de contrôle dans votre terminal sous Debian :
+
+```bash
+sha256sum raptor_2.0.0_amd64.deb raptor-v2.0-linux-x86_64.tar.gz
+
 📄 Licence & Philosophie
 RAPTOR est distribué sous licence open-source. Il garantit une indépendance totale : aucune télémétrie distante, fonctionnement hors-ligne garanti et déconnexion stricte vis-à-vis des infrastructures cloud tierces.
+
+
