@@ -1,6 +1,6 @@
 name: "🧪 Rapport de test Distribution / Noyau"
 description: "Rapporter un résultat de compilation cmake ou d'exécution sur votre système"
-title: "[Test Distro] <Nom de la distribution et version>"
+title: "[Test Distro] <RAPTOR VER 2.0>"
 labels: ["kernel", "testing"]
 body:
   - type: markdown
