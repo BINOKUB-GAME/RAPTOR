@@ -1,0 +1,69 @@
+name: "🚢 Rapport de test FreeBSD / UNIX"
+description: "Rapporter un résultat de compilation ou d'expérimentation sous FreeBSD / HardenedBSD"
+title: "[Test FreeBSD] <Version FreeBSD et architecture>"
+labels: ["freebsd", "portability"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Banc d'essai FreeBSD - RAPTOR Portability
+        Merci de tester les sous-systèmes de RAPTOR sur environnement FreeBSD (base Clang, sysctl, kqueue). Renseignez les spécificités de votre environnement ci-dessous.
+
+  - type: input
+    id: bsd_release
+    attributes:
+      label: Version FreeBSD et Architecture
+      description: "Sortie exacte de la commande : uname -mrs"
+      placeholder: "ex. FreeBSD 14.1-RELEASE amd64"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bsd_env
+    attributes:
+      label: Type d'environnement
+      options:
+        - "Machine physique (Bare-Metal)"
+        - "FreeBSD Jail (Conteneur natif)"
+        - "Bhyve (Hyperviseur FreeBSD)"
+        - "VM KVM / Proxmox"
+        - "VM VirtualBox / VMware"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bsd_compiler
+    attributes:
+      label: Chaîne de compilation
+      options:
+        - "Clang natif (FreeBSD base system)"
+        - "GCC (via pkg / ports)"
+        - "Autre"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: bsd_subsystems
+    attributes:
+      label: Sous-systèmes BSD éprouvés
+      description: "Cochez les composants testés avec succès :"
+      options:
+        - label: "Compilation C99 sans avertissement (-Wall -Wextra)"
+        - label: "Extraction des processus via sysctl(3) / KERN_PROC_PROC"
+        - label: "Inspection cartographie mémoire via KERN_PROC_VMMAP (Inode 0)"
+        - label: "Surveillance de descripteurs via kqueue(2) / EVFILT_VNODE"
+        - label: "Manipulation de tables Packet Filter via ioctl /dev/pf"
+
+  - type: textarea
+    id: build_output
+    attributes:
+      label: Sortie de compilation ou erreurs d'en-têtes (<sys/...>)
+      description: "Collez ici les erreurs rencontrées avec les en-têtes système BSD."
+      placeholder: "Sortie du compilateur..."
+      render: shell
+
+  - type: textarea
+    id: remarks
+    attributes:
+      label: Recommandations d'architecture UNIX
+      placeholder: "Remarques sur la compatibilité POSIX, l'absence de procfs, etc."
