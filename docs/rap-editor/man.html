@@ -1,0 +1,267 @@
+<!-- ==========================================================================
+ * NOM DU SCRIPT   : docs/rap-editor/man.html
+ * RÉVISION        : Rev 1.0 (2026-11-01)
+ * PROJET          : RAPTOR DEFENSE v2.0 // Manuel Tactique rap-edit(1)
+ * RESPONSABILITÉ  : Page de manuel UNIX interactive de RAP-EDIT. Structure canonique
+ *                   UNIX (Section 1), intégration de la barre latérale collante
+ *                   (Sticky TOC) et terminal de rendu .man-viewer-box haute fidélité.
+ *
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.0) :
+ *   - Disposition responsive en 2 colonnes (.faq-layout) avec sommaire interactif (.faq-sidebar).
+ *   - Documentation exhaustive des 8 sections canoniques de rap-edit(1).
+ *   - Matrice détaillée des commandes d'intervention (:hex, :diff, :ro/:rw, :clean, etc.).
+ *   - Bouton de copie intégrale du texte brut pour installation manuelle dans /usr/local/man/man1/.
+ * ========================================================================== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAP-EDIT(1) // Manuel UNIX Officiel</title>
+    <meta name="description" content="Page de manuel UNIX officielle pour rap-edit(1). Guide d'exploitation technique, commandes CLI et architecture 0-heap BSS.">
+    <link rel="stylesheet" href="../css/raptor-core.css">
+    <link rel="icon" type="image/png" href="../raptor-icon.png">
+</head>
+<body>
+
+    <!-- ======================================================================
+         1. EN-TÊTE INSTITUTIONNEL UNIFIÉ
+         ====================================================================== -->
+    <header class="raptor-header">
+        <div class="container">
+            <a href="../index.html" class="raptor-brand">
+                <img src="../raptor-icon.png" alt="Logo Officiel RAPTOR DEFENSE">
+                <span>RAPTOR<span class="version-badge">v2.0</span></span>
+            </a>
+
+            <nav class="raptor-nav" id="raptorNav">
+                <a href="../index.html">Accueil RAPTOR</a>
+                <a href="../intel.html">Net-Intel</a>
+                <a href="index.html">RAP-EDIT</a>
+                <a href="man.html" class="active">Manuel rap-edit(1)</a>
+                <a href="../man.html">Manuel rap(1)</a>
+                <a href="../community.html">Communauté</a>
+            </nav>
+
+            <div class="raptor-header-actions">
+                <a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener" class="btn-github">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+
+                <button class="raptor-hamburger" id="navToggle" aria-label="Afficher le menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================================================================
+         2. MAN PAGE INTERACTIVE & SOMMAIRE COLLANT (STICKY TOC)
+         ====================================================================== -->
+    <main class="raptor-section" style="padding-top: 36px;">
+        <div class="container">
+            <div style="margin-bottom: 24px;">
+                <h1 style="font-size: 2rem; margin-bottom: 8px;">Manuel de Référence UNIX : rap-edit(1)</h1>
+                <p style="color: var(--color-text-muted); font-size: 0.95rem;">
+                    Spécification technique d'exploitation, registres de commandes d'intervention et normes architecturales.
+                </p>
+            </div>
+
+            <div class="faq-layout">
+                <!-- Sommaire latéral fixe -->
+                <aside class="faq-sidebar">
+                    <h4>Sections du Manuel</h4>
+                    <ul class="faq-toc-list">
+                        <li><a href="#sec-name" class="active">NAME</a></li>
+                        <li><a href="#sec-synopsis">SYNOPSIS</a></li>
+                        <li><a href="#sec-description">DESCRIPTION & 0-HEAP</a></li>
+                        <li><a href="#sec-hud">COCKPIT HUD (LIGNES 1-2)</a></li>
+                        <li><a href="#sec-commands">COMMANDES CLI (COLON)</a></li>
+                        <li><a href="#sec-keys">TOUCHES & RACCOURCIS</a></li>
+                        <li><a href="#sec-limits">LIMITES TECHNIQUES</a></li>
+                        <li><a href="#sec-exit">CODES DE SORTIE & SIGNAUX</a></li>
+                    </ul>
+
+                    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border);">
+                        <a href="index.html" class="btn-secondary" style="width: 100%; font-size: 0.85rem; padding: 8px 12px;">&larr; Retour à la Vitrine</a>
+                    </div>
+                </aside>
+
+                <!-- Corps de la Man Page stylisée terminal -->
+                <div class="faq-content">
+                    <div class="man-viewer-box">
+                        <div class="man-viewer-header">
+                            <span class="man-viewer-title">MANUAL PAGE // RAP-EDIT(1) — RAPTOR DEFENSE COMPANION</span>
+                            <button class="man-btn-copy" id="btnCopyRawMan">Copier le texte brut</button>
+                        </div>
+                        <div class="man-content" id="manTextContent">
+<span class="man-section-heading" id="sec-name">NAME</span>
+       <b>rap-edit</b> - Éditeur de texte et inspecteur binaire de secours en environnement dégradé
+
+<span class="man-section-heading" id="sec-synopsis">SYNOPSIS</span>
+       <b>rap-edit</b> <i>fichier1</i> [<i>fichier2</i>] [<i>fichier3</i>] [<i>fichier4</i>]
+
+<span class="man-section-heading" id="sec-description">DESCRIPTION &amp; DOCTRINE 0-HEAP</span>
+       <b>rap-edit</b> est un utilitaire autonome d'administration et de sauvetage conçu pour opérer
+       en environnement de crise matérielle. L'application obéit à la <b>doctrine Zero-Heap</b> :
+       les allocations dynamiques via <b>malloc</b>(3), <b>calloc</b>(3) et <b>realloc</b>(3) sont strictement
+       proscrites du code source.
+
+       L'intégralité des tampons d'édition, tables d'indexation, pile d'annulation et structures
+       de presse-papiers réside dans la section mémoire statique <b>.bss</b> (~2.7 Mo fixes).
+       Cette conception confère à l'exécutable une immunité totale face au <b>Linux OOM Killer</b>
+       et garantit son exécution même sous famine mémoire extrême.
+
+       Lié statiquement (<b>-static</b>), le binaire ne requiert aucun chargeur dynamique ni
+       bibliothèque externe partagée (<b>libc.so</b>).
+
+<span class="man-section-heading" id="sec-hud">COCKPIT HUD (TÉLÉMÉTRIE D'AFFICHAGE)</span>
+       L'éditeur réserve en permanence les deux premières rangées du terminal pour afficher le
+       Cockpit de télémétrie système :
+
+       <b>Rangée 1 : Onglets &amp; Contexte d'exécution</b>
+              Affiche la liste des tampons ouverts (numérotés de 1 à 4), le marqueur de modification
+              active (<b>*</b>), les privilèges du processus (<b>AUTH: ROOT (#)</b> ou <b>USER ($)</b>) ainsi que
+              le répertoire de travail courant (<b>PWD</b>).
+
+       <b>Rangée 2 : Radar d'intégrité &amp; Barrière d'écriture</b>
+              <b>[RW] / [RO]</b>    Indicateur dynamique vert (lecture/écriture) ou rouge vif (lecture seule).
+              <b>[LF/UNIX]</b>      Fichier au format standard Unix (fins de ligne \n pures).
+              <b>[CRLF/DOS]</b>     Alerte rouge signalant la présence de retours chariot Windows (\r).
+              <b>[!NUL]</b>         Radar magenta avertissant de la présence d'octets nuls corrompus (0x00).
+              <b>[SYNCHRONISÉ]</b>  Confirme que les modifications ont été scellées sur disque par <b>fsync</b>(2).
+
+<span class="man-section-heading" id="sec-commands">COMMANDES CLI (COLON COMMANDS)</span>
+       Les commandes s'exécutent en tapant deux-points (<b>:</b>) depuis le mode navigation :
+
+       <span class="man-flag">1. Navigation inter-onglets (mod_buffer)</span>
+              <b>:#1, :#2, :#3, :#4</b>   Bascule instantanée vers l'onglet désigné.
+              <b>:p / :prev</b>           Passe à l'onglet précédent.
+              <b>:n / :next</b>           Passe à l'onglet suivant.
+              <b>:b</b>                   Affiche l'inventaire des tampons actifs et leur statut mémoire.
+              <b>:bd / :close</b>         Ferme le tampon actif (refusé si non synchronisé).
+              <b>:bd! / :close!</b>       Force la fermeture du tampon sans enregistrement.
+
+       <span class="man-flag">2. Protection d'écriture (mod_protect)</span>
+              <b>:ro</b>                  Verrouille le tampon en LECTURE SEULE ([RO]). Bloque la frappe,
+                                   les suppressions et les collages accidentels pour audit sûr.
+              <b>:rw</b>                  Déverrouille le tampon en LECTURE-ÉCRITURE ([RW]) après contrôle
+                                   des permissions réelles du fichier sur disque via <b>access</b>(2).
+
+       <span class="man-flag">3. Inspection binaire &amp; matrices (mod_hex)</span>
+              <b>:hex</b>                 Bascule en vue hexadécimale brute à la position du curseur.
+                                   Format adaptatif 16 ou 32 octets/ligne selon le terminal.
+              <b>:hex 0x&lt;offset&gt;</b>      Téléportation directe à l'adresse hexadécimale spécifiée.
+              <b>:hex &lt;decimal&gt;</b>       Téléportation directe à l'offset exprimé en octets décimaux.
+              <i>Touche Tab</i>           Dans l'inspecteur, bascule instantanément entre 16 et 32 octets.
+              <i>Touche q / Échap</i>     Referme l'inspecteur et restitue le mode texte.
+
+       <span class="man-flag">4. Comparaison différentielle in-situ (mod_diff)</span>
+              <b>:diff / :diff orig</b>   Compare la mémoire active avec le clone disque d'origine (.orig.bak).
+              <b>:diff #&lt;1..4&gt;</b>        Compare la mémoire active avec un autre onglet en mémoire vive.
+              <b>:diff &lt;fichier&gt;</b>      Compare la mémoire active avec un fichier externe spécifié.
+              <i>Visionneur</i>           Lignes vertes (+) ajouts, rouges (-) suppressions. Quitter avec <b>q</b>.
+
+       <span class="man-flag">5. Sauvegarde synchrone &amp; panique (mod_panic &amp; mod_io)</span>
+              <b>:w!</b>                  Persistance synchrone sur disque avec barrière <b>fsync</b>(2) bloquante.
+              <b>:bak</b>                 Sauvegarde synchrone immédiate vers &lt;fichier&gt;.bak.
+              <b>:bak orig</b>            Clonage direct du fichier disque intact vers &lt;fichier&gt;.orig.bak.
+              <b>:panic</b>               Évacuation d'urgence du tampon brut vers /tmp/ si disque saturé.
+              <b>:q!</b>                  Ferme immédiatement l'éditeur sans confirmation.
+
+       <span class="man-flag">6. Assainissement anti-corruption (mod_sanitize)</span>
+              <b>:clean</b>               Purge globale combinée des retours chariot (^M) et octets nuls (^@).
+              <b>:dos2unix / :d2u</b>     Convertit les fins de ligne CRLF en LF Unix standard.
+              <b>:strip-null / :null</b>  Élimine les octets 0x00 issus de coupures de courant brutales.
+
+       <span class="man-flag">7. Suppression physique &amp; relative (mod_delete)</span>
+              <b>:d / :dd</b>             Supprime la ligne courante située sous le curseur.
+              <b>:&lt;N&gt;dd</b>               Supprime N lignes consécutives depuis la position active du curseur.
+              <b>:&lt;num&gt;d</b>              Supprime la ligne absolue &lt;num&gt; (Exemple : :42d).
+              <b>:&lt;deb&gt;:&lt;fin&gt;d</b>        Supprime la plage de lignes absolue (Exemple : :10:30d).
+
+       <span class="man-flag">8. Presse-papiers unifié &amp; macros (mod_clipboard)</span>
+              <b>:&lt;deb&gt;:&lt;fin&gt;c:&lt;dest&gt;w</b> Copie les lignes &lt;deb&gt; à &lt;fin&gt; et les colle à la ligne &lt;dest&gt;.
+              <b>:&lt;deb&gt;:&lt;fin&gt;x:&lt;dest&gt;w</b> Déplace (coupe et colle) les lignes vers la ligne &lt;dest&gt;.
+              <b>:pp</b>                  Colle le contenu du presse-papiers à la position exacte du curseur.
+
+       <span class="man-flag">9. Substitution &amp; recherche (mod_replace &amp; mod_search)</span>
+              <b>:s/ancien/nouveau/</b>   Remplace la première occurrence sur la ligne courante.
+              <b>:%s/anc/nouv/g</b>       Remplace toutes les occurrences dans l'ensemble du tampon.
+              <b>:rch &lt;motif&gt;</b>         Recherche circulaire instantanée du motif textuel.
+              <b>:u / Ctrl+Z</b>          Annule immédiatement la dernière modification (Snapshot Undo).
+
+<span class="man-section-heading" id="sec-keys">TOUCHES MATÉRIELLES &amp; RACCOURCIS</span>
+       <b>Suppr / Delete</b> (\033[3~)   Efface le caractère ou le saut de ligne directement sous le curseur.
+       <b>Backspace</b> (127 / \b)       Efface le caractère précédent (fusionne les lignes en colonne 0).
+       <b>Shift + Flèches</b>            Déclenche la sélection visuelle d'un bloc de texte.
+       <b>Ctrl + C / Ctrl + X</b>        Copie / Coupe la sélection active vers le presse-papiers unifié.
+       <b>Ctrl + V</b>                   Colle le contenu du presse-papiers à l'emplacement du curseur.
+       <b>Ctrl + W</b>                   Cycle immédiatement vers le prochain onglet ouvert.
+       <b>Ctrl + A / Ctrl + E</b>        Déplace le curseur au début absolu (col 0) ou en fin de ligne (EOL).
+       <b>Page-Up / Page-Down</b>        Fait défiler l'affichage d'une hauteur complète de fenêtre.
+
+<span class="man-section-heading" id="sec-limits">LIMITES &amp; SPÉCIFICATIONS TECHNIQUES</span>
+       Les plafonds ci-dessous sont scellés à la compilation pour garantir le modèle 0-heap :
+              * <b>Nombre maximal de tampons</b>     : 4 fichiers ouverts simultanément.
+              * <b>Taille maximale par tampon</b>     : 256 Ko (262 144 octets par fichier).
+              * <b>Indexation maximale de lignes</b>  : 8 192 lignes par document.
+              * <b>Taille du presse-papiers</b>       : 256 Ko (partagé entre tous les onglets).
+              * <b>Profondeur d'annulation</b>        : 1 instantané miroir complet par tampon.
+
+<span class="man-section-heading" id="sec-exit">CODES DE SORTIE &amp; SIGNAUX POSIX</span>
+       <b>0</b>      Arrêt normal et propre via la commande <b>:q!</b>.
+       <b>1</b>      Échec d'initialisation, arguments incorrects ou aucun fichier valide chargé.
+       <b>SIGWINCH</b> L'éditeur interroge <b>ioctl</b>(TIOCGWINSZ) pour recalculer les dimensions à chaud.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================================================================
+         3. PIED DE PAGE INSTITUTIONNEL
+         ====================================================================== -->
+    <footer class="raptor-footer">
+        <div class="container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+                <div>&copy; 2026 RAPTOR DEFENSE Project. Documentation officielle du projet.</div>
+                <div><a href="index.html" style="color: #ABB2BF;">Retour à la présentation RAP-EDIT</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            /* 1. Menu hamburger mobile */
+            var toggle = document.getElementById('navToggle');
+            var nav = document.getElementById('raptorNav');
+            if (toggle && nav) {
+                toggle.addEventListener('click', function() {
+                    var isOpen = nav.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', isOpen);
+                });
+            }
+
+            /* 2. Copie du texte brut de la man page */
+            var btnCopy = document.getElementById('btnCopyRawMan');
+            var manBox = document.getElementById('manTextContent');
+            if (btnCopy && manBox) {
+                btnCopy.addEventListener('click', function() {
+                    var rawText = manBox.innerText || manBox.textContent;
+                    navigator.clipboard.writeText(rawText).then(function() {
+                        var oldText = btnCopy.textContent;
+                        btnCopy.textContent = "[✓] Copié !";
+                        setTimeout(function() { btnCopy.textContent = oldText; }, 2000);
+                    });
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

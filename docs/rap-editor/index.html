@@ -1,0 +1,361 @@
+<!-- ==========================================================================
+ * NOM DU SCRIPT   : docs/rap-editor/index.html
+ * RÉVISION        : Rev 1.0 (2026-11-01)
+ * PROJET          : RAPTOR DEFENSE v2.0 // Vitrine & Manifeste RAP-EDIT
+ * RESPONSABILITÉ  : Page d'accueil officielle du compagnon de sauvetage RAP-EDIT.
+ *                   Présentation de la doctrine 0-heap, simulation du Cockpit HUD,
+ *                   grille des 6 modules de crise et guide de compilation statique.
+ *
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.0) :
+ *   - Intégration du simulateur visuel TTY (.man-viewer-box) reproduisant fidèlement
+ *     le Cockpit HUD à 2 lignes (onglets, droits [RO]/[RW], radar anti-corruption).
+ *   - Grille des 4 piliers d'ingénierie (0-Heap BSS, Binaire ELF statique, fsync, O(1)).
+ *   - Matrice des 6 outils d'intervention d'urgence (:diff, :hex, :ro/:rw, :clean, etc.).
+ *   - Menu responsive unifié pointant vers le socle RAPTOR et le manuel dédié.
+ * ========================================================================== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAP-EDIT // Éditeur & Inspecteur de Secours (RAPTOR DEFENSE)</title>
+    <meta name="description" content="Éditeur de texte et d'inspection binaire de secours pour Linux. Binaire statique ELF 64-bit autonome, architecture 0-heap BSS et barrière fsync.">
+    <link rel="stylesheet" href="../css/raptor-core.css">
+    <link rel="icon" type="image/png" href="../raptor-icon.png">
+</head>
+<body>
+
+    <!-- ======================================================================
+         1. EN-TÊTE INSTITUTIONNEL UNIFIÉ
+         ====================================================================== -->
+    <header class="raptor-header">
+        <div class="container">
+            <a href="../index.html" class="raptor-brand">
+                <img src="../raptor-icon.png" alt="Logo Officiel RAPTOR DEFENSE">
+                <span>RAPTOR<span class="version-badge">v2.0</span></span>
+            </a>
+
+            <nav class="raptor-nav" id="raptorNav">
+                <a href="../index.html">Accueil RAPTOR</a>
+                <a href="../intel.html">Net-Intel</a>
+                <a href="index.html" class="active">RAP-EDIT</a>
+                <a href="man.html">Manuel rap-edit(1)</a>
+                <a href="../man.html">Manuel rap(1)</a>
+                <a href="../community.html">Communauté</a>
+            </nav>
+
+            <div class="raptor-header-actions">
+                <a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener" class="btn-github">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+
+                <button class="raptor-hamburger" id="navToggle" aria-label="Afficher le menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================================================================
+         2. BANNIÈRE HERO & DOCTRINE OPÉRATIONNELLE
+         ====================================================================== -->
+    <section class="raptor-hero">
+        <div class="container">
+            <div class="raptor-hero-badge">
+                MODULE SYSTÈME DE SECOURS // COMPAGNON DE COMBAT RAPTOR
+            </div>
+            <h1>RAP-EDIT</h1>
+            <p class="raptor-hero-subtitle">
+                Éditeur de texte autonome et inspecteur binaire chirurgical conçu pour les crises système extrêmes.
+                Binaire statique ELF 64-bit, <strong>architecture 0-heap</strong> (zéro <code>malloc</code>, immunité OOM Killer)
+                et persistance matérielle par barrière <code>fsync()</code> synchrone.
+            </p>
+
+            <div class="raptor-hero-actions">
+                <a href="man.html" class="btn-primary">Consulter la Man Page rap-edit(1)</a>
+                <a href="#cockpit" class="btn-secondary">Explorer le Cockpit HUD</a>
+                <a href="#compilation" class="btn-secondary">Guide de Compilation</a>
+            </div>
+
+            <div class="raptor-join-banner">
+                <div class="raptor-join-content">
+                    <h3>Survie garantie en environnement dégradé</h3>
+                    <p>
+                        Quand <code>libc.so</code> est corrompue, que la racine est en lecture seule ou que la mémoire est saturée,
+                        RAP-EDIT démarre et persiste vos fichiers critiques sans aucune dépendance dynamique.
+                    </p>
+                </div>
+                <a href="man.html" class="btn-primary" style="white-space: nowrap;">Documentation API</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         3. SIMULATEUR TTY DU COCKPIT HUD
+         ====================================================================== -->
+    <section class="raptor-section" id="cockpit" style="padding-top: 20px;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Cockpit HUD Tactique (Affichage VT100/ANSI)</h2>
+                <p>Télémétrie continue à deux lignes : statut d'onglets, radar anti-corruption et barrière d'écriture en temps réel.</p>
+            </div>
+
+            <div class="man-viewer-box" style="max-width: 980px; margin: 0 auto;">
+                <div class="man-viewer-header">
+                    <span class="man-viewer-title">TTY — Écran d'intervention d'urgence (Simulation en direct)</span>
+                    <button class="man-btn-copy" onclick="navigator.clipboard.writeText('./bin/rap-edit /etc/fstab /etc/resolv.conf')">Copier la commande d'amorçage</button>
+                </div>
+                <div class="man-content" style="padding: 16px 20px; font-size: 0.88rem; line-height: 1.55;">
+<span style="background-color: #ABB2BF; color: #16181D; font-weight: bold; display: block; padding: 2px 8px; width: 100%;">RAP-EDIT | [1: /etc/fstab*] [2: /etc/resolv.conf] | AUTH: ROOT (#) | PWD: /etc</span>
+<span style="background-color: #21252B; color: #ECEFF4; display: block; padding: 2px 8px; width: 100%; border-bottom: 1px solid #2B313A;">CIBLE: /etc/fstab | L: 14/32 | 1024 o | <span style="color: #2EA043; font-weight: bold;">[RW]</span> | <span style="color: #58A6FF;">[LF/UNIX]</span> | <span style="color: #D29922;">[!NUL]</span> | <span style="color: #E06C75;">[MODIFIÉ]</span></span>
+  1 | <span style="color: #5A6578;"># /etc/fstab: static file system information.</span>
+  2 | <span style="color: #5A6578;"># &lt;file system&gt;             &lt;mount point&gt;   &lt;type&gt;      &lt;options&gt;       &lt;dump&gt;  &lt;pass&gt;</span>
+  3 | UUID=4f92-9a11-b841       /               ext4        errors=remount-ro 0       1
+  4 | UUID=e3b1-2184-cc09       /boot/efi       vfat        umask=0077        0       2
+  5 | <span style="color: #E06C75; font-weight: bold;">^M</span><span style="color: #5A6578;"># Erreur d'édition Windows interceptée par mod_sanitize ci-dessous :</span>
+  6 | /dev/mapper/crypt_swap    none            swap        sw<span style="color: #E06C75; font-weight: bold;">^M</span>              0       0
+  7 | <span style="color: #C678DD; font-weight: bold;">^@^@</span><span style="color: #5A6578;"># Corruption par octets nuls 0x00 signalée par le voyant radar [!NUL]</span>
+  8 |
+<span style="background-color: #8C1D18; color: #FFFFFF; font-weight: bold; display: block; padding: 2px 8px; margin-top: 14px;">:clean                                                                               [ENTRÉE]</span>
+<span style="color: #2EA043; font-weight: bold;">[✓] Assainissement terminé : 2 retour(s) chariot (^M) et 2 octet(s) nul(s) (^@) purgés.</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         4. LES 4 PILIERS D'INGÉNIERIE SOUVERAINE
+         ====================================================================== -->
+    <section class="raptor-section" style="background-color: var(--color-bg-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
+        <div class="container">
+            <div class="section-header">
+                <h2>Piliers d'Architecture Matérielle</h2>
+                <p>Déterminisme absolu de la mémoire vive et intégrité physique du stockage de masse.</p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="raptor-card">
+                    <div class="card-icon">0-H</div>
+                    <h3>Doctrine Zero-Heap (.bss)</h3>
+                    <p>
+                        Bannissement strict de <code>malloc()</code>, <code>calloc()</code> et <code>realloc()</code>.
+                        L'ensemble des structures de travail (4 tampons de 256 Ko, 8 192 lignes, presse-papiers, historique d'annulation)
+                        est pré-alloué statiquement en section <code>.bss</code> (~2.7 Mo fixes). Immunité totale face à l'OOM Killer Linux.
+                    </p>
+                    <div class="card-footer-tag">MÉMOIRE STATIQUE : ~2.7 MO CONSTANTS</div>
+                </div>
+
+                <div class="raptor-card">
+                    <div class="card-icon">ELF</div>
+                    <h3>Binaire Statique Indépendant</h3>
+                    <p>
+                        Compilation autonome <code>-static</code> ne dépendant d'aucune bibliothèque partagée dynamique
+                        (<code>ldd bin/rap-edit</code> renvoie <em>not a dynamic executable</em>). Démarrage garanti même si la chaîne
+                        <code>libc.so</code> est brisée ou inaccessible.
+                    </p>
+                    <div class="card-footer-tag">FORMAT : ELF 64-BIT STATIQUE STRIPPED</div>
+                </div>
+
+                <div class="raptor-card">
+                    <div class="card-icon">SYNC</div>
+                    <h3>Barrière Synchrone fsync</h3>
+                    <p>
+                        Toute sauvegarde (<code>:w!</code>, <code>:bak</code>, <code>:panic</code>) déclenche un appel système <code>fsync()</code>
+                        bloquant. Les données traversent impérativement le <em>Page Cache</em> du noyau pour être scellées physiquement
+                        dans les cellules du disque avant de rendre la main.
+                    </p>
+                    <div class="card-footer-tag">SÉCURITÉ : VRAIE PERSISTANCE MATÉRIELLE</div>
+                </div>
+
+                <div class="raptor-card">
+                    <div class="card-icon">MOD</div>
+                    <h3>Modularité par Greffons BSS</h3>
+                    <p>
+                        Architecture extensible conforme aux normes strictes de défense : aucun code métier dans le moteur d'affichage.
+                        Chaque capacité (diff, hex, assainissement, panique, protection) est isolée dans un greffon autonome
+                        enregistré dans la table statique centrale.
+                    </p>
+                    <div class="card-footer-tag">INTERFACE : rap_plugin_t (0 ALLOCATION)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         5. LA BOÎTE À OUTILS DE CRISE (COMMANDES TACTIQUES)
+         ====================================================================== -->
+    <section class="raptor-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Arsenal d'Intervention d'Urgence</h2>
+                <p>Commandes directes en ligne (Colon Commands) pour auditer, comparer et assainir.</p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="raptor-card">
+                    <div class="card-icon">DIFF</div>
+                    <h3>Comparateur In-Situ</h3>
+                    <p>
+                        Compare la mémoire vive active avec le clone physique original (<code>:diff orig</code>), avec un autre onglet
+                        (<code>:diff #2</code>) ou un fichier externe. Fenêtrage glissant avec badges haute lisibilité TTY.
+                    </p>
+                    <div class="card-footer-tag">COMMANDES : :diff | :diff orig | :diff #n</div>
+                </div>
+
+                <div class="raptor-card">
+                    <div class="card-icon">HEX</div>
+                    <h3>Inspecteur Hexadécimal Brut</h3>
+                    <p>
+                        Projette instantanément le tampon brut sans calcul de lignes. Matrice adaptative 16/32 octets par rangée selon la géométrie du terminal, bascule <kbd>Tab</kbd> à la volée et saut d'offset direct en base 16 ou décimale.
+                    </p>
+                    <div class="card-footer-tag">COMMANDES : :hex | :hex 0x&lt;offset&gt;</div>
+                </div>
+
+                <div class="raptor-card">
+                    <div class="card-icon">PROT</div>
+                    <h3>Verrouillage d'Audit</h3>
+                    <p>
+                        Bascule le tampon en lecture seule protégée (<code>:ro</code>) bloquant toute frappe, effacement ou collage accidentel.
+                        Déverrouillage contrôlé (<code>:rw</code>) avec vérification préalable des permissions d'écriture POSIX <code>W_OK</code>.
+                    </p>
+                    <div class="card-footer-tag">COMMANDES : :ro | :rw</div>
+                </div>
+
+                <div class="raptor-card">
+                    <div class="card-icon">SAN</div>
+                    <h3>Assainissement Anti-Corruption</h3>
+                    <p>
+                        Purge en un passage les retours chariot Windows (<code>\r</code> / <code>^M</code>) qui bloquent les scripts Linux,
+                        et élimine les octets nuls accidentels (<code>0x00</code> / <code>^@</code>) issus de coupures de courant non synchronisées.
+                    </p>
+                    <div class="card-footer-tag">COMMANDES : :clean | :dos2unix | :strip-null</div>
+                </div>
+
+                <div class="raptor-card">
+                    <div class="card-icon">DEL</div>
+                    <h3>Suppression Relative & Absolue</h3>
+                    <p>
+                        Prise en charge matérielle de la touche physique <kbd>Suppr</kbd> (VT220 <code>\033[3~</code>), effacement courant
+                        (<code>:d</code>, <code>:dd</code>), paquet relatif par lot (<code>:&lt;N&gt;dd</code>) et adressage absolu (<code>:10:30d</code>).
+                    </p>
+                    <div class="card-footer-tag">COMMANDES : :d | :&lt;N&gt;dd | :&lt;num&gt;d | Suppr</div>
+                </div>
+
+                <div class="raptor-card">
+                    <div class="card-icon">BAK</div>
+                    <h3>Secours & Évacuation de Panique</h3>
+                    <p>
+                        Clonage physique de l'état d'origine du disque (<code>:bak orig</code>), sauvegarde synchrone (<code>:bak</code>)
+                        et protocole d'évacuation d'urgence (<code>:panic</code>) vers <code>/tmp</code> en cas de blocage d'E/S sur la partition courante.
+                    </p>
+                    <div class="card-footer-tag">COMMANDES : :bak | :bak orig | :panic</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         6. COMPILATION & ESSAIS TACTIQUES
+         ====================================================================== -->
+    <section class="raptor-section" id="compilation" style="background-color: var(--color-bg-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
+        <div class="container">
+            <div class="section-header">
+                <h2>Génération du Binaire Statique</h2>
+                <p>Chaîne de compilation universelle en C99 avec liaisons matérielles strictes.</p>
+            </div>
+
+            <div class="man-viewer-box" style="max-width: 860px; margin: 0 auto;">
+                <div class="man-viewer-header">
+                    <span class="man-viewer-title">bash — Terminal de compilation de RAP-EDIT</span>
+                    <button class="man-btn-copy" onclick="navigator.clipboard.writeText('make clean\nmake\n./bin/rap-edit /etc/fstab')">Copier les commandes</button>
+                </div>
+                <div class="man-content" style="padding: 20px 24px;">
+<span style="color: #636D83;"># 1. Nettoyer et compiler avec liaisons statiques pures (-static)</span>
+<span style="color: #E5C07B;">make clean</span>
+<span style="color: #E5C07B;">make</span>
+
+<span style="color: #636D83;"># 2. Vérifier l'indépendance binaire absolue (zéro dépendance dynamique)</span>
+<span style="color: #E5C07B;">file</span> bin/rap-edit
+<span style="color: #58A6FF;">&gt; bin/rap-edit: ELF 64-bit LSB executable, x86-64, statically linked, stripped</span>
+
+<span style="color: #E5C07B;">ldd</span> bin/rap-edit
+<span style="color: #2EA043;">&gt; not a dynamic executable</span>
+
+<span style="color: #636D83;"># 3. Lancer l'éditeur sur un ou plusieurs fichiers simultanés (jusqu'à 4 onglets)</span>
+<span style="color: #8C1D18; font-weight: bold;">./bin/rap-edit</span> /etc/fstab /etc/network/interfaces</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         7. PIED DE PAGE INSTITUTIONNEL
+         ====================================================================== -->
+    <footer class="raptor-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                        <img src="../raptor-icon.png" alt="RAPTOR Logo" style="height: 32px; width: 32px; border-radius: 50%;">
+                        <span style="color: #FFFFFF; font-weight: 700; font-size: 1.1rem;">RAPTOR DEFENSE</span>
+                    </div>
+                    <p style="font-size: 0.88rem; line-height: 1.6; color: #8C96A5;">
+                        RAP-EDIT fait partie de la suite d'outils souverains RAPTOR DEFENSE.
+                        Conçu pour la réparation et l'audit de systèmes critiques sous contrainte mémoire absolue.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Documentation RAP-EDIT</h5>
+                    <ul>
+                        <li><a href="man.html">Manuel rap-edit(1)</a></li>
+                        <li><a href="man.html#hud">Cockpit HUD Tactique</a></li>
+                        <li><a href="man.html#hex">Inspecteur Hexadécimal</a></li>
+                        <li><a href="man.html#diff">Comparaison In-Situ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Écosystème RAPTOR</h5>
+                    <ul>
+                        <li><a href="../index.html">Accueil RAPTOR</a></li>
+                        <li><a href="../intel.html">Net-Intel</a></li>
+                        <li><a href="../man.html">Manuel rap(1)</a></li>
+                        <li><a href="../community.html">Rejoindre l'équipe</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h5>Gouvernance & Dépôt</h5>
+                    <ul>
+                        <li><a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener">Dépôt GitHub</a></li>
+                        <li><a href="../community.html#charte">Charte d'Ingénierie</a></li>
+                        <li><a href="../community.html#licence">Licence C99 Libre</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>&copy; 2026 RAPTOR DEFENSE Project. Ingénierie des systèmes résilients.</div>
+                <div><a href="../index.html" style="color: #ABB2BF;">Retour au portail RAPTOR</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            var toggle = document.getElementById('navToggle');
+            var nav = document.getElementById('raptorNav');
+            if (toggle && nav) {
+                toggle.addEventListener('click', function() {
+                    var isOpen = nav.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', isOpen);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
