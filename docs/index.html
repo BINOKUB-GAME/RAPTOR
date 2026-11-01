@@ -1,18 +1,16 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/index.html
- * RÉVISION        : Rev 1.4 (2026-10-27)
+ * RÉVISION        : Rev 1.5 (2026-11-01)
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Page d'accueil officielle, présentation de l'architecture
  *                   souveraine, appel aux contributeurs / développeurs C/Linux,
- *                   vitrine des sondes de combat et guide d'amorçage.
+ *                   vitrine des sondes de combat et maillage vers RAP-EDIT.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.4) :
- *   - Intégration de la console tactique temps réel 'rap netop' (badge NO)
- *     dans les 6 piliers d'outils de combat en remplacement de rapless.
- *   - Mise en avant du routeur d'actions chirurgicales in-place (k, b, i, s, f).
- *   - Actualisation de l'étape 4 du terminal d'amorçage avec 'rap netop'.
- *   - Conservation intégrale de la recherche rapide (#navSearchInput), du menu
- *     responsive et de la charte visuelle institutionnelle.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.5) :
+ *   - Intégration du lien direct vers 'rap-editor/index.html' dans la navigation.
+ *   - Ajout d'une bannière de présentation dédiée à RAP-EDIT dans la section Hero.
+ *   - Ajout des liens vers la vitrine et le manuel rap-edit(1) dans le pied de page.
+ *   - Maintien des 6 piliers d'outils de combat et du terminal de compilation.
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -38,6 +36,7 @@
 
             <nav class="raptor-nav" id="raptorNav">
                 <a href="index.html" class="active">Accueil</a>
+                <a href="rap-editor/index.html">RAP-EDIT</a>
                 <a href="intel.html">Net-Intel</a>
                 <a href="man.html">Manuel (Man)</a>
                 <a href="faq.html">FAQ Technique</a>
@@ -84,8 +83,10 @@
             <div class="raptor-hero-actions">
                 <a href="#compilation" class="btn-primary">Compiler le Projet (CMake)</a>
                 <a href="man.html" class="btn-secondary">Consulter le Manuel rap(1)</a>
+                <a href="rap-editor/index.html" class="btn-secondary">Découvrir RAP-EDIT</a>
             </div>
 
+            <!-- Encart 1 : Rejoindre le projet -->
             <div class="raptor-join-banner">
                 <div class="raptor-join-content">
                     <h3>Rejoignez l'équipe de développement RAPTOR</h3>
@@ -94,6 +95,17 @@
                     </p>
                 </div>
                 <a href="community.html" class="btn-primary" style="white-space: nowrap;">Rejoindre le Projet</a>
+            </div>
+
+            <!-- Encart 2 : NOUVEAU — Compagnon de survie RAP-EDIT -->
+            <div class="raptor-join-banner" style="margin-top: 16px; border-left-color: #58A6FF;">
+                <div class="raptor-join-content">
+                    <h3>Nouveau module : RAP-EDIT (Éditeur de Secours 0-Heap)</h3>
+                    <p>
+                        Éditeur autonome statique ELF 64-bit conçu pour les pannes système : inspection hexadécimale brute, comparaison in-situ, radar anti-corruption et persistance synchrone <code>fsync()</code>.
+                    </p>
+                </div>
+                <a href="rap-editor/index.html" class="btn-secondary" style="white-space: nowrap;">Ouvrir RAP-EDIT &rarr;</a>
             </div>
         </div>
     </section>
@@ -218,9 +230,10 @@
                 <div class="footer-col">
                     <h5>Documentation</h5>
                     <ul>
+                        <li><a href="rap-editor/index.html"><strong>Éditeur RAP-EDIT</strong></a></li>
+                        <li><a href="rap-editor/man.html">Manuel rap-edit(1)</a></li>
                         <li><a href="intel.html">Renseignement Net-Intel</a></li>
                         <li><a href="man.html">Manuel rap(1)</a></li>
-                        <li><a href="man.html#rapless">Téléscripteur rapless(1)</a></li>
                         <li><a href="faq.html">FAQ Faux Positifs (JIT/FFI)</a></li>
                     </ul>
                 </div>
