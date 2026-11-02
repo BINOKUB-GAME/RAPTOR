@@ -1,16 +1,18 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/rap-editor/index.html
- * RÉVISION        : Rev 1.3 (2026-11-02)
+ * RÉVISION        : Rev 1.4 (2026-11-02)
  * PROJET          : RAPTOR DEFENSE v2.0 // Vitrine & Manifeste RAP-EDIT
  * RESPONSABILITÉ  : Page d'accueil officielle du compagnon de sauvetage RAP-EDIT.
  *                   Présentation de la doctrine 0-heap, simulation du Cockpit HUD,
- *                   grille des 6 modules de crise et téléchargement unifié.
+ *                   grille des 6 modules de crise, téléchargement et accès au PDF.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.3) :
- *   - Élagage du bouton de binaire brut orphelin dans l'Option A pour supprimer
- *     toute ambiguïté : distribution ciblée sur l'archive complète .tar.gz
- *     (embarquant le binaire statique autonome et sa page de manuel rap-edit.1).
- *   - Conservation du One-Liner curl / install.sh et de la compilation Git.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.4) :
+ *   - Intégration du lien direct vers le document officiel 'rap-edit-specifications.pdf'
+ *     (Cahier des charges & Spécifications d'ingénierie 0-Heap) :
+ *     * Bouton d'accès direct dans la barre d'actions Hero (.raptor-hero-actions).
+ *     * Encart dédié de consultation technique sous les piliers d'architecture (.raptor-join-banner).
+ *     * Entrée directe dans la colonne documentation du pied de page (.footer-col).
+ *   - Maintien du bouton de téléchargement unique du pack .tar.gz et du One-Liner curl.
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -78,6 +80,7 @@
             <div class="raptor-hero-actions">
                 <a href="#deploiement" class="btn-primary">Obtenir RAP-EDIT (Téléchargement &amp; Curl)</a>
                 <a href="man.html" class="btn-secondary">Consulter la Man Page rap-edit(1)</a>
+                <a href="rap-edit-specifications.pdf" target="_blank" rel="noopener" class="btn-secondary">Spécifications &amp; Architecture (PDF)</a>
                 <a href="#cockpit" class="btn-secondary">Explorer le Cockpit HUD</a>
             </div>
 
@@ -127,7 +130,7 @@
     </section>
 
     <!-- ======================================================================
-         4. LES 4 PILIERS D'INGÉNIERIE SOUVERAINE
+         4. LES 4 PILIERS D'INGÉNIERIE SOUVERAINE & PAPIER TECHNIQUE
          ====================================================================== -->
     <section class="raptor-section" style="background-color: var(--color-bg-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
         <div class="container">
@@ -180,6 +183,26 @@
                     </p>
                     <div class="card-footer-tag">INTERFACE : rap_plugin_t (0 ALLOCATION)</div>
                 </div>
+            </div>
+
+            <!-- Encart d'audit formel : Téléchargement du papier technique PDF -->
+            <div class="raptor-join-banner" style="margin-top: 36px; border-left-color: var(--color-primary-red);">
+                <div class="raptor-join-content">
+                    <h3>Cahier des Charges &amp; Spécifications d'Ingénierie</h3>
+                    <p>
+                        Consultez le document de référence officiel en format PDF : modélisation du segment <code>.bss</code>, analyse de conformité ISO C99, garanties d'immunité face à l'OOM-Killer et protocole d'E/S déterministe.
+                    </p>
+                </div>
+                <a href="rap-edit-specifications.pdf" target="_blank" rel="noopener" class="btn-primary" style="white-space: nowrap; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Consulter le PDF
+                </a>
             </div>
         </div>
     </section>
@@ -267,7 +290,7 @@
                 <p>Choisissez votre mode de déploiement : pack complet prêt à l'emploi, installation automatisée en une commande, ou compilation manuelle depuis les sources.</p>
             </div>
 
-            <!-- Grille Côte-à-Côte Épurée : Téléchargement Pack vs One-Liner Automatisé -->
+            <!-- Grille Côte-à-Côte : Téléchargement Pack vs One-Liner Automatisé -->
             <div class="cards-grid" style="margin-bottom: 32px;">
                 
                 <!-- Option A : Téléchargement direct Pack complet -->
@@ -379,6 +402,7 @@
                     <h5>Documentation RAP-EDIT</h5>
                     <ul>
                         <li><a href="man.html">Manuel rap-edit(1)</a></li>
+                        <li><a href="rap-edit-specifications.pdf" target="_blank" rel="noopener">Cahier des Charges (PDF)</a></li>
                         <li><a href="man.html#hud">Cockpit HUD Tactique</a></li>
                         <li><a href="man.html#hex">Inspecteur Hexadécimal</a></li>
                         <li><a href="man.html#diff">Comparaison In-Situ</a></li>
