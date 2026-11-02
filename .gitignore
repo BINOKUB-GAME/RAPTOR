@@ -11,7 +11,7 @@
 build/
 build_*/
 cmake-build-*/
-bin/
+/bin/
 obj/
 out/
 _deps/
@@ -81,3 +81,7 @@ desktop.ini
 !assets/fonts/
 !assets/fonts/*.ttf
 tools/export_handbook_pdf.sh
+
+# Distribution web RAP-EDIT
+!docs/rap-editor/bin/
+!docs/rap-editor/bin/*

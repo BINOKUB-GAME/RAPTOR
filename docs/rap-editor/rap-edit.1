@@ -1,0 +1,232 @@
+.\" ==============================================================================
+.\" SCRIPT      : doc/rap-edit.1
+.\" RÉVISION    : Rev 1.0 (2026-11-02)
+.\" PROJET      : RAPTOR DEFENSE / RAP-EDIT
+.\" RESPONSABILITÉ : Page de manuel officielle UNIX (Section 1 - Commandes)
+.\" ==============================================================================
+.TH RAP-EDIT 1 "Novembre 2026" "RAPTOR DEFENSE" "Commandes Générales"
+.SH NOM
+rap-edit \- Éditeur de texte et inspecteur binaire de secours en environnement dégradé
+.SH SYNOPSIS
+.B rap-edit
+\fIfichier1\fR [\fIfichier2\fR] [\fIfichier3\fR] [\fIfichier4\fR]
+.SH DESCRIPTION
+.B rap-edit
+est un éditeur de texte et un inspecteur binaire autonome de secours conçu pour les opérations de récupération système, de criminalistique (forensique) et de maintenance sous famine mémoire critique.
+.PP
+L'application applique rigoureusement la \fBdoctrine Zero-Heap\fR : l'ensemble des allocations dynamiques via
+.BR malloc (3),
+.BR calloc (3)
+et
+.BR realloc (3)
+est strictement proscrit. Tous les tampons de travail, structures d'indexation, pile d'annulation et presse-papiers sont pré-alloués en mémoire statique dans la section \fB.bss\fR (~2.7 Mo fixes).
+.PP
+Cette architecture procure une immunité absolue face au \fBLinux OOM Killer\fR. Compilé en binaire statique pur (\fB-static\fR),
+.B rap-edit
+ne dépend d'aucune bibliothèque partagée (\fBlibc.so\fR) et s'exécute sans condition d'environnement.
+
+.SH COCKPIT HUD (TÉLÉMÉTRIE D'AFFICHAGE)
+L'éditeur réserve en permanence les deux premières rangées du terminal pour afficher le Cockpit de surveillance système :
+.TP
+.B Rangée 1 : Onglets & Contexte d'exécution
+Affiche la liste des tampons chargés (1 à 4), le voyant de modification en mémoire (*), le statut d'authentification (\fBAUTH: ROOT (#)\fR ou \fBAUTH: USER ($)\fR) et le répertoire courant (\fBPWD\fR).
+.TP
+.B Rangée 2 : Radar d'intégrité & Barrière d'écriture
+.RS
+.IP \fB[RW]\fR 8
+Tampon déverrouillé en mode lecture-écriture.
+.IP \fB[RO]\fR 8
+Tampon verrouillé en lecture seule sécurisée (interdit frappe, effacement et collage).
+.IP \fB[LF/UNIX]\fR 8
+Fins de lignes Unix pures (caractères \\n).
+.IP \fB[CRLF/DOS]\fR 8
+Alerte rouge signalant la présence de retours chariot parasites Windows (\\r / ^M).
+.IP \fB[!NUL]\fR 8
+Alerte magenta signalant la détection d'octets nuls corrompus (0x00 / ^@).
+.IP \fB[SYNCHRONISÉ]\fR 8
+Confirme la persistance physique garantie sur stockage via barrière \fBfsync\fR(2).
+.RE
+
+.SH COMMANDES DE LA LIGNE D'ORDRES (COLON COMMANDS)
+Les commandes s'exécutent en mode normal en pressant la touche deux-points (\fB:\fR) :
+.SS 1. Gestion des Tampons Multi-Documents (mod_buffer)
+.TP
+.B :#1, :#2, :#3, :#4
+Bascule directe vers l'onglet 1, 2, 3 ou 4.
+.TP
+.B :p \fR,\fB :prev
+Sélectionne le document précédent.
+.TP
+.B :n \fR,\fB :next
+Sélectionne le document suivant.
+.TP
+.B :b
+Affiche la table des tampons ouverts, leur taille et leur état de synchronisation.
+.TP
+.B :bd \fR,\fB :close
+Ferme le document actif (rejeté si des modifications n'ont pas été synchronisées).
+.TP
+.B :bd! \fR,\fB :close!
+Force la fermeture du document actif en ignorant les modifications non écrites.
+
+.SS 2. Protection d'Écriture et Audit Sûr (mod_protect)
+.TP
+.B :ro
+Verrouille immédiatement le tampon en LECTURE SEULE. Intercepte et bloque toute frappe, effacement ou collage accidentel.
+.TP
+.B :rw
+Déverrouille le tampon en LECTURE-ÉCRITURE après vérification des droits POSIX \fBW_OK\fR du fichier sous-jacent.
+
+.SS 3. Inspection Hexadécimale Brute (mod_hex)
+.TP
+.B :hex
+Bascule l'affichage en matrice hexadécimale brute (alignement adaptatif 16 ou 32 octets par ligne).
+.TP
+.B :hex 0x\fI<offset>\fR
+Téléporte directement la vue à l'adresse hexadécimale spécifiée (ex. \fB:hex 0x200\fR).
+.TP
+.B :hex \fI<offset_decimal>\fR
+Téléporte la vue à l'offset exprimé en octets décimaux (ex. \fB:hex 512\fR).
+.PP
+Dans l'inspecteur hexadécimal, la touche \fBTab\fR bascule instantanément entre 16 et 32 octets par rangée. La touche \fBq\fR ou \fBÉchap\fR restitue l'éditeur de texte.
+
+.SS 4. Comparaison Différentielle In-Situ (mod_diff)
+.TP
+.B :diff \fR,\fB :diff orig
+Compare la mémoire vive active avec le clone d'origine sur disque (\fI<fichier>.orig.bak\fR).
+.TP
+.B :diff #\fI<1..4>\fR
+Compare en temps réel le document actif avec un autre onglet chargé en mémoire.
+.TP
+.B :diff \fI<chemin_fichier>\fR
+Compare le document actif avec un fichier externe spécifié.
+.PP
+Les ajouts apparaissent en vert (+) et les suppressions en rouge (-). Quitter avec \fBq\fR.
+
+.SS 5. Assainissement Anti-Corruption (mod_sanitize)
+.TP
+.B :clean
+Purge globale combinée des retours chariot Windows (^M) et des octets nuls (^@) en un seul passage.
+.TP
+.B :dos2unix \fR,\fB :d2u
+Convertit les fins de ligne DOS/CRLF en format standard Unix LF.
+.TP
+.B :strip-null \fR,\fB :null
+Élimine les séquences d'octets 0x00 accidentelles issues d'écritures interrompues.
+
+.SS 6. Sauvegarde Synchrone & Sécurité de Crise (mod_panic & mod_io)
+.TP
+.B :w!
+Écriture synchrone sur disque avec déclenchement bloquant de l'appel système \fBfsync\fR(2).
+.TP
+.B :bak
+Sauvegarde synchrone immédiate dans un fichier miroir \fI<fichier>.bak\fR.
+.TP
+.B :bak orig
+Création d'un clone physique direct du fichier intact sur disque vers \fI<fichier>.orig.bak\fR.
+.TP
+.B :panic
+Protocole d'évacuation d'urgence du tampon brut vers \fI/tmp/\fR en cas de saturation d'E/S.
+.TP
+.B :q!
+Quitte immédiatement l'application sans confirmation.
+
+.SS 7. Effacement Physique et Suppressions Relatives (mod_delete)
+.TP
+.B :d \fR,\fB :dd
+Supprime la ligne courante située sous le curseur.
+.TP
+.B :\fI<N>\fRdd
+Supprime les \fIN\fR lignes consécutives à partir de la position du curseur.
+.TP
+.B :\fI<num>\fRd
+Supprime la ligne absolue \fInum\fR (ex. \fB:42d\fR).
+.TP
+.B :\fI<deb>\fR:\fI<fin>\fRd
+Supprime la plage absolue de lignes comprises entre \fIdeb\fR et \fIfin\fR (ex. \fB:10:30d\fR).
+
+.SS 8. Presse-Papiers Partagé & Macros d'Édition (mod_clipboard)
+.TP
+.B :\fI<d>\fR:\fI<f>\fRc:\fI<cible>\fRw
+Copie les lignes \fId\fR à \fIf\fR et les colle à la ligne \fIcible\fR.
+.TP
+.B :\fI<d>\fR:\fI<f>\fRx:\fI<cible>\fRw
+Coupe (déplace) les lignes \fId\fR à \fIf\fR vers la ligne \fIcible\fR.
+.TP
+.B :pp
+Colle le bloc stocké dans le presse-papiers à l'emplacement exact du curseur.
+
+.SS 9. Substitution et Annulation (mod_replace & mod_undo)
+.TP
+.B :s/\fIancien\fR/\fInouveau\fR/
+Remplace la première occurrence trouvée sur la ligne active.
+.TP
+.B :%s/\fIancien\fR/\fInouveau\fR/g
+Remplace l'ensemble des occurrences dans la totalité du fichier.
+.TP
+.B :u \fR,\fB Ctrl+Z
+Annule immédiatement la dernière modification (restauration d'instantané BSS).
+
+.SH RACCOURCIS CLAVIER VT100/VT220
+.TP
+.B Suppr / Delete \fR(\fB\\033[3~\fR)
+Efface le caractère ou le saut de ligne situé directement sous le curseur.
+.TP
+.B Backspace \fR(\fB127\fR ou \fB\\b\fR)
+Efface le caractère précédant le curseur (fusionne les lignes en colonne 0).
+.TP
+.B Shift + Flèches
+Enclenche la sélection visuelle dynamique d'un bloc de texte.
+.TP
+.B Ctrl + C
+Copie la sélection active dans le presse-papiers unifié (partagé entre tous les onglets).
+.TP
+.B Ctrl + X
+Coupe la sélection active vers le presse-papiers.
+.TP
+.B Ctrl + V
+Colle le contenu du presse-papiers à la position courante du curseur.
+.TP
+.B Ctrl + W
+Bascule immédiatement à l'onglet suivant.
+.TP
+.B Ctrl + A \fR/\fB Ctrl + E
+Déplace le curseur au début absolu de la ligne (colonne 0) ou en fin de ligne (EOL).
+.TP
+.B Page-Up \fR/\fB Page-Down
+Défilement rapide d'une hauteur d'écran complète.
+
+.SH LIMITES TECHNIQUES DU MODÈLE ZERO-HEAP
+Pour assurer un déterminisme strict sans recours au tas (\fIheap\fR), les contraintes suivantes sont arrêtées lors de la compilation :
+.IP \(bu 2
+Nombre maximal d'onglets simultanés : \fB4 documents\fR.
+.IP \(bu 2
+Taille maximale par tampon : \fB256 Ko\fR (262 144 octets).
+.IP \(bu 2
+Indexation maximale de lignes par tampon : \fB8 192 lignes\fR.
+.IP \(bu 2
+Capacité du presse-papiers global : \fB256 Ko\fR.
+.IP \(bu 2
+Empreinte mémoire totale allouée en .bss : \fB~2.7 Mo constants\fR.
+
+.SH CODES DE RETOUR
+.TP
+.B 0
+Arrêt normal exécuté avec succès via la commande \fB:q!\fR.
+.TP
+.B 1
+Erreur fatale d'initialisation, absence d'argument fichier ou arguments invalides.
+
+.SH SIGNAUX
+.TP
+.B SIGWINCH
+Interception du redimensionnement du terminal. L'éditeur interroge dynamiquement \fBioctl\fR(TIOCGWINSZ) et redessine l'écran sans distorsion.
+
+.SH VOIR AUSSI
+.BR rap (1),
+.BR fsync (2),
+.BR access (2),
+.BR proc (5)
+
+.SH AUTEUR
+Développé par le projet \fBRAPTOR DEFENSE\fR (https://raptor.binokub.com).
