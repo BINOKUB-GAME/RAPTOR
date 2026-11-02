@@ -1,17 +1,17 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/rap-editor/index.html
- * RÉVISION        : Rev 1.0 (2026-11-01)
+ * RÉVISION        : Rev 1.1 (2026-11-02)
  * PROJET          : RAPTOR DEFENSE v2.0 // Vitrine & Manifeste RAP-EDIT
  * RESPONSABILITÉ  : Page d'accueil officielle du compagnon de sauvetage RAP-EDIT.
  *                   Présentation de la doctrine 0-heap, simulation du Cockpit HUD,
  *                   grille des 6 modules de crise et guide de compilation statique.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.0) :
- *   - Intégration du simulateur visuel TTY (.man-viewer-box) reproduisant fidèlement
- *     le Cockpit HUD à 2 lignes (onglets, droits [RO]/[RW], radar anti-corruption).
- *   - Grille des 4 piliers d'ingénierie (0-Heap BSS, Binaire ELF statique, fsync, O(1)).
- *   - Matrice des 6 outils d'intervention d'urgence (:diff, :hex, :ro/:rw, :clean, etc.).
- *   - Menu responsive unifié pointant vers le socle RAPTOR et le manuel dédié.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
+ *   - Intégration du guide complet pas-à-pas pour les utilisateurs :
+ *     clonage public GitHub, compilation 0-heap, installation système (sudo make install)
+ *     et déploiement de la page de manuel UNIX rap-edit(1).
+ *   - Mise à jour du terminal interactif de déploiement et des boutons de copie rapide.
+ *   - Actualisation des liens et boutons d'action Hero vers la procédure d'installation.
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -77,9 +77,9 @@
             </p>
 
             <div class="raptor-hero-actions">
-                <a href="man.html" class="btn-primary">Consulter la Man Page rap-edit(1)</a>
+                <a href="#installation" class="btn-primary">Installer RAP-EDIT (Git &amp; Make)</a>
+                <a href="man.html" class="btn-secondary">Consulter la Man Page rap-edit(1)</a>
                 <a href="#cockpit" class="btn-secondary">Explorer le Cockpit HUD</a>
-                <a href="#compilation" class="btn-secondary">Guide de Compilation</a>
             </div>
 
             <div class="raptor-join-banner">
@@ -108,7 +108,7 @@
             <div class="man-viewer-box" style="max-width: 980px; margin: 0 auto;">
                 <div class="man-viewer-header">
                     <span class="man-viewer-title">TTY — Écran d'intervention d'urgence (Simulation en direct)</span>
-                    <button class="man-btn-copy" onclick="navigator.clipboard.writeText('./bin/rap-edit /etc/fstab /etc/resolv.conf')">Copier la commande d'amorçage</button>
+                    <button class="man-btn-copy" onclick="navigator.clipboard.writeText('rap-edit /etc/fstab /etc/resolv.conf')">Copier la commande d'amorçage</button>
                 </div>
                 <div class="man-content" style="padding: 16px 20px; font-size: 0.88rem; line-height: 1.55;">
 <span style="background-color: #ABB2BF; color: #16181D; font-weight: bold; display: block; padding: 2px 8px; width: 100%;">RAP-EDIT | [1: /etc/fstab*] [2: /etc/resolv.conf] | AUTH: ROOT (#) | PWD: /etc</span>
@@ -259,34 +259,46 @@
     </section>
 
     <!-- ======================================================================
-         6. COMPILATION & ESSAIS TACTIQUES
+         6. DÉPLOIEMENT, COMPILATION & INSTALLATION SYSTÈME
          ====================================================================== -->
-    <section class="raptor-section" id="compilation" style="background-color: var(--color-bg-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
+    <section class="raptor-section" id="installation" style="background-color: var(--color-bg-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
         <div class="container">
             <div class="section-header">
-                <h2>Génération du Binaire Statique</h2>
-                <p>Chaîne de compilation universelle en C99 avec liaisons matérielles strictes.</p>
+                <h2>Rapatriement, Compilation &amp; Installation</h2>
+                <p>Procédure complète pour cloner le dépôt public GitHub, compiler le binaire statique autonome et l'installer globalement avec sa page de manuel UNIX.</p>
             </div>
 
-            <div class="man-viewer-box" style="max-width: 860px; margin: 0 auto;">
+            <div class="man-viewer-box" style="max-width: 880px; margin: 0 auto;">
                 <div class="man-viewer-header">
-                    <span class="man-viewer-title">bash — Terminal de compilation de RAP-EDIT</span>
-                    <button class="man-btn-copy" onclick="navigator.clipboard.writeText('make clean\nmake\n./bin/rap-edit /etc/fstab')">Copier les commandes</button>
+                    <span class="man-viewer-title">bash — Terminal de déploiement et d'installation de RAP-EDIT</span>
+                    <button class="man-btn-copy" onclick="navigator.clipboard.writeText('git clone https://github.com/BINOKUB-GAME/rap-edit.git\ncd rap-edit\nmake\nsudo make install\nrap-edit /etc/fstab')">Copier les commandes</button>
                 </div>
                 <div class="man-content" style="padding: 20px 24px;">
-<span style="color: #636D83;"># 1. Nettoyer et compiler avec liaisons statiques pures (-static)</span>
+<span style="color: #636D83;"># 1. Rapatrier le dépôt public depuis GitHub</span>
+<span style="color: #E5C07B;">git clone</span> https://github.com/BINOKUB-GAME/rap-edit.git
+<span style="color: #E5C07B;">cd</span> rap-edit
+
+<span style="color: #636D83;"># 2. Compiler le binaire statique 0-heap</span>
 <span style="color: #E5C07B;">make clean</span>
 <span style="color: #E5C07B;">make</span>
 
-<span style="color: #636D83;"># 2. Vérifier l'indépendance binaire absolue (zéro dépendance dynamique)</span>
+<span style="color: #636D83;"># 3. Vérifier l'indépendance binaire absolue (zéro dépendance dynamique libc.so)</span>
 <span style="color: #E5C07B;">file</span> bin/rap-edit
 <span style="color: #58A6FF;">&gt; bin/rap-edit: ELF 64-bit LSB executable, x86-64, statically linked, stripped</span>
 
 <span style="color: #E5C07B;">ldd</span> bin/rap-edit
 <span style="color: #2EA043;">&gt; not a dynamic executable</span>
 
-<span style="color: #636D83;"># 3. Lancer l'éditeur sur un ou plusieurs fichiers simultanés (jusqu'à 4 onglets)</span>
-<span style="color: #8C1D18; font-weight: bold;">./bin/rap-edit</span> /etc/fstab /etc/network/interfaces</div>
+<span style="color: #636D83;"># 4. Installer globalement dans /usr/local/bin et déployer la man page doc/rap-edit.1</span>
+<span style="color: #E5C07B;">sudo make install</span>
+<span style="color: #58A6FF;">&gt; [✓] RAP-EDIT binaire installé dans /usr/local/bin/rap-edit</span>
+<span style="color: #58A6FF;">&gt; [✓] Page de manuel installée dans /usr/local/share/man/man1/rap-edit.1</span>
+
+<span style="color: #636D83;"># 5. Consulter la page de manuel officielle du système</span>
+<span style="color: #E5C07B;">man</span> rap-edit
+
+<span style="color: #636D83;"># 6. Lancer l'éditeur directement depuis n'importe quel dossier (jusqu'à 4 onglets)</span>
+<span style="color: #8C1D18; font-weight: bold;">rap-edit</span> /etc/fstab /etc/network/interfaces</div>
             </div>
         </div>
     </section>
