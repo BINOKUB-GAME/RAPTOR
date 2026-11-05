@@ -1,6 +1,6 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/intel.html
- * RÉVISION        : Rev 1.1 (2026-10-27)
+ * RÉVISION        : Rev 1.2 (2026-11-04)
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Interface web souveraine d'investigation médico-légale IP.
  *                   - Recherche instantanée O(1) sans intermédiaire serveur.
@@ -9,13 +9,21 @@
  *                   - Générateur automatique de commandes de riposte (rap net -i,
  *                     règles de neutralisation iptables et nftables).
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.1) :
- *   - Raccordement interactif du champ de recherche rapide d'en-tête (.raptor-search-box).
- *   - Écoute de la touche 'Enter' : redirection automatique vers man.html?q=...
- *     pour toute commande ou terme de recherche Unix.
- *   - Détection intelligente IPv4 dans l'en-tête : déclenche l'audit local Net-Intel
- *     directement sans quitter la page si une adresse IP est saisie.
- *   - Synchronisation complète avec le routeur d'URL de man-engine.js.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.2) :
+ *   1. Dynamisation intégrale du compteur de menaces dans le rapport TTY (inspectIP) :
+ *      disparition du chiffre statique "19 927", remplacement par la lecture
+ *      directe de la variable globale RAPTOR_THREAT_COUNT issue de threat_data.js.
+ *   2. Ajout de la fonction getThreatCountFormatted() pour garantir l'uniformité
+ *      du formatage numérique (locale fr-FR) à travers toute l'interface.
+ *   3. Synchronisation dynamique de la balise meta description au chargement du DOM.
+ *   4. Alignement des valeurs de repli (fallback HTML) sur la base du 2026-11-01 (18 263 IP).
+ *
+ * SECTIONS NUMÉROTÉES :
+ *   1. EN-TÊTE INSTITUTIONNEL & NAVIGATION RESPONSIVE
+ *   2. BANNIÈRE HERO NET-INTEL
+ *   3. CONSOLE D'INVESTIGATION MÉDICO-LÉGALE (RAPPORT TTY DYNAMIQUE)
+ *   4. MÉTRIQUES ET STATUT DE LA BASE LOCALE
+ *   5. PIED DE PAGE INSTITUTIONNEL
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -23,7 +31,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAPTOR DEFENSE // Net-Intel — Renseignement & Forensic IP</title>
-    <meta name="description" content="Audit immédiat et confidentiel de réputation IP contre 19 927 menaces cyber. 100% exécuté dans votre navigateur, aucun paquet externe émis.">
+    <meta name="description" id="metaDescription" content="Audit immédiat et confidentiel de réputation IP contre 18 263 menaces cyber. 100% exécuté dans votre navigateur, aucun paquet externe émis.">
     <link rel="stylesheet" href="css/raptor-core.css">
     <link rel="icon" type="image/png" href="raptor-icon.png">
 </head>
@@ -131,7 +139,7 @@
 
             <div class="intel-stats-grid">
                 <div class="intel-stat-box">
-                    <div class="intel-stat-val" id="statIpCount">19 927</div>
+                    <div class="intel-stat-val" id="statIpCount">18 263</div>
                     <div class="intel-stat-lbl">IP Malveillantes Indexées</div>
                 </div>
                 <div class="intel-stat-box">
@@ -143,7 +151,7 @@
                     <div class="intel-stat-lbl">Trafic Réseau Émis</div>
                 </div>
                 <div class="intel-stat-box">
-                    <div class="intel-stat-val" id="statTimestamp" style="font-size: 1.1rem; line-height: 2rem;">2026-10-24</div>
+                    <div class="intel-stat-val" id="statTimestamp" style="font-size: 1.1rem; line-height: 2rem;">2026-11-01</div>
                     <div class="intel-stat-lbl">Dernière Synchronisation</div>
                 </div>
             </div>
@@ -251,13 +259,36 @@
     <script>
         var currentRuleText = "";
 
-        // Initialisation des métriques et des écouteurs
-        window.addEventListener('DOMContentLoaded', function() {
+        // Fonction 1 : Récupération dynamique et formatage du volume de menaces
+        function getThreatCountFormatted() {
             if (typeof RAPTOR_THREAT_COUNT !== 'undefined') {
-                document.getElementById('statIpCount').textContent = RAPTOR_THREAT_COUNT.toLocaleString('fr-FR');
+                return RAPTOR_THREAT_COUNT.toLocaleString('fr-FR');
             }
+            return '18 263';
+        }
+
+        // Fonction 2 : Initialisation des métriques, de la balise meta et des écouteurs
+        window.addEventListener('DOMContentLoaded', function() {
+            var formattedCount = getThreatCountFormatted();
+
+            // Injection dynamique dans la carte de métriques
+            var statIp = document.getElementById('statIpCount');
+            if (statIp) {
+                statIp.textContent = formattedCount;
+            }
+
+            // Injection dynamique de la date de synchronisation
             if (typeof RAPTOR_THREAT_TIMESTAMP !== 'undefined') {
-                document.getElementById('statTimestamp').textContent = RAPTOR_THREAT_TIMESTAMP.split(' ')[0];
+                var statDate = document.getElementById('statTimestamp');
+                if (statDate) {
+                    statDate.textContent = RAPTOR_THREAT_TIMESTAMP.split(' ')[0];
+                }
+            }
+
+            // Mise à jour de la balise meta description
+            var metaDesc = document.getElementById('metaDescription');
+            if (metaDesc) {
+                metaDesc.setAttribute('content', 'Audit immédiat et confidentiel de réputation IP contre ' + formattedCount + ' menaces cyber. 100% exécuté dans votre navigateur, aucun paquet externe émis.');
             }
 
             // Branchement de la recherche rapide de l'en-tête vers man.html
@@ -269,11 +300,9 @@
                         var query = this.value.trim();
                         if (!query) return;
 
-                        // Si l'utilisateur saisit une IP IPv4 valide dans l'en-tête, on l'audite sur place
                         if (isValidIPv4(query)) {
                             setAndAudit(query);
                         } else {
-                            // Sinon, routage universel vers la documentation man.html (?q=...)
                             window.location.href = 'man.html?q=' + encodeURIComponent(query);
                         }
                     }
@@ -291,27 +320,25 @@
             }
         });
 
+        // Fonction 3 : Déclenchement de l'audit depuis l'en-tête
         function setAndAudit(ip) {
             document.getElementById('ipInput').value = ip;
             inspectIP();
         }
 
+        // Fonction 4 : Détection des plages privées RFC 1918
         function isPrivateIPv4(ip) {
             var parts = ip.split('.').map(Number);
             if (parts.length !== 4) return false;
-            // 10.0.0.0/8
             if (parts[0] === 10) return true;
-            // 127.0.0.0/8
             if (parts[0] === 127) return true;
-            // 172.16.0.0/12
             if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
-            // 192.168.0.0/16
             if (parts[0] === 192 && parts[1] === 168) return true;
-            // 169.254.0.0/16
             if (parts[0] === 169 && parts[1] === 254) return true;
             return false;
         }
 
+        // Fonction 5 : Validation stricte de format IPv4
         function isValidIPv4(ip) {
             var parts = ip.split('.');
             if (parts.length !== 4) return false;
@@ -324,6 +351,7 @@
             return true;
         }
 
+        // Fonction 6 : Moteur principal d'évaluation médico-légale
         function inspectIP() {
             var input = document.getElementById('ipInput');
             var ip = input.value.trim();
@@ -342,11 +370,10 @@
             resultBox.style.display = 'block';
 
             var report = "";
-            var isThreat = false;
             var threatData = (typeof RAPTOR_THREAT_DB !== 'undefined') ? RAPTOR_THREAT_DB[ip] : null;
+            var dynamicThreatCount = getThreatCountFormatted();
 
             if (isPrivateIPv4(ip)) {
-                // Cas IP privée / LAN
                 currentRuleText = "# Adresse interne : aucune neutralisation requise";
                 report = 
 '<span class="man-section-heading">QUALIFICATION FORENSIQUE : RÉSEAU LOCAL / PRIVÉ</span>\n' +
@@ -361,7 +388,6 @@
 '<span style="color: #E5C07B;">./build/rap net</span> | grep ' + ip + '\n';
 
             } else if (threatData) {
-                // Cas IP malveillante identifiée dans la base
                 var catId = threatData[0];
                 var score = threatData[1];
                 var tag = threatData[2];
@@ -396,7 +422,6 @@
 '<span style="color: #E5C07B;">sudo nft add rule inet filter output ip daddr ' + ip + ' drop</span>\n';
 
             } else {
-                // Cas IP saine / non répertoriée
                 currentRuleText = "# Aucun blocage recommandé pour " + ip;
                 report = 
 '<span class="man-section-heading">RÉSULTAT FORENSIQUE : AUCUNE MENACE CONNUE RÉPERTORIÉE</span>\n' +
@@ -405,7 +430,7 @@
 'SCORE DE MENACE : 0 / 100 [RÉPUTATION STANDARD]\n\n' +
 '<span class="man-section-heading">OBSERVATIONS FORENSIQUES</span>\n' +
 'Cette adresse ne figure sur aucune des listes de serveurs de commande (C2), rançongiciels ou scanners agressifs\n' +
-'au sein des 19 927 signatures consolidées dans la base active de RAPTOR.\n\n' +
+'au sein des ' + dynamicThreatCount + ' signatures consolidées dans la base active de RAPTOR.\n\n' +
 '<span class="man-section-heading">VÉRIFICATION COMPLÉMENTAIRE DE PERSISTANCE</span>\n' +
 '<span style="color: #636D83;"># Surveiller l\'état des flux et descripteurs de fichiers sous Linux :</span>\n' +
 '<span style="color: #E5C07B;">./build/rap net</span> | grep ' + ip + '\n';
@@ -415,6 +440,7 @@
             resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
+        // Fonction 7 : Copie presse-papiers de la commande de riposte
         function copyDefensiveRule() {
             if (!currentRuleText) return;
             navigator.clipboard.writeText(currentRuleText).then(function() {
