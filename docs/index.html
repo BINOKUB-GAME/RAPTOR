@@ -1,16 +1,21 @@
 <!-- ==========================================================================
  * NOM DU SCRIPT   : docs/index.html
- * RÉVISION        : Rev 1.5 (2026-11-01)
+ * RÉVISION        : Rev 1.6 (2026-11-15)
  * PROJET          : RAPTOR DEFENSE v2.0 // Portail Officiel & Hub Développeurs
  * RESPONSABILITÉ  : Page d'accueil officielle, présentation de l'architecture
  *                   souveraine, appel aux contributeurs / développeurs C/Linux,
- *                   vitrine des sondes de combat et maillage vers RAP-EDIT.
+ *                   vitrine des sondes de combat, maillage vers RAP-EDIT et
+ *                   passerelle officielle vers CENTURION / RAPTOR-OS 2.0.
  *
- * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.5) :
- *   - Intégration du lien direct vers 'rap-editor/index.html' dans la navigation.
- *   - Ajout d'une bannière de présentation dédiée à RAP-EDIT dans la section Hero.
- *   - Ajout des liens vers la vitrine et le manuel rap-edit(1) dans le pied de page.
- *   - Maintien des 6 piliers d'outils de combat et du terminal de compilation.
+ * BLOC DESCRIPTIF DES NOUVELLES INTÉGRATIONS (Rev 1.6) :
+ *   - Ajout du lien 'RAPTOR-OS 2.0' dans la barre de navigation principale.
+ *   - Ajout d'un encart dédié dans la section Hero présentant l'appliance
+ *     bare-metal CENTURION / RAPTOR-OS 2.0 (OpenBSD/amd64, kern.securelevel=1)
+ *     avec bouton direct vers https://raptor-os.binokub.com/.
+ *   - Ajout des liens vers raptor-os.binokub.com et le dépôt GitHub raptor-os
+ *     dans le pied de page institutionnel.
+ *   - Conservation intégrale des 6 piliers défensifs, du terminal CMake et des
+ *     scripts de navigation mobile / recherche rapide.
  * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="fr">
@@ -18,7 +23,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAPTOR DEFENSE // Système d'Audit & Hub Développeurs</title>
-    <meta name="description" content="Boîte à outils défensive et forensique pour Linux en C99 (< 2 Mo RAM). Rejoignez l'équipe de développement.">
+    <meta name="description" content="Boîte à outils défensive et forensique pour Linux en C99 (< 2 Mo RAM), éditeur RAP-EDIT et socle de l'appliance bare-metal CENTURION / RAPTOR-OS 2.0.">
     <link rel="stylesheet" href="css/raptor-core.css">
     <link rel="icon" type="image/png" href="raptor-icon.png">
 </head>
@@ -37,6 +42,7 @@
             <nav class="raptor-nav" id="raptorNav">
                 <a href="index.html" class="active">Accueil</a>
                 <a href="rap-editor/index.html">RAP-EDIT</a>
+                <a href="https://raptor-os.binokub.com/" target="_blank" rel="noopener">RAPTOR-OS 2.0</a>
                 <a href="intel.html">Net-Intel</a>
                 <a href="man.html">Manuel (Man)</a>
                 <a href="faq.html">FAQ Technique</a>
@@ -84,6 +90,7 @@
                 <a href="#compilation" class="btn-primary">Compiler le Projet (CMake)</a>
                 <a href="man.html" class="btn-secondary">Consulter le Manuel rap(1)</a>
                 <a href="rap-editor/index.html" class="btn-secondary">Découvrir RAP-EDIT</a>
+                <a href="https://raptor-os.binokub.com/" target="_blank" rel="noopener" class="btn-secondary">Explorer RAPTOR-OS 2.0 &rarr;</a>
             </div>
 
             <!-- Encart 1 : Rejoindre le projet -->
@@ -97,7 +104,7 @@
                 <a href="community.html" class="btn-primary" style="white-space: nowrap;">Rejoindre le Projet</a>
             </div>
 
-            <!-- Encart 2 : NOUVEAU — Compagnon de survie RAP-EDIT -->
+            <!-- Encart 2 : Compagnon de survie RAP-EDIT -->
             <div class="raptor-join-banner" style="margin-top: 16px; border-left-color: #58A6FF;">
                 <div class="raptor-join-content">
                     <h3>Nouveau module : RAP-EDIT (Éditeur de Secours 0-Heap)</h3>
@@ -106,6 +113,17 @@
                     </p>
                 </div>
                 <a href="rap-editor/index.html" class="btn-secondary" style="white-space: nowrap;">Ouvrir RAP-EDIT &rarr;</a>
+            </div>
+
+            <!-- Encart 3 : NOUVEAU — L'Appliance Bare-Metal CENTURION / RAPTOR-OS 2.0 -->
+            <div class="raptor-join-banner" style="margin-top: 16px; border-left-color: #10B981;">
+                <div class="raptor-join-content">
+                    <h3>Écosystème Bare-Metal : CENTURION / RAPTOR-OS 2.0 (OpenBSD/amd64)</h3>
+                    <p>
+                        Découvrez l'appliance système complète propulsée par <code>rap</code> et <code>rap-edit</code> : serveur de fichiers critiques WAN/LAN, coffre-fort documentaire anti-rançongiciel (<code>kern.securelevel=1</code>) et fusion directe avec Packet Filter (<code>pf</code>).
+                    </p>
+                </div>
+                <a href="https://raptor-os.binokub.com/" target="_blank" rel="noopener" class="btn-secondary" style="white-space: nowrap;">Visiter RAPTOR-OS 2.0 &rarr;</a>
             </div>
         </div>
     </section>
@@ -230,6 +248,7 @@
                 <div class="footer-col">
                     <h5>Documentation</h5>
                     <ul>
+                        <li><a href="https://raptor-os.binokub.com/" target="_blank" rel="noopener"><strong>CENTURION / RAPTOR-OS 2.0</strong></a></li>
                         <li><a href="rap-editor/index.html"><strong>Éditeur RAP-EDIT</strong></a></li>
                         <li><a href="rap-editor/man.html">Manuel rap-edit(1)</a></li>
                         <li><a href="intel.html">Renseignement Net-Intel</a></li>
@@ -244,7 +263,8 @@
                         <li><a href="community.html">Rejoindre l'équipe</a></li>
                         <li><a href="community.html#bugs">Signaler un bogue</a></li>
                         <li><a href="community.html#plugins">Développer un greffon</a></li>
-                        <li><a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener">Dépôt Git</a></li>
+                        <li><a href="https://github.com/BINOKUB-GAME/RAPTOR" target="_blank" rel="noopener">Dépôt Git RAPTOR</a></li>
+                        <li><a href="https://github.com/BINOKUB-GAME/raptor-os" target="_blank" rel="noopener">Dépôt Git RAPTOR-OS</a></li>
                     </ul>
                 </div>
 
